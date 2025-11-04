@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\EquipeRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name:"tbl_equipe")]
@@ -16,6 +17,8 @@ class Equipe
 
     #[ORM\Column(length: 50)]
     private ?string $nom = null;
+
+    
 
     public function getId(): ?int
     {
@@ -33,4 +36,5 @@ class Equipe
 
         return $this;
     }
+
 }

@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Equipe index{% endblock %}
+{% block title %}Equipe{% endblock %}
 
 {% block body %}
-    <h1>Equipe index</h1>
+    <h1>Equipe</h1>
 
     <table class="table">
         <thead>
@@ -19,17 +19,17 @@
                 <td>{{ equipe.id }}</td>
                 <td>{{ equipe.nom }}</td>
                 <td>
-                    <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}">show</a>
-                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}">edit</a>
+                    <a href="{{ path('app_equipe_liste', {'id': equipe.id}) }}">Liste des équipes</a>
+                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="3">Aucun enregistrement trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_equipe_new') }}">Create new</a>
+    <a href="{{ path('app_equipe_creer') }}">Créer une équipe</a>
 {% endblock %}

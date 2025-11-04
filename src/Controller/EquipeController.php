@@ -22,7 +22,7 @@ final class EquipeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_equipe_new', methods: ['GET', 'POST'])]
+    #[Route('/creer', name: 'app_equipe_creer', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $equipe = new Equipe();
@@ -36,16 +36,18 @@ final class EquipeController extends AbstractController
             return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('equipe/new.html.twig', [
+        return $this->render('equipe/creer.html.twig', [
             'equipe' => $equipe,
             'form' => $form,
         ]);
     }
-
-    #[Route('/{id}', name: 'app_equipe_show', methods: ['GET'])]
+    
+    #[Route('/{id}', name: 'app_equipe_liste', methods: ['GET'])]
     public function show(Equipe $equipe): Response
     {
-        return $this->render('equipe/show.html.twig', [
+        $this->denyAccessUnlessGranted('ROLE_PROF');
+
+        return $this->render('equipe/liste.html.twig', [
             'equipe' => $equipe,
         ]);
     }
@@ -53,6 +55,8 @@ final class EquipeController extends AbstractController
     #[Route('/{id}/edit', name: 'app_equipe_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_PROF');
+
         $form = $this->createForm(EquipeType::class, $equipe);
         $form->handleRequest($request);
 
@@ -71,6 +75,8 @@ final class EquipeController extends AbstractController
     #[Route('/{id}', name: 'app_equipe_delete', methods: ['POST'])]
     public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_PROF');
+
         if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($equipe);
             $entityManager->flush();
