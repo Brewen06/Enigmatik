@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mur des énigmes{% endblock %}
+
+{% block body %}
+    <h1>Choisissez votre énigme.</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Theme</th>
+                <th>Description</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for jeu in jeus %}
+            <tr>
+                <td>{{ jeu.id }}</td>
+                <td>{{ jeu.Nom }}</td>
+                <td>{{ jeu.Theme }}</td>
+                <td>{{ jeu.Description }}</td>
+                <td>
+                    <a href="{{ path('app_jeu_show', {'id': jeu.id}) }}">show</a>
+                    <a href="{{ path('app_jeu_edit', {'id': jeu.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if is_granted('ROLE_PROF') %}
+    <a href="{{ path('app_jeu_new') }}">Créer un nouveau jeu</a>
+    {% endif %}
+{% endblock %}

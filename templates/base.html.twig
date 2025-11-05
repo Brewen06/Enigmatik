@@ -61,8 +61,21 @@
                 <a class="nav-link" href="/admin">Administration</a>
               </li>
               {% endif %}
-              <li class="nav-item">
-                <a class="nav-link" href="/jeu">Enigmes</a>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="/jeu" role="button" data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  Énigmes
+                </a>
+                {% if is_granted('ROLE_PROF') %}
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="/jeu/creer">Créer une énigme</a></li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li><a class="dropdown-item" href="/jeu/liste">Liste des énigmes</a></li>
+                  <li><a class="dropdown-item" href="/jeu/edit">Modifier des énigmes</a></li>
+                  {% endif %}
+                </ul>
               </li>
               {% if app.user != null %}
               <li class="nav-item">

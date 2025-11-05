@@ -33,7 +33,7 @@ final class EquipeController extends AbstractController
             $entityManager->persist($equipe);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_jeu_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('equipe/creer.html.twig', [
