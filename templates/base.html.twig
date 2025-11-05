@@ -29,30 +29,30 @@
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="/equipe/creer">Créer une équipe</a></li>
-                  {% if is_granted('ROLE_PROF') %}
-                  <li>
+                  {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+                  <!--<li>
                     <hr class="dropdown-divider">
-                  </li>
+                  </li> -->
                   <li><a class="dropdown-item" href="/equipe/liste">Liste des équipes</a></li>
                   <li><a class="dropdown-item" href="/equipe/edit">Modifier des équipes</a></li>
                   {% endif %}
                 </ul>
               </li>
-              {% if is_granted('ROLE_PROF') %}
+              {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')%}
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="/prof" role="button" data-bs-toggle="dropdown"
+                <a class="nav-link dropdown-toggle" href="/user" role="button" data-bs-toggle="dropdown"
                   aria-expanded="false">
                   Professeurs
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="/prof/creer">Créer un professeur</a></li>
+                  <li><a class="dropdown-item" href="/user/creer">Créer un professeur</a></li>
                   {% endif %}
                   {% if is_granted('ROLE_ADMIN') %}
-                  <li>
+                  <!-- <li>
                     <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item" href="/prof/liste">Liste des professeurs</a></li>
-                  <li><a class="dropdown-item" href="/prof/edit">Modifier des professeurs</a></li>
+                  </li> -->
+                  <li><a class="dropdown-item" href="/user/liste">Liste des professeurs</a></li>
+                  <li><a class="dropdown-item" href="/user/edit">Modifier des professeurs</a></li>
                   {% endif %}
                 </ul>
               </li>
@@ -66,12 +66,12 @@
                   aria-expanded="false">
                   Énigmes
                 </a>
-                {% if is_granted('ROLE_PROF') %}
+                {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="/jeu/creer">Créer une énigme</a></li>
-                  <li>
+                  <!-- <li>
                     <hr class="dropdown-divider">
-                  </li>
+                  </li> -->
                   <li><a class="dropdown-item" href="/jeu/liste">Liste des énigmes</a></li>
                   <li><a class="dropdown-item" href="/jeu/edit">Modifier des énigmes</a></li>
                   {% endif %}
