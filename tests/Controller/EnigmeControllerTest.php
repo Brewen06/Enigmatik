@@ -48,11 +48,12 @@ final class EnigmeControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'enigme[type]' => 'Testing',
             'enigme[ordre]' => 'Testing',
             'enigme[titre]' => 'Testing',
             'enigme[consigne]' => 'Testing',
             'enigme[codeSecret]' => 'Testing',
+            'enigme[type]' => 'Testing',
+            'enigme[vignette]' => 'Testing',
         ]);
 
         self::assertResponseRedirects($this->path);
@@ -64,11 +65,12 @@ final class EnigmeControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Enigme();
-        $fixture->setType('My Title');
         $fixture->setOrdre('My Title');
         $fixture->setTitre('My Title');
         $fixture->setConsigne('My Title');
         $fixture->setCodeSecret('My Title');
+        $fixture->setType('My Title');
+        $fixture->setVignette('My Title');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -85,11 +87,12 @@ final class EnigmeControllerTest extends WebTestCase
     {
         $this->markTestIncomplete();
         $fixture = new Enigme();
-        $fixture->setType('Value');
         $fixture->setOrdre('Value');
         $fixture->setTitre('Value');
         $fixture->setConsigne('Value');
         $fixture->setCodeSecret('Value');
+        $fixture->setType('Value');
+        $fixture->setVignette('Value');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -97,33 +100,36 @@ final class EnigmeControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'enigme[type]' => 'Something New',
             'enigme[ordre]' => 'Something New',
             'enigme[titre]' => 'Something New',
             'enigme[consigne]' => 'Something New',
             'enigme[codeSecret]' => 'Something New',
+            'enigme[type]' => 'Something New',
+            'enigme[vignette]' => 'Something New',
         ]);
 
         self::assertResponseRedirects('/enigme/');
 
         $fixture = $this->enigmeRepository->findAll();
 
-        self::assertSame('Something New', $fixture[0]->getType());
         self::assertSame('Something New', $fixture[0]->getOrdre());
         self::assertSame('Something New', $fixture[0]->getTitre());
         self::assertSame('Something New', $fixture[0]->getConsigne());
         self::assertSame('Something New', $fixture[0]->getCodeSecret());
+        self::assertSame('Something New', $fixture[0]->getType());
+        self::assertSame('Something New', $fixture[0]->getVignette());
     }
 
     public function testRemove(): void
     {
         $this->markTestIncomplete();
         $fixture = new Enigme();
-        $fixture->setType('Value');
         $fixture->setOrdre('Value');
         $fixture->setTitre('Value');
         $fixture->setConsigne('Value');
         $fixture->setCodeSecret('Value');
+        $fixture->setType('Value');
+        $fixture->setVignette('Value');
 
         $this->manager->persist($fixture);
         $this->manager->flush();

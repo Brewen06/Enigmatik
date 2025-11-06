@@ -3,6 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Enigme;
+use App\Entity\Type;
+use App\Entity\Vignette;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -12,12 +15,18 @@ class EnigmeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('type')
             ->add('ordre')
             ->add('titre')
             ->add('consigne')
             ->add('codeSecret')
-            ->add('vignette')
+            ->add('type', EntityType::class, [
+                'class' => Type::class,
+                'choice_label' => 'id',
+            ])
+            ->add('vignette', EntityType::class, [
+                'class' => Vignette::class,
+                'choice_label' => 'id',
+            ])
         ;
     }
 

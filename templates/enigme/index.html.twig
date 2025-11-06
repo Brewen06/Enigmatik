@@ -9,12 +9,10 @@
         <thead>
             <tr>
                 <th>Id</th>
-                <th>Type</th>
                 <th>Ordre</th>
                 <th>Titre</th>
                 <th>Consigne</th>
                 <th>CodeSecret</th>
-                <th>Vignette</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -22,12 +20,10 @@
         {% for enigme in enigmes %}
             <tr>
                 <td>{{ enigme.id }}</td>
-                <!--type ici -->
                 <td>{{ enigme.ordre }}</td>
                 <td>{{ enigme.titre }}</td>
                 <td>{{ enigme.consigne }}</td>
                 <td>{{ enigme.codeSecret }}</td>
-                <td>{{ enigme.vignette }}</td>
                 <td>
                     <a href="{{ path('app_enigme_show', {'id': enigme.id}) }}">show</a>
                     <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}">edit</a>
@@ -35,7 +31,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="7">no records found</td>
+                <td colspan="6">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

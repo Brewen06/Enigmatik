@@ -6,6 +6,7 @@ use App\Repository\VignetteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'tbl_vignette')]
 #[ORM\Entity(repositoryClass: VignetteRepository::class)]
 class Vignette
 {

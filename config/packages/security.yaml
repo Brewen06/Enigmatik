@@ -39,9 +39,7 @@ security:
          - { path: ^/user, roles: ROLE_PROF }
          - { path: ^/equipe/new, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
-    roles_hierarchy:
-        ROLE_ADMIN:       ROLE_PROF
-        ROLE_PROF:        ROLE_USER
+   
 
 when@test:
     security:

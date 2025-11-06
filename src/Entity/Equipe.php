@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'tbl_equipe')]
 #[ORM\Entity(repositoryClass: EquipeRepository::class)]
 class Equipe
 {
