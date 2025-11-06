@@ -2,26 +2,26 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Equipe;
+use App\Entity\Avatar;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class EquipeControllerTest extends WebTestCase
+final class AvatarControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private EntityManagerInterface $manager;
-    private EntityRepository $equipeRepository;
-    private string $path = '/equipe/';
+    private EntityRepository $avatarRepository;
+    private string $path = '/avatar/';
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
         $this->manager = static::getContainer()->get('doctrine')->getManager();
-        $this->equipeRepository = $this->manager->getRepository(Equipe::class);
+        $this->avatarRepository = $this->manager->getRepository(Avatar::class);
 
-        foreach ($this->equipeRepository->findAll() as $object) {
+        foreach ($this->avatarRepository->findAll() as $object) {
             $this->manager->remove($object);
         }
 
@@ -34,7 +34,7 @@ final class EquipeControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->path);
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Equipe index');
+        self::assertPageTitleContains('Avatar index');
 
         // Use the $crawler to perform additional assertions e.g.
         // self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
@@ -48,25 +48,21 @@ final class EquipeControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'equipe[nom]' => 'Testing',
-            'equipe[position]' => 'Testing',
-            'equipe[note]' => 'Testing',
-            'equipe[enigmeActuelle]' => 'Testing',
+            'avatar[nom]' => 'Testing',
+            'avatar[equipe]' => 'Testing',
         ]);
 
         self::assertResponseRedirects($this->path);
 
-        self::assertSame(1, $this->equipeRepository->count([]));
+        self::assertSame(1, $this->avatarRepository->count([]));
     }
 
     public function testShow(): void
     {
         $this->markTestIncomplete();
-        $fixture = new Equipe();
+        $fixture = new Avatar();
         $fixture->setNom('My Title');
-        $fixture->setPosition('My Title');
-        $fixture->setNote('My Title');
-        $fixture->setEnigmeActuelle('My Title');
+        $fixture->setEquipe('My Title');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -74,7 +70,7 @@ final class EquipeControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Equipe');
+        self::assertPageTitleContains('Avatar');
 
         // Use assertions to check that the properties are properly displayed.
     }
@@ -82,11 +78,9 @@ final class EquipeControllerTest extends WebTestCase
     public function testEdit(): void
     {
         $this->markTestIncomplete();
-        $fixture = new Equipe();
+        $fixture = new Avatar();
         $fixture->setNom('Value');
-        $fixture->setPosition('Value');
-        $fixture->setNote('Value');
-        $fixture->setEnigmeActuelle('Value');
+        $fixture->setEquipe('Value');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -94,30 +88,24 @@ final class EquipeControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'equipe[nom]' => 'Something New',
-            'equipe[position]' => 'Something New',
-            'equipe[note]' => 'Something New',
-            'equipe[enigmeActuelle]' => 'Something New',
+            'avatar[nom]' => 'Something New',
+            'avatar[equipe]' => 'Something New',
         ]);
 
-        self::assertResponseRedirects('/equipe/');
+        self::assertResponseRedirects('/avatar/');
 
-        $fixture = $this->equipeRepository->findAll();
+        $fixture = $this->avatarRepository->findAll();
 
         self::assertSame('Something New', $fixture[0]->getNom());
-        self::assertSame('Something New', $fixture[0]->getPosition());
-        self::assertSame('Something New', $fixture[0]->getNote());
-        self::assertSame('Something New', $fixture[0]->getEnigmeActuelle());
+        self::assertSame('Something New', $fixture[0]->getEquipe());
     }
 
     public function testRemove(): void
     {
         $this->markTestIncomplete();
-        $fixture = new Equipe();
+        $fixture = new Avatar();
         $fixture->setNom('Value');
-        $fixture->setPosition('Value');
-        $fixture->setNote('Value');
-        $fixture->setEnigmeActuelle('Value');
+        $fixture->setEquipe('Value');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -125,7 +113,7 @@ final class EquipeControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
         $this->client->submitForm('Delete');
 
-        self::assertResponseRedirects('/equipe/');
-        self::assertSame(0, $this->equipeRepository->count([]));
+        self::assertResponseRedirects('/avatar/');
+        self::assertSame(0, $this->avatarRepository->count([]));
     }
 }

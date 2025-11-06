@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vignette{% endblock %}
+
+{% block body %}
+    <h1>Vignette</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ vignette.id }}</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>{{ vignette.image }}</td>
+            </tr>
+            <tr>
+                <th>Information</th>
+                <td>{{ vignette.information }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_vignette_index') }}">back to list</a>
+
+    <a href="{{ path('app_vignette_edit', {'id': vignette.id}) }}">edit</a>
+
+    {{ include('vignette/_delete_form.html.twig') }}
+{% endblock %}

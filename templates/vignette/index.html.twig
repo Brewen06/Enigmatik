@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vignette index{% endblock %}
+
+{% block body %}
+    <h1>Vignette index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Image</th>
+                <th>Information</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for vignette in vignettes %}
+            <tr>
+                <td>{{ vignette.id }}</td>
+                <td>{{ vignette.image }}</td>
+                <td>{{ vignette.information }}</td>
+                <td>
+                    <a href="{{ path('app_vignette_show', {'id': vignette.id}) }}">show</a>
+                    <a href="{{ path('app_vignette_edit', {'id': vignette.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_vignette_new') }}">Create new</a>
+{% endblock %}

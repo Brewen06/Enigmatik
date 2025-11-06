@@ -2,26 +2,26 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Prof;
+use App\Entity\Vignette;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class ProfControllerTest extends WebTestCase
+final class VignetteControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private EntityManagerInterface $manager;
-    private EntityRepository $profRepository;
-    private string $path = '/prof/';
+    private EntityRepository $vignetteRepository;
+    private string $path = '/vignette/';
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
         $this->manager = static::getContainer()->get('doctrine')->getManager();
-        $this->profRepository = $this->manager->getRepository(Prof::class);
+        $this->vignetteRepository = $this->manager->getRepository(Vignette::class);
 
-        foreach ($this->profRepository->findAll() as $object) {
+        foreach ($this->vignetteRepository->findAll() as $object) {
             $this->manager->remove($object);
         }
 
@@ -34,7 +34,7 @@ final class ProfControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->path);
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Prof index');
+        self::assertPageTitleContains('Vignette index');
 
         // Use the $crawler to perform additional assertions e.g.
         // self::assertSame('Some text on the page', $crawler->filter('.p')->first()->text());
@@ -48,21 +48,23 @@ final class ProfControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
 
         $this->client->submitForm('Save', [
-            'prof[nom]' => 'Testing',
-            'prof[motdepasse]' => 'Testing',
+            'vignette[image]' => 'Testing',
+            'vignette[information]' => 'Testing',
+            'vignette[enigme]' => 'Testing',
         ]);
 
         self::assertResponseRedirects($this->path);
 
-        self::assertSame(1, $this->profRepository->count([]));
+        self::assertSame(1, $this->vignetteRepository->count([]));
     }
 
     public function testShow(): void
     {
         $this->markTestIncomplete();
-        $fixture = new Prof();
-        $fixture->setNom('My Title');
-        $fixture->setMotdepasse('My Title');
+        $fixture = new Vignette();
+        $fixture->setImage('My Title');
+        $fixture->setInformation('My Title');
+        $fixture->setEnigme('My Title');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -70,7 +72,7 @@ final class ProfControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('Prof');
+        self::assertPageTitleContains('Vignette');
 
         // Use assertions to check that the properties are properly displayed.
     }
@@ -78,9 +80,10 @@ final class ProfControllerTest extends WebTestCase
     public function testEdit(): void
     {
         $this->markTestIncomplete();
-        $fixture = new Prof();
-        $fixture->setNom('Value');
-        $fixture->setMotdepasse('Value');
+        $fixture = new Vignette();
+        $fixture->setImage('Value');
+        $fixture->setInformation('Value');
+        $fixture->setEnigme('Value');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -88,24 +91,27 @@ final class ProfControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
 
         $this->client->submitForm('Update', [
-            'prof[nom]' => 'Something New',
-            'prof[motdepasse]' => 'Something New',
+            'vignette[image]' => 'Something New',
+            'vignette[information]' => 'Something New',
+            'vignette[enigme]' => 'Something New',
         ]);
 
-        self::assertResponseRedirects('/prof/');
+        self::assertResponseRedirects('/vignette/');
 
-        $fixture = $this->profRepository->findAll();
+        $fixture = $this->vignetteRepository->findAll();
 
-        self::assertSame('Something New', $fixture[0]->getNom());
-        self::assertSame('Something New', $fixture[0]->getMotdepasse());
+        self::assertSame('Something New', $fixture[0]->getImage());
+        self::assertSame('Something New', $fixture[0]->getInformation());
+        self::assertSame('Something New', $fixture[0]->getEnigme());
     }
 
     public function testRemove(): void
     {
         $this->markTestIncomplete();
-        $fixture = new Prof();
-        $fixture->setNom('Value');
-        $fixture->setMotdepasse('Value');
+        $fixture = new Vignette();
+        $fixture->setImage('Value');
+        $fixture->setInformation('Value');
+        $fixture->setEnigme('Value');
 
         $this->manager->persist($fixture);
         $this->manager->flush();
@@ -113,7 +119,7 @@ final class ProfControllerTest extends WebTestCase
         $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
         $this->client->submitForm('Delete');
 
-        self::assertResponseRedirects('/prof/');
-        self::assertSame(0, $this->profRepository->count([]));
+        self::assertResponseRedirects('/vignette/');
+        self::assertSame(0, $this->vignetteRepository->count([]));
     }
 }

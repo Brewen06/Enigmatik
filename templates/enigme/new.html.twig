@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Enigme{% endblock %}
+
+{% block body %}
+    <h1>Create new Enigme</h1>
+
+    {{ include('enigme/_form.html.twig') }}
+
+    <a href="{{ path('app_enigme_index') }}">back to list</a>
+{% endblock %}

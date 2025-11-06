@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Table(name:"tbl_user")]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -19,9 +18,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $nom = null;
 
     /**
      * @var list<string> The user roles
@@ -115,22 +111,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // @deprecated, to be removed when upgrading to Symfony 8
     }
-
-    public function prof(string $password, string $email, string $nom): static
-    {
-        $this->password = $password;
-        $this->email = $email;
-        $this->nom = $nom;
-
-        return $this;
-    }
-    public function admin(string $password, string $nom): static
-    {
-        $this->password = $password;
-        $this->nom = $nom;
-
-        return $this;
-    }
-
-    
 }
