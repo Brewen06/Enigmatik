@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\AvatarRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'tbl_avatar')]
 #[ORM\Entity(repositoryClass: AvatarRepository::class)]
 class Avatar
 {

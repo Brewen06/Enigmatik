@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'tbl_jeu')]
 #[ORM\Entity(repositoryClass: JeuRepository::class)]
 class Jeu
 {
@@ -26,15 +27,19 @@ class Jeu
     private ?string $imageBienvenue = null;
 
     /**
-     * @var Collection<int, Parametres>
+     * @var Collection<int, Parametre>
      */
-    #[ORM\OneToMany(targetEntity: Parametres::class, mappedBy: 'jeu')]
+    #[ORM\OneToMany(targetEntity: Parametre::class, mappedBy: 'jeu')]
     private Collection $parametres;
 
     public function __construct()
     {
         $this->parametres = new ArrayCollection();
     }
+
+    
+
+    
 
     public function getId(): ?int
     {
@@ -78,14 +83,14 @@ class Jeu
     }
 
     /**
-     * @return Collection<int, Parametres>
+     * @return Collection<int, Parametre>
      */
     public function getParametres(): Collection
     {
         return $this->parametres;
     }
 
-    public function addParametre(Parametres $parametre): static
+    public function addParametre(Parametre $parametre): static
     {
         if (!$this->parametres->contains($parametre)) {
             $this->parametres->add($parametre);
@@ -95,7 +100,7 @@ class Jeu
         return $this;
     }
 
-    public function removeParametre(Parametres $parametre): static
+    public function removeParametre(Parametre $parametre): static
     {
         if ($this->parametres->removeElement($parametre)) {
             // set the owning side to null (unless already changed)
@@ -106,4 +111,6 @@ class Jeu
 
         return $this;
     }
+
+    
 }

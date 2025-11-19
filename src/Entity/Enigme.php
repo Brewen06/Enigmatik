@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'tbl_enigme')]
 #[ORM\Entity(repositoryClass: EnigmeRepository::class)]
 class Enigme
 {
@@ -15,12 +16,10 @@ class Enigme
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-/**
-     * @var Collection<int, Type>
-     */
-    #[ORM\ManyToMany(targetEntity: Type::class, inversedBy: 'enigmes')]
 
-    private Collection $type;
+    #[ORM\ManyToOne(inversedBy: 'enigmes')]
+    private ?Type $type = null;
+
     #[ORM\Column]
     private ?int $ordre = null;
 
@@ -36,36 +35,23 @@ class Enigme
     #[ORM\OneToOne(inversedBy: 'enigme', cascade: ['persist', 'remove'])]
     private ?Vignette $vignette = null;
 
-    public function __construct()
-    {
-        $this->type = new ArrayCollection();
-    }
+    
+
+    
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return Collection<int, Type>
-     */
-    public function getType(): Collection
+    public function getType(): ?Type
     {
         return $this->type;
     }
 
-    public function addType(Type $type): static
+    public function setType(?Type $type): static
     {
-        if (!$this->type->contains($type)) {
-            $this->type->add($type);
-        }
-
-        return $this;
-    }
-
-    public function removeType(Type $type): static
-    {
-        $this->type->removeElement($type);
+        $this->type = $type;
 
         return $this;
     }
@@ -130,5 +116,6 @@ class Enigme
         return $this;
     }
 
+    
     
 }

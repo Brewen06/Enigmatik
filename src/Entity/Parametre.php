@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ParametresRepository;
+use App\Repository\ParametreRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ParametresRepository::class)]
-class Parametres
+#[ORM\Entity(repositoryClass: ParametreRepository::class)]
+class Parametre
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

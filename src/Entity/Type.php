@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'tbl_type')]
 #[ORM\Entity(repositoryClass: TypeRepository::class)]
 class Type
 {
@@ -21,13 +22,19 @@ class Type
     /**
      * @var Collection<int, Enigme>
      */
-    #[ORM\ManyToMany(targetEntity: Enigme::class, mappedBy: 'type')]
+    #[ORM\OneToMany(targetEntity: Enigme::class, mappedBy: 'type')]
     private Collection $enigmes;
 
     public function __construct()
     {
         $this->enigmes = new ArrayCollection();
     }
+
+    /**
+     * @var Collection<int, Enigme>
+     */
+    #[ORM\ManyToMany(targetEntity: Enigme::class, mappedBy: 'type')]
+    
 
     public function getId(): ?int
     {
@@ -58,7 +65,7 @@ class Type
     {
         if (!$this->enigmes->contains($enigme)) {
             $this->enigmes->add($enigme);
-            $enigme->addType($this);
+            $enigme->setType($this);
         }
 
         return $this;
@@ -67,9 +74,13 @@ class Type
     public function removeEnigme(Enigme $enigme): static
     {
         if ($this->enigmes->removeElement($enigme)) {
-            $enigme->removeType($this);
+            // set the owning side to null (unless already changed)
+            if ($enigme->getType() === $this) {
+                $enigme->setType(null);
+            }
         }
 
         return $this;
     }
+
 }
