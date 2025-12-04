@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
-use App\Repository\JeuRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Enigme;
+use App\Entity\Parametre;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\JeuRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Table(name: 'tbl_jeu')]
 #[ORM\Entity(repositoryClass: JeuRepository::class)]
@@ -32,9 +34,16 @@ class Jeu
     #[ORM\OneToMany(targetEntity: Parametre::class, mappedBy: 'jeu')]
     private Collection $parametres;
 
+    /**
+     * @var Collection<int, Enigme>
+     */
+    #[ORM\OneToMany(targetEntity: Enigme::class, mappedBy: 'jeu')]
+    private Collection $enigme;
+
     public function __construct()
     {
         $this->parametres = new ArrayCollection();
+        $this->enigme = new ArrayCollection();
     }
 
     
@@ -106,6 +115,36 @@ class Jeu
             // set the owning side to null (unless already changed)
             if ($parametre->getJeu() === $this) {
                 $parametre->setJeu(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Enigme>
+     */
+    public function getEnigme(): Collection
+    {
+        return $this->enigme;
+    }
+
+    public function addEnigme(Enigme $enigme): static
+    {
+        if (!$this->enigme->contains($enigme)) {
+            $this->enigme->add($enigme);
+            $enigme->setJeu($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEnigme(Enigme $enigme): static
+    {
+        if ($this->enigme->removeElement($enigme)) {
+            // set the owning side to null (unless already changed)
+            if ($enigme->getJeu() === $this) {
+                $enigme->setJeu(null);
             }
         }
 

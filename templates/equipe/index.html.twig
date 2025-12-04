@@ -12,7 +12,7 @@
                 <th>Nom</th>
                 <th>Position</th>
                 <th>Note</th>
-                <th>EnigmeActuelle</th>
+                <th>Enigme Actuelle</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -25,8 +25,8 @@
                 <td>{{ equipe.note }}</td>
                 <td>{{ equipe.enigmeActuelle }}</td>
                 <td>
-                    <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}">show</a>
-                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}">edit</a>
+                    <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}">Show</a>
+                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
@@ -37,5 +37,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_equipe_new') }}">Create new</a>
+    <a href="{{ path('app_equipe_créer') }}">Création d'une nouvelle équipe.</a>
 {% endblock %}

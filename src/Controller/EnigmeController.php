@@ -22,7 +22,7 @@ final class EnigmeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_enigme_new', methods: ['GET', 'POST'])]
+    #[Route('/créer', name: 'app_enigme_créer', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $enigme = new Enigme();

@@ -39,6 +39,7 @@ security:
          - { path: ^/user, roles: ROLE_PROF }
          - { path: ^/equipe/créer, roles: PUBLIC_ACCESS }
          - { path: ^/jeu, roles: PUBLIC_ACCESS }
+         - { path: ^/enigme/créer, roles: ROLE_PROF }
 
 
     role_hierarchy:

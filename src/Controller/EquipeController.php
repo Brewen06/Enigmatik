@@ -30,10 +30,13 @@ final class EquipeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $equipe->setPosition(0);
+            $equipe->setNote('');
+            $equipe->setEnigmeActuelle(1);
             $entityManager->persist($equipe);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_equipe_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_jeu_index', ['equipe_id' => $equipe->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('equipe/new.html.twig', [

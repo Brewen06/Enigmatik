@@ -35,6 +35,9 @@ class Enigme
     #[ORM\OneToOne(inversedBy: 'enigme', cascade: ['persist', 'remove'])]
     private ?Vignette $vignette = null;
 
+    #[ORM\ManyToOne(inversedBy: 'enigme')]
+    private ?Jeu $jeu = null;
+
     
 
     
@@ -112,6 +115,18 @@ class Enigme
     public function setVignette(?Vignette $vignette): static
     {
         $this->vignette = $vignette;
+
+        return $this;
+    }
+
+    public function getJeu(): ?Jeu
+    {
+        return $this->jeu;
+    }
+
+    public function setJeu(?Jeu $jeu): static
+    {
+        $this->jeu = $jeu;
 
         return $this;
     }

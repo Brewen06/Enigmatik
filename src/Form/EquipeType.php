@@ -13,9 +13,6 @@ class EquipeType extends AbstractType
     {
         $builder
             ->add('nom')
-            ->add('position')
-            ->add('note')
-            ->add('enigmeActuelle')
         ;
     }
 
