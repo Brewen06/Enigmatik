@@ -22,7 +22,7 @@ final class EquipeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_equipe_new', methods: ['GET', 'POST'])]
+    #[Route('/créer', name: 'app_equipe_créer', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $equipe = new Equipe();

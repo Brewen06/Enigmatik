@@ -35,5 +35,18 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_jeu_new') }}">Create new</a>
+    <div class="container mx-auto mt-10 px-4">
+        <h2 class="text-2xl font-bold mb-6 text-center">Nos Jeux</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for jeu in jeux %}
+                <div class="bg-white rounded-lg shadow-md p-6 border">
+                    <h3 class="text-xl font-bold mb-2">{{ jeu.titre }}</h3>
+                    <p class="text-gray-700 mb-4">{{ jeu.messageDeBienvenue }}</p>
+                    <a href="{{ path('app_jeu_show', {'id': jeu.id}) }}" class="text-blue-500 hover:underline">Voir le jeu</a>
+                </div>
+            {% else %}
+                <p class="text-center col-span-full text-gray-500">Aucun jeu disponible pour le moment.</p>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

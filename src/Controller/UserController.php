@@ -78,4 +78,26 @@ final class UserController extends AbstractController
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/prof', name: 'app_prof', methods: ['GET'])]
+    public function prof(UserRepository $userRepository): Response
+    {
+        return $this->render('user/prof.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/page_prof', name: 'app_page_prof', methods: ['GET'])]
+    public function pageProf(): Response
+    {
+        return $this->render('user/page_prof.html.twig');
+    }
+
+    #[Route('/admin', name: 'app_admin', methods: ['POST'])]
+    public function admin(UserRepository $userRepository): Response
+    {
+        return $this->render('user/admin.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
 }

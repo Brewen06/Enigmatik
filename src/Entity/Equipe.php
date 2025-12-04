@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 
 #[ORM\Table(name: 'tbl_equipe')]
 #[ORM\Entity(repositoryClass: EquipeRepository::class)]
