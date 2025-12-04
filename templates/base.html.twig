@@ -5,10 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Enigmatik{% endblock %}</title>
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,83 +22,79 @@
   {% endblock %}
 </head>
 
-<body class="tw-flex tw-flex-col tw-min-h-screen tw-bg-gray-50">
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-      <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="{{ path('app_index') }}">
-          <span class="tw-text-2xl">🧩</span> Enigmatik
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('app_equipe_créer') }}">Créer une équipe</a>
-            </li>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="{{ path('app_index') }}">
+                    <span class="tw-text-2xl">🧩</span> Enigmatik
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_equipe_créer') }}">Créer une équipe</a>
+                        </li>
+                        
+                        {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="/equipe" id="navbarDropdownEquipes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Equipes
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownEquipes">
+                                    <li><a class="dropdown-item" href="{{ path('app_equipe_index') }}">Liste des équipes</a></li>
+                                </ul>
+                            </li>
+                            
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="/user/prof" id="navbarDropdownProfs" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Professeurs
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownProfs">
+                                    <li><a class="dropdown-item" href="{{ path('app_user_index') }}">Liste des professeurs</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_user_new') }}">Créer un professeur</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
 
-            {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="/equipe" id="navbarDropdownEquipes" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                Equipes
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdownEquipes">
-                <li><a class="dropdown-item" href="{{ path('app_equipe_index') }}">Liste des équipes</a></li>
-              </ul>
-            </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_admin') }}">Administration</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    
+                    <ul class="navbar-nav ms-auto">
+                        {% if app.user %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter ({{ app.user.email }})</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_login') }}">Se connecter</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="/user/prof" id="navbarDropdownProfs" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
-                Professeurs
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdownProfs">
-                <li><a class="dropdown-item" href="{{ path('app_user_index') }}">Liste des professeurs</a></li>
-                <li><a class="dropdown-item" href="{{ path('app_user_new') }}">Créer un professeur</a></li>
-              </ul>
-            </li>
-            {% endif %}
+    <div class="container mt-4">
+        {% block body %}{% endblock %}
+    </div>
 
-            {% if is_granted('ROLE_ADMIN') %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('app_admin') }}">Administration</a>
-            </li>
-            {% endif %}
-          </ul>
-
-          <ul class="navbar-nav ms-auto">
-            {% if app.user %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter ({{ app.user.email }})</a>
-            </li>
-            {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ path('app_login') }}">Se connecter</a>
-            </li>
-            {% endif %}
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
-<main class="tw-flex-grow tw-py-6">
-  <div class="container">
-    {% block body %}{% endblock %}
-  </div>
-</main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
-  <footer class="tw-bg-slate-900 tw-text-white tw-py-8 tw-mt-auto">
+  <footer class="tw-bg-slate-900 tw-text-white tw-py-8 tw-mt-auto tw-text-center">
         <div class="container tw-mx-auto tw-px-4 tw-text-center"></div>
-            <p class="tw-mb-2 tw-text-slate-300">&copy; {{ "now"|date("Y") }} Enigmatik. Tous droits réservés.</p>
-            <p class="tw-text-xs tw-text-slate-500">Développé avec Symfony pour apprendre l'informatique en s'amusant.</p>
+            <p class="tw-mb-2 tw-text-slate-300 tw-text-center">&copy; {{ "now"|date("Y") }} Enigmatik. Tous droits réservés.</p>
+            <p class="tw-text-xs tw-text-slate-500 tw-text-center">Développé avec Symfony pour apprendre l'informatique en s'amusant.</p>
         </div>
     </footer>
-</body>
+  </body>
 
 </html>
