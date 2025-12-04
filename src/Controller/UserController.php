@@ -42,7 +42,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_user_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(User $user): Response
     {
         return $this->render('user/show.html.twig', [
@@ -50,7 +50,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(UserType::class, $user);
@@ -68,7 +68,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
@@ -77,6 +77,14 @@ final class UserController extends AbstractController
         }
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/admin', name: 'app_admin', methods: ['GET'])]
+    public function admin(UserRepository $userRepository): Response
+    {
+        return $this->render('user/admin.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
     }
 
     #[Route('/prof', name: 'app_prof', methods: ['GET'])]
@@ -91,13 +99,5 @@ final class UserController extends AbstractController
     public function pageProf(): Response
     {
         return $this->render('user/page_prof.html.twig');
-    }
-
-    #[Route('/admin', name: 'app_admin', methods: ['POST'])]
-    public function admin(UserRepository $userRepository): Response
-    {
-        return $this->render('user/admin.html.twig', [
-            'users' => $userRepository->findAll(),
-        ]);
     }
 }
