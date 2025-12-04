@@ -3,9 +3,20 @@
 {% block title %}Créer une équipe{% endblock %}
 
 {% block body %}
-    <h1>Créer votre équipe</h1>
-
-    {{ include('equipe/_form.html.twig') }}
-
-    <a href="{{ path('app_index') }}">Retour</a>
+<div class="tw-flex tw-justify-center tw-mt-10">
+    <div class="card tw-shadow-lg tw-w-full tw-max-w-lg">
+        <div class="card-header bg-success text-white tw-text-center tw-py-3">
+            <h1 class="h3 mb-0 tw-font-bold">Créer votre équipe</h1>
+        </div>
+        <div class="card-body tw-p-6">
+            {{ include('equipe/_form.html.twig') }}
+            
+            <div class="tw-mt-4 tw-text-center">
+                <a href="{{ path('app_index') }}" class="btn btn-outline-secondary btn-sm">
+                    ← Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

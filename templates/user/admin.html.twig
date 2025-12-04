@@ -1,11 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Page d'administration{% endblock %}
+{% block title %}Administration{% endblock %}
 
 {% block body %}
-    <h1>Page d'administration</h1>
+<div class="tw-container tw-mx-auto tw-py-8">
+    <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
+        <h1 class="tw-text-3xl tw-font-bold tw-text-gray-800">⚙️ Administration</h1>
+        <a href="{{ path('app_index') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+    </div>
 
-        <p>La page qui paramètre le logiciel</p>
+    <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6"></div>
+        <div class="card tw-shadow-sm hover:tw-shadow-md tw-transition">
+            <div class="card-body">
+                <h5 class="card-title tw-font-bold tw-mb-3">👥 Utilisateurs</h5>
+                <p class="card-text tw-text-gray-600">Gérer les comptes professeurs et administrateurs.</p>
+                <a href="{{ path('app_user_index') }}" class="btn btn-primary tw-w-full tw-mt-2">Gérer</a>
+            </div>
+        </div>
 
-    <a href="{{ path('app_index') }}">Retour</a>
+        <div class="card tw-shadow-sm hover:tw-shadow-md tw-transition">
+            <div class="card-body">
+                <h5 class="card-title tw-font-bold tw-mb-3">🚩 Équipes</h5>
+                <p class="card-text tw-text-gray-600">Voir et gérer les équipes inscrites.</p>
+                <a href="{{ path('app_equipe_index') }}" class="btn btn-primary tw-w-full tw-mt-2">Gérer</a>
+            </div>
+        </div>
+
+        <div class="card tw-shadow-sm hover:tw-shadow-md tw-transition">
+            <div class="card-body">
+                <h5 class="card-title tw-font-bold tw-mb-3">🔧 Paramètres</h5>
+                <p class="card-text tw-text-gray-600">Configuration générale de l'application.</p>
+                <button class="btn btn-secondary tw-w-full tw-mt-2" disabled>Bientôt disponible</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,41 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Equipe index{% endblock %}
+{% block title %}Liste des Équipes{% endblock %}
 
 {% block body %}
-    <h1>Equipe index</h1>
+<div class="tw-container tw-mx-auto tw-py-8">
+    <div class="tw-flex tw-justify-between tw-items-center tw-mb-6">
+        <h1 class="tw-text-3xl tw-font-bold tw-text-gray-800">🏆 Liste des Équipes</h1>
+        <a href="{{ path('app_equipe_créer') }}" class="btn btn-success">
+            + Nouvelle Équipe
+        </a>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Position</th>
-                <th>Note</th>
-                <th>Enigme Actuelle</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for equipe in equipes %}
-            <tr>
-                <td>{{ equipe.id }}</td>
-                <td>{{ equipe.nom }}</td>
-                <td>{{ equipe.position }}</td>
-                <td>{{ equipe.note }}</td>
-                <td>{{ equipe.enigmeActuelle }}</td>
-                <td>
-                    <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}">Show</a>
-                    <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}">Modifier</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_equipe_créer') }}">Création d'une nouvelle équipe.</a>
+    <div class="card tw-shadow-md tw-border-0">
+        <div class="card-body tw-p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped tw-mb-0 tw-align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="tw-py-3 tw-px-4">ID</th>
+                            <th class="tw-py-3 tw-px-4">Nom</th>
+                            <th class="tw-py-3 tw-px-4">Position</th>
+                            <th class="tw-py-3 tw-px-4">Note</th>
+                            <th class="tw-py-3 tw-px-4">Énigme Actuelle</th>
+                            <th class="tw-py-3 tw-px-4 tw-text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for equipe in equipes %}
+                        <tr>
+                            <td class="tw-px-4">{{ equipe.id }}</td>
+                            <td class="tw-px-4 tw-font-bold">{{ equipe.nom }}</td>
+                            <td class="tw-px-4">{{ equipe.position }}</td>
+                            <td class="tw-px-4">{{ equipe.note }}</td>
+                            <td class="tw-px-4"><span class="badge bg-primary">Niveau {{ equipe.enigmeActuelle }}</span></td>
+                            <td class="tw-px-4 tw-text-right">
+                                <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}" class="btn btn-sm btn-outline-primary tw-mr-1">Voir</a>
+                                <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="tw-text-center tw-py-8 tw-text-gray-500">
+                                Aucune équipe inscrite pour le moment.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

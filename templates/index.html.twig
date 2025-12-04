@@ -2,18 +2,15 @@
 
 {% block title %}Accueil{% endblock %}
 
-{% block stylesheets %}
-    <script src="https://cdn.tailwindcss.com"></script>
-{% endblock %}
-
 {% block body %}
-    <div class="text-center mt-10">
-        <h1 class="text-4xl font-bold mb-4">Bienvenue sur Enigmatik</h1>
-        <p>Découvrez des énigmes sur l'informatique et testez vos connaissances</p>
-    </div>
-    <div class="flex justify-center mt-10 space-x-4">
-        <a href="{{ path('app_equipe_créer') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Créez votre équipe
-        </a>
+    <div class="tw-text-center tw-mt-10 tw-p-10 tw-bg-gray-100 tw-rounded-xl tw-shadow-lg">
+        <h1 class="tw-text-5xl tw-font-bold tw-mb-6 tw-text-blue-600">Bienvenue sur Enigmatik</h1>
+        <p class="tw-text-xl tw-text-gray-700 tw-mb-8">Découvrez des énigmes sur l'informatique et testez vos connaissances en équipe !</p>
+        
+        <div class="tw-flex tw-justify-center tw-space-x-4">
+            <a href="{{ path('app_equipe_créer') }}" class="btn btn-primary btn-lg tw-font-bold tw-px-8 tw-py-3 tw-rounded-full tw-shadow-md hover:tw-shadow-xl tw-transition tw-duration-300">
+                🚀 Créer une équipe
+            </a>
+        </div>
     </div>
 {% endblock %}
