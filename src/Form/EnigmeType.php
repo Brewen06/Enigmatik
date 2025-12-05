@@ -51,7 +51,7 @@ class EnigmeType extends AbstractType
             )
             ->add('type', EntityType::class, [
                 'class' => Type::class,
-                'choice_label' => 'nom',
+                'choice_label' => 'libelle',
                 'label' => 'Type d\'énigme',
                 'placeholder' => 'Choisir un type d\'énigme',
                 'required' => false,
