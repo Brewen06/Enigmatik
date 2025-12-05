@@ -27,7 +27,7 @@ class UserType extends AbstractType
                     'Administrateur' => 'ROLE_ADMIN',
                 ],
                 'multiple' => true,
-                'expanded' => true,
+                'expanded' => false,
                 'label' => 'Rôles de l\'utilisateur',
                 'attr' => [
                     'class' => 'form-check'
