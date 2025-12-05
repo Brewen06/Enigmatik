@@ -32,7 +32,7 @@ class Enigme
     #[ORM\Column(length: 50)]
     private ?string $codeSecret = null;
 
-    #[ORM\OneToOne(inversedBy: 'enigme', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'enigmes')]
     private ?Vignette $vignette = null;
 
     #[ORM\ManyToOne(inversedBy: 'enigme')]

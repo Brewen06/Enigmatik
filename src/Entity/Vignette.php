@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\VignetteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,10 +23,14 @@ class Vignette
     #[ORM\Column(type: Types::TEXT)]
     private ?string $information = null;
 
-    #[ORM\OneToOne(mappedBy: 'vignette', cascade: ['persist', 'remove'])]
-    private ?Enigme $enigme = null;
+    #[ORM\OneToMany(mappedBy: 'vignette', targetEntity: Enigme::class)]
+    private Collection $enigmes;
 
-   
+    public function __construct()
+    {
+        $this->enigmes = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -54,24 +60,32 @@ class Vignette
         return $this;
     }
 
-    public function getEnigme(): ?Enigme
+    /**
+     * @return Collection<int, Enigme>
+     */
+    public function getEnigmes(): Collection
     {
-        return $this->enigme;
+        return $this->enigmes;
     }
 
-    public function setEnigme(?Enigme $enigme): static
+    public function addEnigme(Enigme $enigme): static
     {
-        // unset the owning side of the relation if necessary
-        if ($enigme === null && $this->enigme !== null) {
-            $this->enigme->setVignette(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($enigme !== null && $enigme->getVignette() !== $this) {
+        if (!$this->enigmes->contains($enigme)) {
+            $this->enigmes->add($enigme);
             $enigme->setVignette($this);
         }
 
-        $this->enigme = $enigme;
+        return $this;
+    }
+
+    public function removeEnigme(Enigme $enigme): static
+    {
+        if ($this->enigmes->removeElement($enigme)) {
+            // set the owning side to null (unless already changed)
+            if ($enigme->getVignette() === $this) {
+                $enigme->setVignette(null);
+            }
+        }
 
         return $this;
     }

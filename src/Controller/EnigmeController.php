@@ -7,9 +7,12 @@ use App\Form\EnigmeType;
 use App\Repository\EnigmeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[Route('/enigme')]
 final class EnigmeController extends AbstractController
@@ -22,7 +25,7 @@ final class EnigmeController extends AbstractController
         ]);
     }
 
-    #[Route('/créer', name: 'app_enigme_créer', methods: ['GET', 'POST'])]
+    #[Route('/creer', name: 'app_enigme_creer', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $enigme = new Enigme();

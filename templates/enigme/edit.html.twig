@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Enigme{% endblock %}
+{% block title %}Modifier une enigme{% endblock %}
 
 {% block body %}
-    <h1>Edit Enigme</h1>
+    <h1>Modifier une enigme</h1>
 
-    {{ include('enigme/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('enigme/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_enigme_index') }}">back to list</a>
+    <a href="{{ path('app_enigme_index') }}">Retour à la liste</a>
 
     {{ include('enigme/_delete_form.html.twig') }}
 {% endblock %}

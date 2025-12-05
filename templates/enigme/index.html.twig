@@ -12,7 +12,8 @@
                 <th>Ordre</th>
                 <th>Titre</th>
                 <th>Consigne</th>
-                <th>CodeSecret</th>
+                <th>Code Secret</th>
+                <th>Vignettes</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -25,17 +26,22 @@
                 <td>{{ enigme.consigne }}</td>
                 <td>{{ enigme.codeSecret }}</td>
                 <td>
-                    <a href="{{ path('app_enigme_show', {'id': enigme.id}) }}">show</a>
-                    <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}">edit</a>
+                    {% if enigme.vignette %}
+                        <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" width="50">
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_enigme_show', {'id': enigme.id}) }}">Voir</a>
+                    <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}">Modifier</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="7">Aucune donnée trouvée</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_enigme_new') }}">Create new</a>
+    <a href="{{ path('app_enigme_creer') }}">Implémenter une énigme</a>
 {% endblock %}
