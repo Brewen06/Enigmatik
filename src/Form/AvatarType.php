@@ -14,10 +14,22 @@ class AvatarType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom')
+            ->add('nom', 
+                null, [
+                    'label' => 'Nom de l\'avatar',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
             ->add('equipe', EntityType::class, [
                 'class' => Equipe::class,
                 'choice_label' => 'id',
+                'label' => 'Équipe associée',
+                'placeholder' => 'Choisir une équipe',
+                'attr' => [
+                    'class' => 'form-select'
+                ]
             ])
         ;
     }

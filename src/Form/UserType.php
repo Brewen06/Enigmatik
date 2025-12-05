@@ -28,8 +28,17 @@ class UserType extends AbstractType
                 ],
                 'multiple' => true,
                 'expanded' => true,
+                'label' => 'Rôles de l\'utilisateur',
+                'attr' => [
+                    'class' => 'form-check'
+                ]
             ])
-            ->add('password')
+            ->add('password', null, [
+                'label' => 'Mot de passe',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
+            ])
         ;
     }
 

@@ -12,7 +12,14 @@ class TypeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('libelle')
+            ->add('libelle',
+                null, [
+                    'label' => 'Libellé du type',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
         ;
     }
 

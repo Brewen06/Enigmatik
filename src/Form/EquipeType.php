@@ -12,7 +12,14 @@ class EquipeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom')
+            ->add('nom', 
+                null, [
+                    'label' => 'Nom de l\'équipe',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
         ;
     }
 

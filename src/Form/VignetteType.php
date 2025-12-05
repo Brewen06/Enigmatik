@@ -32,8 +32,16 @@ class VignetteType extends AbstractType
                         'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG, WEBP)',
                     ])
                 ],
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
-            ->add('information')
+            ->add('information', null, [
+                'label' => 'Information',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
+            ])
         ;
     }
 

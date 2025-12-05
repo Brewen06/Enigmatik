@@ -3,9 +3,13 @@
 {% block title %}New Enigme{% endblock %}
 
 {% block body %}
-    <h1>Create new Enigme</h1>
+<div class="container mt-4">
+    <h1>Créer une nouvelle énigme</h1>
 
     {{ include('enigme/_form.html.twig') }}
 
-    <a href="{{ path('app_enigme_index') }}">back to list</a>
+    <div class="mt-3">
+        <a href="{{ path('app_enigme_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
 {% endblock %}

@@ -16,13 +16,48 @@ class EnigmeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('ordre')
-            ->add('titre')
-            ->add('consigne')
-            ->add('codeSecret')
+            ->add('ordre', 
+                null, [
+                    'label' => 'Ordre de l\'énigme dans le jeu',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
+            ->add('titre', 
+                null, [
+                    'label' => 'Titre de l\'énigme',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
+            ->add('consigne', 
+                null, [
+                    'label' => 'Consigne de l\'énigme',
+                    'attr' => [
+                        'class' => 'form-control',
+                        'rows' => 5
+                    ]
+                ]
+            )
+            ->add('codeSecret', 
+                null, [
+                    'label' => 'Code secret de l\'énigme',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
             ->add('type', EntityType::class, [
                 'class' => Type::class,
-                'choice_label' => 'nom', 
+                'choice_label' => 'nom',
+                'label' => 'Type d\'énigme',
+                'placeholder' => 'Choisir un type d\'énigme',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-select'
+                ] 
                 ])
             ->add('vignette', EntityType::class, [
                 'class' => Vignette::class,
@@ -30,7 +65,9 @@ class EnigmeType extends AbstractType
                 'label' => 'Vignette associée',
                 'placeholder' => 'Choisir une vignette',
                 'required' => false,
-                
+                'attr' => [
+                    'class' => 'form-select'
+                ]
             ])
             ->add('FileEnigme', FileType::class, [
                 'label' => 'Fichier de l\'énigme (PDF, HTML, JSON, PHP, XML)',
@@ -48,7 +85,11 @@ class EnigmeType extends AbstractType
                         ],
                         'mimeTypesMessage' => 'Veuillez uploader un fichier PDF valide',
                     ])
+                
                 ],
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
         ;
     }

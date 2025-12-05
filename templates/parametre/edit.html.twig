@@ -3,11 +3,14 @@
 {% block title %}Edit Parametre{% endblock %}
 
 {% block body %}
-    <h1>Edit Parametre</h1>
+<div class="container mt-4">
+    <h1>Modifier le paramètre</h1>
 
-    {{ include('parametre/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('parametre/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_parametre_index') }}">back to list</a>
-
-    {{ include('parametre/_delete_form.html.twig') }}
+    <div class="mt-3 d-flex gap-2">
+        <a href="{{ path('app_parametre_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {{ include('parametre/_delete_form.html.twig') }}
+    </div>
+</div>
 {% endblock %}

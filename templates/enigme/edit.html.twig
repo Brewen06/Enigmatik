@@ -3,11 +3,14 @@
 {% block title %}Modifier une enigme{% endblock %}
 
 {% block body %}
-    <h1>Modifier une enigme</h1>
+<div class="container mt-4">
+    <h1>Modifier une énigme</h1>
 
     {{ include('enigme/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_enigme_index') }}">Retour à la liste</a>
-
-    {{ include('enigme/_delete_form.html.twig') }}
+    <div class="mt-3 d-flex gap-2">
+        <a href="{{ path('app_enigme_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {{ include('enigme/_delete_form.html.twig') }}
+    </div>
+</div>
 {% endblock %}

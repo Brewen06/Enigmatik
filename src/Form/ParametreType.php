@@ -17,6 +17,11 @@ class ParametreType extends AbstractType
             ->add('jeu', EntityType::class, [
                 'class' => Jeu::class,
                 'choice_label' => 'id',
+                'label' => 'Jeu associé',
+                'placeholder' => 'Choisir un jeu',
+                'attr' => [
+                    'class' => 'form-select'
+                ]
             ])
         ;
     }

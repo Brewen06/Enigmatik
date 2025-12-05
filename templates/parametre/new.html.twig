@@ -3,9 +3,13 @@
 {% block title %}New Parametre{% endblock %}
 
 {% block body %}
-    <h1>Create new Parametre</h1>
+<div class="container mt-4">
+    <h1>Créer un nouveau paramètre</h1>
 
     {{ include('parametre/_form.html.twig') }}
 
-    <a href="{{ path('app_parametre_index') }}">back to list</a>
+    <div class="mt-3">
+        <a href="{{ path('app_parametre_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    </div>
+</div>
 {% endblock %}
