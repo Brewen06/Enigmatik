@@ -43,7 +43,7 @@ security:
          - { path: ^/equipe/creer , roles: PUBLIC_ACCESS }
          - { path: ^/equipe/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
          - { path: ^/equipe/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
-         - { path: ^/equipe, roles: ROLE_PROF ROLE_ADMIN }
+         - { path: ^/equipe, roles: [ROLE_PROF, ROLE_ADMIN] }
         # contrôle d'accès à la route jeu
          - { path: ^/jeu, roles: PUBLIC_ACCESS }
         # contrôle d'accès aux routes enigme

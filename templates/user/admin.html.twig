@@ -3,36 +3,146 @@
 {% block title %}Administration{% endblock %}
 
 {% block body %}
-<div class="tw-container tw-mx-auto tw-py-8">
-    <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
-        <h1 class="tw-text-3xl tw-font-bold tw-text-gray-800">⚙️ Administration</h1>
-        <a href="{{ path('app_index') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="display-5 fw-bold text-primary"><i class="bi bi-speedometer2 me-3"></i>Tableau de bord</h1>
+            <p class="lead text-muted">Gérez l'ensemble de l'application Enigmatik depuis cet espace.</p>
+        </div>
+        <a href="{{ path('app_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-house-door me-1"></i> Retour à l'accueil
+        </a>
     </div>
 
-    <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6"></div>
-        <div class="card tw-shadow-sm hover:tw-shadow-md tw-transition">
-            <div class="card-body">
-                <h5 class="card-title tw-font-bold tw-mb-3">👥 Utilisateurs</h5>
-                <p class="card-text tw-text-gray-600">Gérer les comptes professeurs et administrateurs.</p>
-                <a href="{{ path('app_user_index') }}" class="btn btn-primary tw-w-full tw-mt-2">Gérer</a>
+    <div class="row g-4">
+        <!-- Section Gestion du Jeu -->
+        <div class="col-12">
+            <h4 class="text-secondary border-bottom pb-2 mb-3"><i class="bi bi-controller me-2"></i>Contenu du Jeu</h4>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-puzzle-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Énigmes</h5>
+                    <p class="card-text text-muted small">Gérer les énigmes, les indices et les réponses.</p>
+                    <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-primary stretched-link">Gérer</a>
+                </div>
             </div>
         </div>
 
-        <div class="card tw-shadow-sm hover:tw-shadow-md tw-transition">
-            <div class="card-body">
-                <h5 class="card-title tw-font-bold tw-mb-3">🚩 Équipes</h5>
-                <p class="card-text tw-text-gray-600">Voir et gérer les équipes inscrites.</p>
-                <a href="{{ path('app_equipe_index') }}" class="btn btn-primary tw-w-full tw-mt-2">Gérer</a>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-images fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Vignettes</h5>
+                    <p class="card-text text-muted small">Gérer les images associées aux énigmes.</p>
+                    <a href="{{ path('app_vignette_index') }}" class="btn btn-outline-info stretched-link">Gérer</a>
+                </div>
             </div>
         </div>
 
-        <div class="card tw-shadow-sm hover:tw-shadow-md tw-transition">
-            <div class="card-body">
-                <h5 class="card-title tw-font-bold tw-mb-3">🔧 Paramètres</h5>
-                <p class="card-text tw-text-gray-600">Configuration générale de l'application.</p>
-                <button class="btn btn-secondary tw-w-full tw-mt-2" disabled>Bientôt disponible</button>
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-tags-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Types</h5>
+                    <p class="card-text text-muted small">Catégories et types d'énigmes.</p>
+                    <a href="{{ path('app_type_index') }}" class="btn btn-outline-success stretched-link">Gérer</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-joystick fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Jeux</h5>
+                    <p class="card-text text-muted small">Configuration des sessions de jeu.</p>
+                    <a href="{{ path('app_jeu_index') }}" class="btn btn-outline-warning stretched-link">Gérer</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Participants -->
+        <div class="col-12 mt-4">
+            <h4 class="text-secondary border-bottom pb-2 mb-3"><i class="bi bi-people-fill me-2"></i>Participants</h4>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-trophy-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Équipes</h5>
+                    <p class="card-text text-muted small">Suivi des équipes et des scores.</p>
+                    <a href="{{ path('app_equipe_index') }}" class="btn btn-outline-danger stretched-link">Gérer</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-person-bounding-box fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Avatars</h5>
+                    <p class="card-text text-muted small">Bibliothèque d'avatars pour les équipes.</p>
+                    <a href="{{ path('app_avatar_index') }}" class="btn btn-outline-secondary stretched-link">Gérer</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Administration -->
+        <div class="col-12 mt-4">
+            <h4 class="text-secondary border-bottom pb-2 mb-3"><i class="bi bi-shield-lock-fill me-2"></i>Système</h4>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-dark bg-opacity-10 text-dark rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-person-badge-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Utilisateurs</h5>
+                    <p class="card-text text-muted small">Comptes professeurs et administrateurs.</p>
+                    <a href="{{ path('app_user_index') }}" class="btn btn-outline-dark stretched-link">Gérer</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 shadow-sm border-0 hover-shadow transition-all">
+                <div class="card-body text-center p-4">
+                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="bi bi-sliders fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Paramètres</h5>
+                    <p class="card-text text-muted small">Configuration globale du site.</p>
+                    <a href="#" class="btn btn-outline-secondary stretched-link disabled">Bientôt disponible</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
 {% endblock %}

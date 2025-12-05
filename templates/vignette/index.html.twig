@@ -1,37 +1,53 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Vignette index{% endblock %}
+{% block title %}Liste des vignettes{% endblock %}
 
 {% block body %}
-    <h1>Vignette index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Image</th>
-                <th>Information</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for vignette in vignettes %}
-            <tr>
-                <td>{{ vignette.id }}</td>
-                <td>{{ vignette.image }}</td>
-                <td>{{ vignette.information }}</td>
-                <td>
-                    <a href="{{ path('app_vignette_show', {'id': vignette.id}) }}">show</a>
-                    <a href="{{ path('app_vignette_edit', {'id': vignette.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_vignette_new') }}">Create new</a>
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0 text-white">Liste des vignettes</h1>
+        <a href="{{ path('app_vignette_new') }}" class="btn btn-light btn-sm">
+            <i class="bi bi-plus-lg"></i> Créer une vignette
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Image</th>
+                        <th>Information</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for vignette in vignettes %}
+                    <tr>
+                        <td>{{ vignette.id }}</td>
+                        <td>
+                            <img src="{{ asset(vignette.image | replace({'public/': ''})) }}" alt="{{ vignette.information }}" width="50" class="img-thumbnail">
+                        </td>
+                        <td>{{ vignette.information }}</td>
+                        <td class="text-end">
+                            <div class="btn-group" role="group">
+                                <a href="{{ path('app_vignette_show', {'id': vignette.id}) }}" class="btn btn-info btn-sm text-white" title="Voir">
+                                    Voir
+                                </a>
+                                <a href="{{ path('app_vignette_edit', {'id': vignette.id}) }}" class="btn btn-warning btn-sm text-white" title="Modifier">
+                                    Modifier
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4">Aucune vignette trouvée</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

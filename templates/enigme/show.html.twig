@@ -1,38 +1,70 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Enigme{% endblock %}
+{% block title %}Détails Enigme{% endblock %}
 
 {% block body %}
-    <h1>Enigme</h1>
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+            <h1 class="h3 mb-0 fw-bold"><i class="bi bi-puzzle-fill me-2"></i>Détails de l'énigme</h1>
+            <span class="badge bg-light text-primary fs-6">#{{ enigme.id }}</span>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <h4 class="text-primary mb-3">{{ enigme.titre }}</h4>
+                    <div class="mb-4">
+                        <h6 class="text-muted text-uppercase small fw-bold">Consigne</h6>
+                        <p class="lead bg-light p-3 rounded border-start border-4 border-primary">{{ enigme.consigne }}</p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase small fw-bold">Ordre</h6>
+                            <p class="fs-5">{{ enigme.ordre }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted text-uppercase small fw-bold">Code Secret</h6>
+                            <p class="fs-5 font-monospace bg-dark text-warning d-inline-block px-2 rounded">{{ enigme.codeSecret }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted text-uppercase small fw-bold mb-3">Vignette associée</h6>
+                            {% if enigme.vignette %}
+                                <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" class="img-fluid rounded shadow-sm mb-2" style="max-height: 200px;">
+                                <p class="small text-muted fst-italic">{{ enigme.vignette.information }}</p>
+                            {% else %}
+                                <div class="py-5 text-muted">
+                                    <i class="bi bi-image fs-1 d-block mb-2"></i>
+                                    Aucune vignette
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ enigme.id }}</td>
-            </tr>
-            <tr>
-                <th>Ordre</th>
-                <td>{{ enigme.ordre }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ enigme.titre }}</td>
-            </tr>
-            <tr>
-                <th>Consigne</th>
-                <td>{{ enigme.consigne }}</td>
-            </tr>
-            <tr>
-                <th>CodeSecret</th>
-                <td>{{ enigme.codeSecret }}</td>
-            </tr>
-        </tbody>
-    </table>
+            <hr class="my-4">
 
-    <a href="{{ path('app_enigme_index') }}">back to list</a>
-
-    <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}">edit</a>
-
-    {{ include('enigme/_delete_form.html.twig') }}
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                </a>
+                
+                {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+                    <div class="d-flex gap-2">
+                        <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}" class="btn btn-warning text-white">
+                            <i class="bi bi-pencil-square me-1"></i> Modifier
+                        </a>
+                        {{ include('enigme/_delete_form.html.twig') }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

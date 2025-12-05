@@ -3,51 +3,62 @@
 {% block title %}Liste des Équipes{% endblock %}
 
 {% block body %}
-<div class="tw-container tw-mx-auto tw-py-8">
-    <div class="tw-flex tw-justify-between tw-items-center tw-mb-6">
-        <h1 class="tw-text-3xl tw-font-bold tw-text-gray-800">🏆 Liste des Équipes</h1>
-        <a href="{{ path('app_equipe_créer') }}" class="btn btn-success">
-            + Nouvelle Équipe
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+        <h1 class="h3 mb-0 fw-bold"><i class="bi bi-trophy-fill me-2"></i>Liste des Équipes</h1>
+        <a href="{{ path('app_equipe_creer') }}" class="btn btn-light btn-sm fw-bold text-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nouvelle Équipe
         </a>
     </div>
-
-    <div class="card tw-shadow-md tw-border-0">
-        <div class="card-body tw-p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped tw-mb-0 tw-align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="tw-py-3 tw-px-4">ID</th>
-                            <th class="tw-py-3 tw-px-4">Nom</th>
-                            <th class="tw-py-3 tw-px-4">Position</th>
-                            <th class="tw-py-3 tw-px-4">Note</th>
-                            <th class="tw-py-3 tw-px-4">Énigme Actuelle</th>
-                            <th class="tw-py-3 tw-px-4 tw-text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for equipe in equipes %}
-                        <tr>
-                            <td class="tw-px-4">{{ equipe.id }}</td>
-                            <td class="tw-px-4 tw-font-bold">{{ equipe.nom }}</td>
-                            <td class="tw-px-4">{{ equipe.position }}</td>
-                            <td class="tw-px-4">{{ equipe.note }}</td>
-                            <td class="tw-px-4"><span class="badge bg-primary">Niveau {{ equipe.enigmeActuelle }}</span></td>
-                            <td class="tw-px-4 tw-text-right">
-                                <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}" class="btn btn-sm btn-outline-primary tw-mr-1">Voir</a>
-                                <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-sm btn-outline-warning">Modifier</a>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="6" class="tw-text-center tw-py-8 tw-text-gray-500">
-                                Aucune équipe inscrite pour le moment.
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Nom</th>
+                        <th>Position</th>
+                        <th>Note</th>
+                        <th>Énigme Actuelle</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for equipe in equipes %}
+                    <tr>
+                        <td class="ps-4 text-muted">#{{ equipe.id }}</td>
+                        <td class="fw-bold text-primary">{{ equipe.nom }}</td>
+                        <td>
+                            <span class="badge bg-secondary rounded-pill">{{ equipe.position }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-star-fill text-warning me-1"></i>
+                                {{ equipe.note }}
+                            </div>
+                        </td>
+                        <td><span class="badge bg-info text-dark">Niveau {{ equipe.enigmeActuelle }}</span></td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group shadow-sm" role="group">
+                                <a href="{{ path('app_equipe_show', {'id': equipe.id}) }}" class="btn btn-outline-primary btn-sm" title="Voir">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('app_equipe_edit', {'id': equipe.id}) }}" class="btn btn-outline-warning btn-sm" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            Aucune équipe inscrite pour le moment.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

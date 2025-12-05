@@ -1,13 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Avatar{% endblock %}
+{% block title %}Modifier l'avatar{% endblock %}
 
 {% block body %}
-    <h1>Edit Avatar</h1>
+<div class="container mt-4">
+    <h1>Modifier l'avatar</h1>
 
-    {{ include('avatar/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('avatar/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_avatar_index') }}">back to list</a>
-
-    {{ include('avatar/_delete_form.html.twig') }}
+    <div class="mt-3 d-flex gap-2">
+        <a href="{{ path('app_avatar_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {{ include('avatar/_delete_form.html.twig') }}
+    </div>
+</div>
 {% endblock %}

@@ -1,13 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Vignette{% endblock %}
+{% block title %}Modifier la vignette{% endblock %}
 
 {% block body %}
-    <h1>Edit Vignette</h1>
+<div class="container mt-4">
+    <h1>Modifier la vignette</h1>
 
-    {{ include('vignette/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('vignette/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_vignette_index') }}">back to list</a>
-
-    {{ include('vignette/_delete_form.html.twig') }}
+    <div class="mt-3 d-flex gap-2">
+        <a href="{{ path('app_vignette_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        {{ include('vignette/_delete_form.html.twig') }}
+    </div>
+</div>
 {% endblock %}
