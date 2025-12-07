@@ -19,6 +19,16 @@
                         <th class="bg-light">Nom</th>
                         <td>{{ avatar.nom }}</td>
                     </tr>
+                    <tr>
+                        <th class="bg-light">Image</th>
+                        <td>
+                            {% if avatar.image %}
+                                <img src="{{ asset(avatar.image | replace({'public/': ''})) }}" alt="{{ avatar.nom }}" class="img-thumbnail" style="max-width: 200px;">
+                            {% else %}
+                                <span class="text-muted">Aucune image</span>
+                            {% endif %}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 

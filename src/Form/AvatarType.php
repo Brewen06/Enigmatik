@@ -31,7 +31,16 @@ class AvatarType extends AbstractType
                     'class' => 'form-select'
                 ]
             ])
+            ->add('image', 
+                null, [
+                    'label' => 'Image de l\'avatar',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
         ;
+        
     }
 
     public function configureOptions(OptionsResolver $resolver): void

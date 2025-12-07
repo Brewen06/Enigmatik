@@ -42,6 +42,10 @@ class TypeFixtures extends Fixture
         $type8->setLibelle('Jeu de logique');
         $manager->persist($type8);
 
+        $type9 = new Type();
+        $type9->setLibelle('Mots mêlés');
+        $manager->persist($type9);
+
         $manager->flush();
     }
 }

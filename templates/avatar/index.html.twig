@@ -16,6 +16,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Id</th>
+                        <th>Aperçu</th>
                         <th>Nom</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -24,14 +25,21 @@
                 {% for avatar in avatars %}
                     <tr>
                         <td>{{ avatar.id }}</td>
+                        <td>
+                            {% if avatar.image %}
+                                <img src="{{ asset(avatar.image | replace({'public/': ''})) }}" alt="{{ avatar.nom }}" width="50" height="50" class="rounded-circle border">
+                            {% else %}
+                                <span class="text-muted small">Aucune image</span>
+                            {% endif %}
+                        </td>
                         <td>{{ avatar.nom }}</td>
                         <td class="text-end">
                             <div class="btn-group" role="group">
                                 <a href="{{ path('app_avatar_show', {'id': avatar.id}) }}" class="btn btn-info btn-sm text-white" title="Voir">
-                                    Voir
+                                    <i class="bi bi-eye"></i>
                                 </a>
                                 <a href="{{ path('app_avatar_edit', {'id': avatar.id}) }}" class="btn btn-warning btn-sm text-white" title="Modifier">
-                                    Modifier
+                                    <i class="bi bi-pencil"></i>
                                 </a>
                             </div>
                         </td>
