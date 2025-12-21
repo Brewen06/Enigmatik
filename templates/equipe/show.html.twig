@@ -20,12 +20,19 @@
                         <td>{{ equipe.nom }}</td>
                     </tr>
                     <tr>
-                        <th class="bg-light">Position</th>
-                        <td>{{ equipe.position }}</td>
+                        <th class="bg-light">Avatar</th>
+                        <td>
+                            {% if equipe.avatar %}
+                                <img src="{{ asset(equipe.avatar.image) }}" alt="{{ equipe.avatar.nom }}" style="height: 50px; width: auto;" class="me-2">
+                                {{ equipe.avatar.nom }}
+                            {% else %}
+                                <span class="text-muted">Aucun avatar</span>
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
-                        <th class="bg-light">Note</th>
-                        <td>{{ equipe.note }}</td>
+                        <th class="bg-light">Position</th>
+                        <td>{{ equipe.position }}</td>
                     </tr>
                     <tr>
                         <th class="bg-light">Énigme Actuelle</th>

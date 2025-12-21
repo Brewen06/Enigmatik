@@ -6,6 +6,7 @@ use App\Entity\Equipe;
 use App\Form\EquipeType;
 use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Column;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,6 @@ final class EquipeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $equipe->setPosition(0);
-            $equipe->setNote('');
             $equipe->setEnigmeActuelle(1);
             $entityManager->persist($equipe);
             $entityManager->flush();

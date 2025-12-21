@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Type;
+use App\Entity\Avatar;
 use App\Entity\Enigme;
 use App\Entity\Vignette;
 use Symfony\Component\Form\AbstractType;
@@ -83,7 +84,7 @@ class EnigmeType extends AbstractType
                             'application/xml',
                             'application/pdf',
                         ],
-                        'mimeTypesMessage' => 'Veuillez uploader un fichier PDF valide',
+                        'mimeTypesMessage' => 'Veuillez télécharger unn fichier valide.',
                     ])
                 
                 ],

@@ -5,9 +5,9 @@
 {% block body %}
 <div class="card shadow-lg border-0">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
-        <h1 class="h3 mb-0 fw-bold"><i class="bi bi-trophy-fill me-2"></i>Liste des Équipes</h1>
+        <h1 class="h3 mb-0 fw-bold"><i class="bi bi-trophy-fill me-2"></i>Liste des équipes</h1>
         <a href="{{ path('app_equipe_creer') }}" class="btn btn-light btn-sm fw-bold text-primary">
-            <i class="bi bi-plus-lg me-1"></i> Nouvelle Équipe
+            <i class="bi bi-plus-lg me-1"></i> Nouvelle équipe
         </a>
     </div>
     <div class="card-body p-0">
@@ -16,9 +16,9 @@
                 <thead class="bg-light text-secondary">
                     <tr>
                         <th class="ps-4">ID</th>
+                        <th>Avatar</th>
                         <th>Nom</th>
                         <th>Position</th>
-                        <th>Note</th>
                         <th>Énigme Actuelle</th>
                         <th class="text-end pe-4">Actions</th>
                     </tr>
@@ -27,15 +27,18 @@
                 {% for equipe in equipes %}
                     <tr>
                         <td class="ps-4 text-muted">#{{ equipe.id }}</td>
+                        <td>
+                            {% if equipe.avatar %}
+                                <img src="{{ asset(equipe.avatar.image) }}" alt="{{ equipe.avatar.nom }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            {% endif %}
+                        </td>
                         <td class="fw-bold text-primary">{{ equipe.nom }}</td>
                         <td>
                             <span class="badge bg-secondary rounded-pill">{{ equipe.position }}</span>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-star-fill text-warning me-1"></i>
-                                {{ equipe.note }}
-                            </div>
                         </td>
                         <td><span class="badge bg-info text-dark">Niveau {{ equipe.enigmeActuelle }}</span></td>
                         <td class="text-end pe-4">

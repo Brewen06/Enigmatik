@@ -17,9 +17,6 @@ class Avatar
     #[ORM\Column(length: 50)]
     private ?string $nom = null;
 
-    #[ORM\ManyToOne(inversedBy: 'avatar')]
-    private ?Equipe $equipe = null;
-
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
@@ -40,17 +37,6 @@ class Avatar
         return $this;
     }
 
-    public function getEquipe(): ?Equipe
-    {
-        return $this->equipe;
-    }
-
-    public function setEquipe(?Equipe $equipe): static
-    {
-        $this->equipe = $equipe;
-
-        return $this;
-    }
     public function __toString(): string
     {
         return $this->nom;

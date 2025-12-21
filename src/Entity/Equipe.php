@@ -24,22 +24,12 @@ class Equipe
     #[ORM\Column]
     private ?int $position = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $note = null;
-
     #[ORM\Column(nullable: true)]
     private ?int $enigmeActuelle = null;
 
-    /**
-     * @var Collection<int, Avatar>
-     */
-    #[ORM\OneToMany(targetEntity: Avatar::class, mappedBy: 'equipe')]
-    private Collection $avatar;
-
-    public function __construct()
-    {
-        $this->avatar = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(targetEntity: Avatar::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Avatar $avatar = null;
 
     public function getId(): ?int
     {
@@ -70,18 +60,6 @@ class Equipe
         return $this;
     }
 
-    public function getNote(): ?string
-    {
-        return $this->note;
-    }
-
-    public function setNote(string $note): static
-    {
-        $this->note = $note;
-
-        return $this;
-    }
-
     public function getEnigmeActuelle(): ?int
     {
         return $this->enigmeActuelle;
@@ -94,32 +72,14 @@ class Equipe
         return $this;
     }
 
-    /**
-     * @return Collection<int, Avatar>
-     */
-    public function getAvatar(): Collection
+    public function getAvatar(): ?Avatar
     {
         return $this->avatar;
     }
 
-    public function addAvatar(Avatar $avatar): static
+    public function setAvatar(?Avatar $avatar): static
     {
-        if (!$this->avatar->contains($avatar)) {
-            $this->avatar->add($avatar);
-            $avatar->setEquipe($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAvatar(Avatar $avatar): static
-    {
-        if ($this->avatar->removeElement($avatar)) {
-            // set the owning side to null (unless already changed)
-            if ($avatar->getEquipe() === $this) {
-                $avatar->setEquipe(null);
-            }
-        }
+        $this->avatar = $avatar;
 
         return $this;
     }

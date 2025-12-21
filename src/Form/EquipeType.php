@@ -2,9 +2,11 @@
 
 namespace App\Form;
 
+use App\Entity\Avatar;
 use App\Entity\Equipe;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EquipeType extends AbstractType
@@ -19,6 +21,17 @@ class EquipeType extends AbstractType
                         'class' => 'form-control'
                     ]
                 ]
+            )
+            ->add('avatar', EntityType::class, [
+                'class' => Avatar::class,
+                'choice_label' => 'nom',
+                'label' => 'Avatar de l\'équipe',
+                'placeholder' => 'Choisir un avatar',
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-select'
+                ]
+            ]
             )
         ;
     }
