@@ -10,8 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/type')]
+#[IsGranted('ROLE_PROF')]
 final class TypeController extends AbstractController
 {
     #[Route(name: 'app_type_index', methods: ['GET'])]

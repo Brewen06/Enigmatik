@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord Enseignant{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Tableau de Bord Enseignant</h1>
+
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h2 class="h5 mb-0"><i class="bi bi-play-circle me-2"></i>Parties en cours</h2>
+                </div>
+                <div class="card-body">
+                    {% if activeGames is empty %}
+                        <p class="text-muted">Aucune partie en cours.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Équipe</th>
+                                        <th>Avatar</th>
+                                        <th>Début</th>
+                                        <th>Progression</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in activeGames %}
+                                        <tr>
+                                            <td class="fw-bold">{{ game.nom }}</td>
+                                            <td>
+                                                {% if game.avatar %}
+                                                    <img src="{{ asset(game.avatar.image | replace({'public/': ''})) }}" alt="Avatar" style="height: 30px; width: 30px; object-fit: cover;" class="rounded-circle">
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ game.startedAt ? game.startedAt|date('d/m/Y H:i') : '-' }}</td>
+                                            <td>
+                                                <span class="badge bg-primary">Enigme {{ game.enigmeActuelle }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ path('app_equipe_show', {'id': game.id}) }}" class="btn btn-sm btn-outline-info">Détails</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h2 class="h5 mb-0"><i class="bi bi-clock-history me-2"></i>Historique des parties</h2>
+                </div>
+                <div class="card-body">
+                    {% if historyGames is empty %}
+                        <p class="text-muted">Aucun historique disponible.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Équipe</th>
+                                        <th>Début</th>
+                                        <th>Fin</th>
+                                        <th>Durée</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in historyGames %}
+                                        <tr>
+                                            <td>{{ game.nom }}</td>
+                                            <td>{{ game.startedAt ? game.startedAt|date('d/m/Y H:i') : '-' }}</td>
+                                            <td>{{ game.finishedAt ? game.finishedAt|date('d/m/Y H:i') : '-' }}</td>
+                                            <td>
+                                                {% if game.startedAt and game.finishedAt %}
+                                                    {% set duration = game.finishedAt.diff(game.startedAt) %}
+                                                    {{ duration.format('%Hh %Im %Ss') }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

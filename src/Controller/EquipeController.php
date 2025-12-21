@@ -33,8 +33,12 @@ final class EquipeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $equipe->setPosition(0);
             $equipe->setEnigmeActuelle(1);
+            $equipe->setStartedAt(new \DateTime());
             $entityManager->persist($equipe);
             $entityManager->flush();
+
+            // Enregistrer l'ID de l'équipe en session
+            $request->getSession()->set('equipe_id', $equipe->getId());
 
             return $this->redirectToRoute('app_jeu_index', ['equipe_id' => $equipe->getId()], Response::HTTP_SEE_OTHER);
         }

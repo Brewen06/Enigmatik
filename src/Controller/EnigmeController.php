@@ -53,6 +53,22 @@ final class EnigmeController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/check', name: 'app_enigme_check', methods: ['POST'])]
+    public function check(Request $request, Enigme $enigme): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $answer = $data['answer'] ?? '';
+
+        if (strcasecmp(trim($answer), trim($enigme->getCodeSecret())) === 0) {
+            return $this->json([
+                'success' => true,
+                'codeReponse' => $enigme->getCodeReponse()
+            ]);
+        }
+
+        return $this->json(['success' => false]);
+    }
+
     #[Route('/{id}/edit', name: 'app_enigme_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
     {

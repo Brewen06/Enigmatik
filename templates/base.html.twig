@@ -36,42 +36,23 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">                        
                         {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="/equipe" id="navbarDropdownEquipes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-trophy-fill me-1"></i> Équipes
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownEquipes">
-                                    <li><a class="dropdown-item" href="{{ path('app_equipe_index') }}">Liste des équipes</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_equipe_creer') }}">Créer une équipe</a></li>
-                                </ul>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="/user" id="navbarDropdownUsers" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-badge-fill me-1"></i> Utilisateurs
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownUsers">
-                                    <li><a class="dropdown-item" href="{{ path('app_user_index') }}">Liste des utilisateurs</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_user_new') }}">Créer un utilisateur</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_page_prof')}}">Page des Professeurs</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="/enigme" id="navbarDropDownEnigmes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-puzzle-fill me-1"></i> Énigmes
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropDownEnigmes">
-                                    <li><a class="dropdown-item" href="{{ path('app_enigme_index') }}">Liste des énigmes</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_enigme_creer') }}">Créer une énigme</a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-
-                        {% if is_granted('ROLE_ADMIN') %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ path('app_admin') }}">
-                                    <i class="bi bi-gear-fill me-1"></i> Administration
+                                <a class="nav-link text-warning fw-bold" href="{{ path('app_admin_dashboard') }}">
+                                    <i class="bi bi-speedometer2 me-1"></i> Tableau de Bord
                                 </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownGestion" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-gear-fill me-1"></i> Gestion
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownGestion">
+                                    <li><a class="dropdown-item" href="{{ path('app_vignette_index') }}">Domaines (Vignettes)</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_type_index') }}">Types de jeu</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_enigme_index') }}">Énigmes</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_equipe_index') }}">Équipes</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_user_index') }}">Utilisateurs</a></li>
+                                </ul>
                             </li>
                         {% endif %}
                     </ul>
@@ -112,7 +93,7 @@
                 <span class="fs-4">🧩</span> <span class="fw-bold">Enigmatik</span>
             </div>
             <p class="mb-2 text-secondary">&copy; {{ "now"|date("Y") }} Enigmatik. Tous droits réservés.</p>
-            <p class="small text-secondary mb-0">Développé avec Symfony pour apprendre l'informatique en s'amusant.</p>
+            <p class="small text-secondary mb-0">Développé avec Symfony.</p>
         </div>
     </footer>
   </body>

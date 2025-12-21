@@ -31,9 +31,39 @@ class Equipe
     #[ORM\JoinColumn(nullable: false)]
     private ?Avatar $avatar = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $startedAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $finishedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getStartedAt(): ?\DateTimeInterface
+    {
+        return $this->startedAt;
+    }
+
+    public function setStartedAt(?\DateTimeInterface $startedAt): static
+    {
+        $this->startedAt = $startedAt;
+
+        return $this;
+    }
+
+    public function getFinishedAt(): ?\DateTimeInterface
+    {
+        return $this->finishedAt;
+    }
+
+    public function setFinishedAt(?\DateTimeInterface $finishedAt): static
+    {
+        $this->finishedAt = $finishedAt;
+
+        return $this;
     }
 
     public function getNom(): ?string

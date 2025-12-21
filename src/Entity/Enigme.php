@@ -32,6 +32,12 @@ class Enigme
     #[ORM\Column(length: 50)]
     private ?string $codeSecret = null;
 
+    #[ORM\Column(length: 2, nullable: true)]
+    private ?string $codeReponse = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $choices = null;
+
     #[ORM\ManyToOne(inversedBy: 'enigmes')]
     private ?Vignette $vignette = null;
 
@@ -45,6 +51,30 @@ class Enigme
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCodeReponse(): ?string
+    {
+        return $this->codeReponse;
+    }
+
+    public function setCodeReponse(?string $codeReponse): static
+    {
+        $this->codeReponse = $codeReponse;
+
+        return $this;
+    }
+
+    public function getChoices(): ?array
+    {
+        return $this->choices;
+    }
+
+    public function setChoices(?array $choices): static
+    {
+        $this->choices = $choices;
+
+        return $this;
     }
 
     public function getType(): ?Type

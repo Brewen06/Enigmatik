@@ -28,6 +28,9 @@ class Jeu
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageBienvenue = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $codeFinal = null;
+
     /**
      * @var Collection<int, Parametre>
      */
@@ -87,6 +90,18 @@ class Jeu
     public function setImageBienvenue(?string $imageBienvenue): static
     {
         $this->imageBienvenue = $imageBienvenue;
+
+        return $this;
+    }
+
+    public function getCodeFinal(): ?string
+    {
+        return $this->codeFinal;
+    }
+
+    public function setCodeFinal(?string $codeFinal): static
+    {
+        $this->codeFinal = $codeFinal;
 
         return $this;
     }

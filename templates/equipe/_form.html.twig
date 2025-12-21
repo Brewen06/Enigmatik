@@ -1,25 +1,8 @@
 {{ form_start(form) }}
-    {{ form_row(form.nom) }}
-    
-    <div class="mb-3">
-        {{ form_label(form.avatar) }}
-        <div class="d-flex flex-wrap gap-3 justify-content-center mt-2">
-            {% for child in form.avatar %}
-                <div class="text-center">
-                    <input type="radio" id="{{ child.vars.id }}" name="{{ child.vars.full_name }}" value="{{ child.vars.value }}" class="btn-check" {% if child.vars.checked %}checked{% endif %}>
-                    <label class="btn btn-outline-light border-0 p-2 shadow-sm text-dark" for="{{ child.vars.id }}" style="width: 120px;">
-                        <img src="{{ asset(child.vars.attr['data-image']) }}" alt="{{ child.vars.label }}" class="d-block mx-auto mb-2" style="width: 60px; height: 60px; object-fit: contain;">
-                        <span class="small fw-bold d-block text-truncate">{{ child.vars.label }}</span>
-                    </label>
-                </div>
-            {% endfor %}
-        </div>
-        {{ form_errors(form.avatar) }}
-    </div>
+{{ form_row(form.nom) }}
+{{ form_rest(form) }}
 
-    {{ form_rest(form) }}
-    
-    <div class="mt-4 text-center">
-        <button class="btn btn-primary btn-lg px-5 rounded-pill shadow">{{ button_label|default('Enregistrer') }}</button>
-    </div>
+<div class="mt-4 text-center">
+    <button class="btn btn-primary btn-lg px-5 rounded-pill shadow">{{ button_label|default('Enregistrer') }}</button>
+</div>
 {{ form_end(form) }}

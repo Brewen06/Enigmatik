@@ -5,30 +5,162 @@
 {% block body %}
     <div class="tw-text-center tw-mb-10">
         <h1 class="tw-text-4xl tw-font-bold tw-mb-2">Bienvenue <span class="tw-text-blue-600">{% if equipe %}{{ equipe.nom }}{% endif %}</span> !</h1>
-        <p class="tw-text-lg tw-text-gray-600">Prêt à relever le défi ? Résolvez les énigmes pour avancer.</p>
+        <p class="tw-text-lg tw-text-gray-600">Prêt à relever le défi ? Résolvez les énigmes pour obtenir les indices du code final.</p>
     </div>
 
-    <div class="tw-container tw-mx-auto tw-px-4">
-        <h2 class="tw-text-2xl tw-font-bold tw-mb-8 tw-text-center tw-border-b tw-pb-4">Les Énigmes</h2>
+    <div class="tw-container tw-mx-auto tw-px-4" 
+         data-controller="board" 
+         data-board-validate-url-value="{{ path('app_jeu_validate_final_code') }}">
         
-        <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6">
+        <!-- Modal Briefing -->
+        <div data-board-target="modal" class="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm">
+            <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-2xl tw-w-full tw-relative tw-shadow-2xl tw-border-4 tw-border-green-500">
+                <button data-action="click->board#closeModal" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-gray-800 tw-transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-8 tw-w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                
+                <div class="tw-text-center">
+                    <div class="tw-text-6xl tw-mb-4">📜</div>
+                    <h2 class="tw-text-3xl tw-font-bold tw-text-green-700 tw-mb-6">Briefing Mission</h2>
+                    
+                    <div class="tw-text-left tw-bg-green-50 tw-p-6 tw-rounded-lg tw-border tw-border-green-200">
+                        <p class="tw-text-lg tw-text-gray-800 tw-mb-4">
+                            <strong>Bienvenue agents.</strong> Votre mission est critique :
+                        </p>
+                        <ul class="tw-space-y-3 tw-text-gray-700">
+                            <li class="tw-flex tw-items-start">
+                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">1</span>
+                                Résolvez les 5 énigmes proposées.
+                            </li>
+                            <li class="tw-flex tw-items-start">
+                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">2</span>
+                                Chaque réussite vous donne un indice (ex: A1).
+                            </li>
+                            <li class="tw-flex tw-items-start">
+                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">3</span>
+                                Assemblez les indices pour former le <strong>Code Final</strong>.
+                            </li>
+                            <li class="tw-flex tw-items-start">
+                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">4</span>
+                                Entrez le code sur la carte Cadenas 🔐 pour gagner.
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <button data-action="click->board#closeModal" class="tw-mt-8 tw-px-8 tw-py-3 tw-bg-green-600 hover:tw-bg-green-700 tw-text-white tw-font-bold tw-rounded-full tw-shadow-lg tw-transition-transform hover:tw-scale-105">
+                        J'ACCEPTE LA MISSION
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Enigme (Dynamique) -->
+        <div data-board-target="enigmaModal" class="tw-hidden tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm">
+            <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-lg tw-w-full tw-relative tw-shadow-2xl tw-border-4 tw-border-blue-500">
+                <button data-action="click->board#closeEnigmaModal" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-gray-800 tw-transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-8 tw-w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                
+                <div class="tw-text-center">
+                    <div class="tw-text-6xl tw-mb-4">🧩</div>
+                    <h2 data-board-target="enigmaTitle" class="tw-text-2xl tw-font-bold tw-text-blue-700 tw-mb-2">Titre Enigme</h2>
+                    <div class="tw-mb-4">
+                        <span data-board-target="enigmaType" class="tw-inline-block tw-bg-blue-100 tw-text-blue-800 tw-text-xs tw-px-2 tw-py-1 tw-rounded-full tw-uppercase tw-tracking-wide tw-font-semibold">Type</span>
+                    </div>
+                    
+                    <div class="tw-bg-blue-50 tw-p-6 tw-rounded-lg tw-border tw-border-blue-200 tw-mb-6 tw-text-left">
+                        <h4 class="tw-text-sm tw-font-bold tw-text-blue-800 tw-mb-2 tw-uppercase">Consigne :</h4>
+                        <p data-board-target="enigmaDesc" class="tw-text-gray-700 tw-italic tw-mb-4">Description...</p>
+                        
+                        <div data-board-target="enigmaVignetteContainer" class="tw-hidden tw-mt-4 tw-pt-4 tw-border-t tw-border-blue-200">
+                            <h4 class="tw-text-sm tw-font-bold tw-text-blue-800 tw-mb-1 tw-uppercase">Info Vignette :</h4>
+                            <p data-board-target="enigmaVignette" class="tw-text-sm tw-text-gray-600">Info...</p>
+                        </div>
+                    </div>
+                    
+                    <a data-board-target="enigmaLink" href="#" class="tw-inline-block tw-px-8 tw-py-3 tw-bg-blue-600 hover:tw-bg-blue-700 tw-text-white tw-font-bold tw-rounded-full tw-shadow-lg tw-transition-transform hover:tw-scale-105">
+                        ACCÉDER À L'ÉNIGME
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if jeu and jeu.messageDeBienvenue %}
+            <div class="tw-bg-blue-100 tw-border-l-4 tw-border-blue-500 tw-text-blue-700 tw-p-4 tw-mb-8 tw-rounded tw-shadow-sm" role="alert">
+                <p class="tw-font-bold">Message de bienvenue :</p>
+                <p>{{ jeu.messageDeBienvenue }}</p>
+            </div>
+        {% endif %}
+
+        <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-8 tw-justify-items-center">
             {% for enigme in enigmes %}
-                <div class="card tw-h-full tw-shadow-md hover:tw-shadow-xl tw-transition tw-duration-300 tw-border-0">
-                    <div class="card-body tw-flex tw-flex-col">
-                        <h3 class="card-title tw-text-xl tw-font-bold tw-mb-3">{{ enigme.titre }}</h3>
-                        <p class="card-text tw-text-gray-600 tw-flex-grow">{{ enigme.consigne|slice(0, 100) }}...</p>
-                        <div class="tw-mt-4 tw-text-right">
-                            <a href="{{ path('app_enigme_show', {'id': enigme.id}) }}" class="btn btn-primary">
-                                🧩 Voir l'énigme
-                            </a>
+                <!-- Carte Enigme {{ loop.index }} -->
+                <div class="tw-w-64 tw-h-96 tw-cursor-pointer tw-transition-transform hover:tw-scale-105"
+                     data-action="click->board#openEnigma"
+                     data-board-title-param="{{ enigme.titre }}"
+                     data-board-desc-param="{{ enigme.consigne|slice(0, 150) }}..."
+                     data-board-type-param="{{ enigme.type.libelle }}"
+                     data-board-vignette-param="{% if enigme.vignette %}{{ enigme.vignette.information }}{% endif %}"
+                     data-board-url-param="{{ path('app_enigme_show', {'id': enigme.id}) }}"
+                     data-board-index-param="{{ loop.index }}">
+                    <div class="tw-w-full tw-h-full tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-blue-500 tw-bg-white tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-shadow-xl">
+                        <div class="tw-text-5xl tw-mb-4">🧩</div>
+                        <h3 class="tw-text-xl tw-font-bold tw-text-blue-600 tw-text-center">Énigme {{ loop.index }}</h3>
+                        <p class="tw-mt-2 tw-text-sm tw-text-gray-500 tw-text-center">{{ enigme.titre }}</p>
+                        <span class="tw-mt-2 tw-inline-block tw-bg-blue-100 tw-text-blue-800 tw-text-xs tw-px-2 tw-py-1 tw-rounded-full">{{ enigme.type.libelle }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Carte 6 : Code Final -->
+            <div class="tw-relative tw-group tw-perspective-1000 tw-w-64 tw-h-96 tw-cursor-pointer"
+                 data-board-target="card"
+                 data-action="click->board#flipCard">
+                <div class="tw-relative tw-w-full tw-h-full tw-transition-all tw-duration-500 tw-transform-style-3d tw-shadow-xl tw-rounded-xl">
+                    <!-- Face Recto (Cadenas) -->
+                    <div class="tw-absolute tw-w-full tw-h-full tw-backface-hidden tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-yellow-500 tw-bg-gray-900 tw-flex tw-flex-col tw-items-center tw-justify-center tw-text-white">
+                        <div class="tw-text-6xl tw-mb-4">🔐</div>
+                        <h3 class="tw-text-2xl tw-font-bold tw-text-yellow-400 tw-uppercase tw-tracking-wider">Code Final</h3>
+                        <p class="tw-mt-4 tw-text-sm tw-text-gray-300 tw-px-4 tw-text-center">Rassemblez les indices pour déverrouiller le système</p>
+                    </div>
+
+                    <!-- Face Verso (Formulaire) -->
+                    <div class="tw-absolute tw-w-full tw-h-full tw-backface-hidden tw-rotate-y-180 tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-yellow-500 tw-bg-gray-800 tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4">
+                        <h3 class="tw-text-xl tw-font-bold tw-text-yellow-400 tw-mb-4">Saisir le Code</h3>
+                        <div class="tw-w-full tw-space-y-4">
+                            <input type="text" 
+                                   data-board-target="finalCodeInput"
+                                   class="tw-w-full tw-px-4 tw-py-2 tw-bg-gray-700 tw-border tw-border-yellow-500 tw-rounded tw-text-white tw-text-center tw-tracking-widest tw-uppercase tw-placeholder-gray-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-yellow-400"
+                                   placeholder="XXXXX"
+                                   maxlength="10">
+                            <button data-action="click->board#checkFinalCode"
+                                    class="tw-w-full tw-py-2 tw-bg-yellow-500 hover:tw-bg-yellow-400 tw-text-gray-900 tw-font-bold tw-rounded tw-transition-colors">
+                                VALIDER
+                            </button>
+                            <div data-board-target="finalMessage" class="tw-text-sm tw-text-center tw-min-h-[20px]"></div>
                         </div>
                     </div>
                 </div>
-            {% else %}
-                <div class="tw-col-span-full tw-text-center tw-p-10 tw-bg-gray-50 tw-rounded-lg">
-                    <p class="tw-text-gray-500 tw-text-lg">Aucune énigme disponible pour le moment.</p>
-                </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
+
+    <style>
+        .tw-perspective-1000 {
+            perspective: 1000px;
+        }
+        .tw-transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .tw-backface-hidden {
+            backface-visibility: hidden;
+        }
+        .tw-rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
 {% endblock %}

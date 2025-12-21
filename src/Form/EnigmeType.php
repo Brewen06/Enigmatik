@@ -11,6 +11,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\CallbackTransformer;
 
 class EnigmeType extends AbstractType
 {
@@ -50,6 +52,12 @@ class EnigmeType extends AbstractType
                     ]
                 ]
             )
+            ->add('choices', TextareaType::class, [
+                'label' => 'Choix de réponses (une par ligne, laisser vide pour réponse libre)',
+                'required' => false,
+                'attr' => ['class' => 'form-control', 'rows' => 5],
+                'help' => 'Si rempli, l\'énigme sera présentée sous forme de QCM.'
+            ])
             ->add('type', EntityType::class, [
                 'class' => Type::class,
                 'choice_label' => 'libelle',
@@ -93,6 +101,24 @@ class EnigmeType extends AbstractType
                 ]
             ])
         ;
+
+        $builder->get('choices')
+            ->addModelTransformer(new CallbackTransformer(
+                function ($choicesAsArray) {
+                    // transform the array to a string
+                    if (!$choicesAsArray) {
+                        return '';
+                    }
+                    return implode("\n", $choicesAsArray);
+                },
+                function ($choicesAsString) {
+                    // transform the string back to an array
+                    if (!$choicesAsString) {
+                        return [];
+                    }
+                    return array_filter(array_map('trim', explode("\n", $choicesAsString)));
+                }
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
