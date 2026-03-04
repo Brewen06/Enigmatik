@@ -39,20 +39,28 @@ security:
          - { path: ^/user/admin, roles: ROLE_ADMIN }
          - { path: ^/user, roles: [ROLE_PROF, ROLE_ADMIN] }
          - { path: ^/user/prof, roles: ROLE_PROF }
+         - { path: ^/user/*/delete, roles: ROLE_ADMIN }
+         - { path: ^/user/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
         # contrôle d'accès aux routes equipe
          - { path: ^/equipe/creer , roles: PUBLIC_ACCESS }
-         - { path: ^/equipe/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
-         - { path: ^/equipe/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/equipe/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/equipe/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
          - { path: ^/equipe, roles: [ROLE_PROF, ROLE_ADMIN] }
         # contrôle d'accès à la route jeu
          - { path: ^/jeu, roles: PUBLIC_ACCESS }
         # contrôle d'accès aux routes enigme
          - { path: ^/enigme/creer, roles: [ROLE_PROF, ROLE_ADMIN] }
-         - { path: ^/enigme/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
-         - { path: ^/enigme/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/enigme/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/enigme/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
          - { path: ^/enigme, roles: PUBLIC_ACCESS }
         # contrôle d'accès aux routes paramètres
          - { path: ^/parametre, roles: ROLE_ADMIN }
+        # contrôle d'accès aux routes type-enigme
+         - { path: ^/type, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/type/creer, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/type/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/type/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+        #
 
 
     role_hierarchy:
