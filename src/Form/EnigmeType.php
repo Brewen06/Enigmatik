@@ -17,14 +17,6 @@ class EnigmeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('ordre', 
-                null, [
-                    'label' => 'Ordre de l\'énigme dans le jeu',
-                    'attr' => [
-                        'class' => 'form-control'
-                    ]
-                ]
-            )
             ->add('titre', 
                 null, [
                     'label' => 'Titre de l\'énigme',
@@ -42,20 +34,6 @@ class EnigmeType extends AbstractType
                     ]
                 ]
             )
-            ->add('codeSecret', 
-                null, [
-                    'label' => 'Code secret de l\'énigme',
-                    'attr' => [
-                        'class' => 'form-control'
-                    ]
-                ]
-            )
-            ->add('choices', TextareaType::class, [
-                'label' => 'Choix de réponses (une par ligne, laisser vide pour réponse libre)',
-                'required' => false,
-                'attr' => ['class' => 'form-control', 'rows' => 5],
-                'help' => 'Si rempli, l\'énigme sera présentée sous forme de QCM.'
-            ])
             ->add('type', EntityType::class, [
                 'class' => Type::class,
                 'choice_label' => 'libelle',
@@ -75,6 +53,20 @@ class EnigmeType extends AbstractType
                 'attr' => [
                     'class' => 'form-select'
                 ]
+            ])
+            ->add('codeSecret', 
+                null, [
+                    'label' => 'Code secret de l\'énigme',
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]
+            )
+            ->add('choices', TextareaType::class, [
+                'label' => 'Choix de réponses (une par ligne, laisser vide pour réponse libre)',
+                'required' => false,
+                'attr' => ['class' => 'form-control', 'rows' => 5],
+                'help' => 'Si rempli, l\'énigme sera présentée sous forme de QCM.'
             ])
         ;
 

@@ -3,9 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Avatar;
-use App\Entity\Equipe;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -22,23 +22,23 @@ class AvatarType extends AbstractType
                     ]
                 ]
             )
-            ->add('equipe', EntityType::class, [
-                'class' => Equipe::class,
-                'choice_label' => 'id',
-                'label' => 'Équipe associée',
-                'placeholder' => 'Choisir une équipe',
+            ->add('imageFile', FileType::class, [
+                'label' => 'Image de la vignette (Fichier image)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'image/svg+xml',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez uploader une image valide (SVG)',
+                    ])
+                ],
                 'attr' => [
-                    'class' => 'form-select'
+                    'class' => 'form-control'
                 ]
             ])
-            ->add('image', 
-                null, [
-                    'label' => 'Image de l\'avatar',
-                    'attr' => [
-                        'class' => 'form-control'
-                    ]
-                ]
-            )
         ;
         
     }

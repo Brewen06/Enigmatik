@@ -37,6 +37,17 @@ class Equipe
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $finishedAt = null;
 
+    /**
+     * @var Collection<int, Avatar>
+     */
+    #[ORM\OneToMany(targetEntity: Avatar::class, mappedBy: 'equipe')]
+    private Collection $avatars;
+
+    public function __construct()
+    {
+        $this->avatars = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -110,6 +121,36 @@ class Equipe
     public function setAvatar(?Avatar $avatar): static
     {
         $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avatar>
+     */
+    public function getAvatars(): Collection
+    {
+        return $this->avatars;
+    }
+
+    public function addAvatar(Avatar $avatar): static
+    {
+        if (!$this->avatars->contains($avatar)) {
+            $this->avatars->add($avatar);
+            $avatar->setEquipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvatar(Avatar $avatar): static
+    {
+        if ($this->avatars->removeElement($avatar)) {
+            // set the owning side to null (unless already changed)
+            if ($avatar->getEquipe() === $this) {
+                $avatar->setEquipe(null);
+            }
+        }
 
         return $this;
     }
