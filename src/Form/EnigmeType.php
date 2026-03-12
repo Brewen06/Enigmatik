@@ -3,14 +3,12 @@
 namespace App\Form;
 
 use App\Entity\Type;
-use App\Entity\Avatar;
 use App\Entity\Enigme;
 use App\Entity\Vignette;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\CallbackTransformer;
 
@@ -76,28 +74,6 @@ class EnigmeType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'form-select'
-                ]
-            ])
-            ->add('FileEnigme', FileType::class, [
-                'label' => 'Fichier de l\'énigme (PDF, HTML, JSON, PHP, XML)',
-                'mapped' => false,
-                'required' => false,
-                'constraints' => [
-                    new \Symfony\Component\Validator\Constraints\File([
-                        'maxSize' => '2048k',
-                        'mimeTypes' => [
-                            'application/php',
-                            'application/html',
-                            'application/json',
-                            'application/xml',
-                            'application/pdf',
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger unn fichier valide.',
-                    ])
-                
-                ],
-                'attr' => [
-                    'class' => 'form-control'
                 ]
             ])
         ;

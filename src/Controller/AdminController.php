@@ -16,10 +16,12 @@ class AdminController extends AbstractController
     public function dashboard(EquipeRepository $equipeRepository): Response
     {
         $activeGames = $equipeRepository->createQueryBuilder('e')
+            ->select('e.id, e.nom, e.startedAt, e.enigmeActuelle, a.image AS avatarImage')
+            ->leftJoin('e.avatar', 'a')
             ->where('e.finishedAt IS NULL')
             ->orderBy('e.startedAt', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
 
         $historyGames = $equipeRepository->createQueryBuilder('e')
             ->where('e.finishedAt IS NOT NULL')

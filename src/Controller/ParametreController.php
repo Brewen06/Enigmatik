@@ -22,7 +22,7 @@ final class ParametreController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_parametre_new', methods: ['GET', 'POST'])]
+    #[Route('/creer', name: 'app_parametre_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $parametre = new Parametre();
@@ -50,7 +50,7 @@ final class ParametreController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_parametre_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/modifier', name: 'app_parametre_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Parametre $parametre, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ParametreType::class, $parametre);
@@ -68,7 +68,7 @@ final class ParametreController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_parametre_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'app_parametre_delete', methods: ['POST'])]
     public function delete(Request $request, Parametre $parametre, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$parametre->getId(), $request->getPayload()->getString('_token'))) {

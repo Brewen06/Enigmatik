@@ -24,7 +24,7 @@ final class TypeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_type_new', methods: ['GET', 'POST'])]
+    #[Route('/creer', name: 'app_type_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $type = new Type();
@@ -52,7 +52,7 @@ final class TypeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_type_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/modifier', name: 'app_type_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Type $type, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(TypeType::class, $type);
@@ -70,7 +70,7 @@ final class TypeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_type_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'app_type_delete', methods: ['POST'])]
     public function delete(Request $request, Type $type, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$type->getId(), $request->getPayload()->getString('_token'))) {

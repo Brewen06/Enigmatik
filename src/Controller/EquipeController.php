@@ -6,7 +6,6 @@ use App\Entity\Equipe;
 use App\Form\EquipeType;
 use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Column;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,7 +56,7 @@ final class EquipeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_equipe_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/modifier', name: 'app_equipe_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(EquipeType::class, $equipe);
@@ -75,7 +74,7 @@ final class EquipeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_equipe_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'app_equipe_delete', methods: ['POST'])]
     public function delete(Request $request, Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$equipe->getId(), $request->getPayload()->getString('_token'))) {

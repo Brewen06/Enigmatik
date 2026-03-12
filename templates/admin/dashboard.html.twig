@@ -32,8 +32,10 @@
                                         <tr>
                                             <td class="fw-bold">{{ game.nom }}</td>
                                             <td>
-                                                {% if game.avatar %}
-                                                    <img src="{{ asset(game.avatar.image | replace({'public/': ''})) }}" alt="Avatar" style="height: 30px; width: 30px; object-fit: cover;" class="rounded-circle">
+                                                {% if game.avatarImage %}
+                                                    <img src="{{ asset(game.avatarImage | replace({'public/': ''})) }}" alt="Avatar" style="height: 30px; width: 30px; object-fit: cover;" class="rounded-circle">
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
                                                 {% endif %}
                                             </td>
                                             <td>{{ game.startedAt ? game.startedAt|date('d/m/Y H:i') : '-' }}</td>

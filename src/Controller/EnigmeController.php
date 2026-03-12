@@ -7,12 +7,9 @@ use App\Form\EnigmeType;
 use App\Repository\EnigmeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[Route('/enigme')]
 final class EnigmeController extends AbstractController
@@ -69,7 +66,7 @@ final class EnigmeController extends AbstractController
         return $this->json(['success' => false]);
     }
 
-    #[Route('/{id}/edit', name: 'app_enigme_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/modifier', name: 'app_enigme_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(EnigmeType::class, $enigme);
@@ -87,7 +84,7 @@ final class EnigmeController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_enigme_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'app_enigme_delete', methods: ['POST'])]
     public function delete(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$enigme->getId(), $request->getPayload()->getString('_token'))) {

@@ -24,7 +24,7 @@ final class VignetteController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_vignette_new', methods: ['GET', 'POST'])]
+    #[Route('/creer', name: 'app_vignette_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $vignette = new Vignette();
@@ -52,7 +52,7 @@ final class VignetteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_vignette_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/modifier', name: 'app_vignette_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Vignette $vignette, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(VignetteType::class, $vignette);
@@ -70,7 +70,7 @@ final class VignetteController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_vignette_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'app_vignette_delete', methods: ['POST'])]
     public function delete(Request $request, Vignette $vignette, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$vignette->getId(), $request->getPayload()->getString('_token'))) {
