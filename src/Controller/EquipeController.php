@@ -17,8 +17,15 @@ final class EquipeController extends AbstractController
     #[Route(name: 'app_equipe_index', methods: ['GET'])]
     public function index(EquipeRepository $equipeRepository): Response
     {
+        $equipes = $equipeRepository->createQueryBuilder('e')
+            ->select('e.id, e.nom, e.position, e.enigmeActuelle, a.image AS avatarImage, a.nom AS avatarNom')
+            ->leftJoin('e.avatar', 'a')
+            ->orderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
         return $this->render('equipe/index.html.twig', [
-            'equipes' => $equipeRepository->findAll(),
+            'equipes' => $equipes,
         ]);
     }
 
