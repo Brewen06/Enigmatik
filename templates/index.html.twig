@@ -9,6 +9,15 @@
         
         <div class="tw-flex tw-justify-center tw-space-x-4">
             {% if equipe is defined and equipe %}
+                <div class="tw-bg-white tw-rounded-lg tw-shadow tw-p-4 tw-mr-4 tw-flex tw-items-center tw-gap-3">
+                    {% if equipe.avatar %}
+                        <img src="{{ asset(equipe.avatar.image) }}" alt="{{ equipe.avatar.nom }}" class="tw-w-12 tw-h-12 tw-rounded-full tw-object-cover">
+                    {% endif %}
+                    <div class="tw-text-left">
+                        <p class="tw-text-xs tw-text-gray-500 tw-uppercase tw-mb-0">Équipe</p>
+                        <p class="tw-font-semibold tw-text-gray-800 tw-mb-0">{{ equipe.nom }}</p>
+                    </div>
+                </div>
                 <a href="{{ path('app_jeu_index', {'equipe_id': equipe.id}) }}" class="btn btn-success btn-lg tw-font-bold tw-px-8 tw-py-3 tw-rounded-full tw-shadow-md hover:tw-shadow-xl tw-transition tw-duration-300">
                     ▶ Reprendre la partie ({{ equipe.nom }})
                 </a>

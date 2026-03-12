@@ -8,6 +8,21 @@
         <p class="tw-text-lg tw-text-gray-600">Prêt à relever le défi ? Résolvez les énigmes pour obtenir les indices du code final.</p>
     </div>
 
+    {% if equipe %}
+        <div class="tw-max-w-md tw-mx-auto tw-bg-white tw-rounded-xl tw-shadow tw-p-4 tw-mb-8 tw-flex tw-items-center tw-gap-4">
+            {% if equipe.avatar %}
+                <img src="{{ asset(equipe.avatar.image) }}" alt="{{ equipe.avatar.nom }}" class="tw-w-16 tw-h-16 tw-rounded-full tw-object-cover tw-border tw-border-gray-200">
+            {% endif %}
+            <div>
+                <p class="tw-text-xs tw-uppercase tw-text-gray-500 tw-mb-1">Données de l'équipe</p>
+                <p class="tw-font-semibold tw-text-gray-900 tw-mb-0">{{ equipe.nom }}</p>
+                {% if equipe.avatar %}
+                    <p class="tw-text-sm tw-text-gray-600 tw-mb-0">Avatar : {{ equipe.avatar.nom }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
     <div class="tw-container tw-mx-auto tw-px-4" 
          data-controller="board" 
          data-board-validate-url-value="{{ path('app_jeu_validate_final_code') }}">

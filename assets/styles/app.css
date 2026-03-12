@@ -1,1 +1,114 @@
 
+:root {
+	--edit-bg: linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%);
+	--edit-card: #ffffff;
+	--edit-border: #dbe6f7;
+	--edit-title: #1f2a44;
+	--edit-subtitle: #5b6780;
+	--edit-accent-start: #2459e0;
+	--edit-accent-end: #0ca678;
+}
+
+.edit-page {
+	max-width: 960px;
+	margin: 0 auto;
+}
+
+.edit-page__card {
+	background: var(--edit-bg);
+	border: 1px solid var(--edit-border);
+	border-radius: 1rem;
+	box-shadow: 0 12px 28px rgba(35, 56, 95, 0.12);
+	padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+}
+
+.edit-page__header {
+	margin-bottom: 1rem;
+}
+
+.edit-page__title {
+	color: var(--edit-title);
+	font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+	font-weight: 700;
+	margin-bottom: 0.35rem;
+}
+
+.edit-page__subtitle {
+	color: var(--edit-subtitle);
+	margin-bottom: 0;
+}
+
+.edit-page form {
+	background: var(--edit-card);
+	border: 1px solid #e8edf5;
+	border-radius: 0.85rem;
+	padding: 1.2rem;
+}
+
+.edit-page .form-control,
+.edit-page .form-select,
+.edit-page textarea {
+	border-radius: 0.65rem;
+	border-color: #cfd9e8;
+}
+
+.edit-page .form-control:focus,
+.edit-page .form-select:focus,
+.edit-page textarea:focus {
+	border-color: #82a8ff;
+	box-shadow: 0 0 0 0.2rem rgba(36, 89, 224, 0.16);
+}
+
+.edit-page .btn.btn-primary {
+	border: 0;
+	border-radius: 999px;
+	padding-inline: 1.35rem;
+	font-weight: 600;
+	background: linear-gradient(90deg, var(--edit-accent-start), var(--edit-accent-end));
+}
+
+.edit-page .btn.btn-primary:hover {
+	filter: brightness(0.95);
+}
+
+.edit-page__actions {
+	align-items: center;
+}
+
+.edit-page__actions form {
+	border: 0;
+	background: transparent;
+	padding: 0;
+}
+
+.edit-page__actions form .btn {
+	border: 1px solid #dc3545;
+	color: #dc3545;
+}
+
+.edit-page__actions form .btn:hover {
+	background-color: #dc3545;
+	color: #fff;
+}
+
+@media (max-width: 576px) {
+	.edit-page__card {
+		border-radius: 0.8rem;
+		padding: 1rem;
+	}
+
+	.edit-page form {
+		padding: 0.9rem;
+	}
+
+	.edit-page__actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.edit-page__actions .btn,
+	.edit-page__actions form {
+		width: 100%;
+	}
+}
+

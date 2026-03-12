@@ -25,6 +25,15 @@ class EquipeType extends AbstractType
             ->add('avatar', EntityType::class, [
                 'class' => Avatar::class,
                 'choice_label' => 'nom',
+                'choice_attr' => static function (?Avatar $avatar): array {
+                    if (!$avatar) {
+                        return [];
+                    }
+
+                    return [
+                        'data-image' => $avatar->getImage(),
+                    ];
+                },
                 'label' => 'Avatar de l\'équipe',
                 'placeholder' => 'Choisir un avatar',
                 'required' => true,

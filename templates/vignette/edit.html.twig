@@ -3,14 +3,19 @@
 {% block title %}Modifier la vignette{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Modifier la vignette</h1>
+<section class="edit-page">
+    <div class="edit-page__card">
+        <div class="edit-page__header">
+            <h1 class="edit-page__title">Modifier la vignette</h1>
+            <p class="edit-page__subtitle">Actualisez les informations de la vignette en toute sécurité.</p>
+        </div>
 
-    {{ include('vignette/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+        {{ include('vignette/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <div class="mt-3 d-flex gap-2">
-        <a href="{{ path('app_vignette_index') }}" class="btn btn-secondary">Retour à la liste</a>
-        {{ include('vignette/_delete_form.html.twig') }}
+        <div class="edit-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_vignette_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+            {{ include('vignette/_delete_form.html.twig') }}
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}
