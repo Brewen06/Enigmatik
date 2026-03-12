@@ -34,4 +34,12 @@ class AdminController extends AbstractController
             'historyGames' => $historyGames,
         ]);
     }
+    #[Route('/delete', name: 'app_admin_delete')]
+        public function delete(): Response
+        {
+            return $this->render('admin/_delete_all.html.twig', [
+                'controller_name' => 'AdminController',
+            ]);
+        }
+
 }
