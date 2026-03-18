@@ -34,16 +34,16 @@
         "symfony/runtime": "7.3.*",
         "symfony/security-bundle": "7.3.*",
         "symfony/serializer": "7.3.*",
-        "symfony/stimulus-bundle": "^2.32",
+        "symfony/stimulus-bundle": "^2.33",
         "symfony/string": "7.3.*",
         "symfony/translation": "7.3.*",
         "symfony/twig-bundle": "7.3.*",
-        "symfony/ux-turbo": "^2.32",
+        "symfony/ux-turbo": "^2.33",
         "symfony/validator": "7.3.*",
         "symfony/web-link": "7.3.*",
         "symfony/yaml": "7.3.*",
-        "twig/extra-bundle": "^2.12|^3.23.0",
-        "twig/twig": "^2.12|^3.23.0"
+        "twig/extra-bundle": "^2.12|^3.24.0",
+        "twig/twig": ">=3.24"
     },
     "config": {
         "allow-plugins": {

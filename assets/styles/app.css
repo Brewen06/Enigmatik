@@ -1,113 +1,165 @@
 
 :root {
-	--edit-bg: linear-gradient(135deg, #f8fafc 0%, #eef4ff 100%);
-	--edit-card: #ffffff;
-	--edit-border: #dbe6f7;
-	--edit-title: #1f2a44;
-	--edit-subtitle: #5b6780;
-	--edit-accent-start: #2459e0;
-	--edit-accent-end: #0ca678;
+	--enigme-shell-bg: linear-gradient(130deg, #f7f4ef 0%, #eef3fb 48%, #e6f5ef 100%);
+	--enigme-card-bg: #ffffffcc;
+	--enigme-border: #d6dfef;
+	--enigme-title: #1f2a44;
+	--enigme-subtitle: #5b657c;
+	--enigme-accent-start: #2459e0;
+	--enigme-accent-end: #129a72;
+	--enigme-focus-ring: rgba(36, 89, 224, 0.18);
 }
 
-.edit-page {
-	max-width: 960px;
+.enigme-page {
+	max-width: 980px;
 	margin: 0 auto;
+	font-family: "Poppins", "Segoe UI", sans-serif;
 }
 
-.edit-page__card {
-	background: var(--edit-bg);
-	border: 1px solid var(--edit-border);
-	border-radius: 1rem;
-	box-shadow: 0 12px 28px rgba(35, 56, 95, 0.12);
-	padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+.enigme-page__card {
+	background: var(--enigme-shell-bg);
+	border: 1px solid var(--enigme-border);
+	border-radius: 1.1rem;
+	box-shadow: 0 14px 30px rgba(29, 43, 77, 0.14);
+	padding: clamp(1.25rem, 0.9rem + 1.3vw, 2.1rem);
 }
 
-.edit-page__header {
-	margin-bottom: 1rem;
+.enigme-page__header {
+	margin-bottom: 1.1rem;
 }
 
-.edit-page__title {
-	color: var(--edit-title);
-	font-size: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+.enigme-page__title {
+	color: var(--enigme-title);
+	font-size: clamp(1.45rem, 1.1rem + 1.2vw, 2rem);
 	font-weight: 700;
+	letter-spacing: 0.01em;
 	margin-bottom: 0.35rem;
 }
 
-.edit-page__subtitle {
-	color: var(--edit-subtitle);
+.enigme-page__subtitle {
+	color: var(--enigme-subtitle);
 	margin-bottom: 0;
 }
 
-.edit-page form {
-	background: var(--edit-card);
-	border: 1px solid #e8edf5;
-	border-radius: 0.85rem;
-	padding: 1.2rem;
+.enigme-page form.enigme-form {
+	background: var(--enigme-card-bg);
+	backdrop-filter: blur(3px);
+	border: 1px solid #e6ecf7;
+	border-radius: 0.9rem;
+	padding: 1.15rem;
+	display: grid;
+	gap: 1rem;
 }
 
-.edit-page .form-control,
-.edit-page .form-select,
-.edit-page textarea {
+.enigme-form__section {
+	background: #fff;
+	border: 1px solid #e7edf8;
+	border-radius: 0.8rem;
+	padding: 1rem;
+	box-shadow: inset 0 1px 0 #fff;
+}
+
+.enigme-form__section-title {
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: #283a5e;
+	margin-bottom: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.enigme-form .form-label {
+	font-weight: 600;
+	color: #2e3d5d;
+	margin-bottom: 0.35rem;
+}
+
+.enigme-form .form-control,
+.enigme-form .form-select,
+.enigme-form textarea {
 	border-radius: 0.65rem;
-	border-color: #cfd9e8;
+	border-color: #ccd8ea;
+	background-color: #fff;
 }
 
-.edit-page .form-control:focus,
-.edit-page .form-select:focus,
-.edit-page textarea:focus {
-	border-color: #82a8ff;
-	box-shadow: 0 0 0 0.2rem rgba(36, 89, 224, 0.16);
+.enigme-form .form-control:focus,
+.enigme-form .form-select:focus,
+.enigme-form textarea:focus {
+	border-color: #81a6ff;
+	box-shadow: 0 0 0 0.2rem var(--enigme-focus-ring);
 }
 
-.edit-page .btn.btn-primary {
+.enigme-form .form-check {
+	padding: 0.55rem 0.8rem 0.55rem 2rem;
+	border: 1px solid #dce6f5;
+	border-radius: 0.65rem;
+	background: #f8fbff;
+	margin-bottom: 0.45rem;
+}
+
+.enigme-form .form-check-input:checked {
+	background-color: #2f68f2;
+	border-color: #2f68f2;
+}
+
+.enigme-form .btn.btn-primary {
 	border: 0;
 	border-radius: 999px;
-	padding-inline: 1.35rem;
+	padding: 0.58rem 1.35rem;
 	font-weight: 600;
-	background: linear-gradient(90deg, var(--edit-accent-start), var(--edit-accent-end));
+	background: linear-gradient(90deg, var(--enigme-accent-start), var(--enigme-accent-end));
 }
 
-.edit-page .btn.btn-primary:hover {
-	filter: brightness(0.95);
+.enigme-form .btn.btn-primary:hover {
+	filter: brightness(0.96);
 }
 
-.edit-page__actions {
+.enigme-page__actions {
 	align-items: center;
 }
 
-.edit-page__actions form {
+.enigme-page__actions form {
 	border: 0;
 	background: transparent;
 	padding: 0;
 }
 
-.edit-page__actions form .btn {
+.enigme-page__actions form .btn {
 	border: 1px solid #dc3545;
 	color: #dc3545;
 }
 
-.edit-page__actions form .btn:hover {
+.enigme-page__actions form .btn:hover {
 	background-color: #dc3545;
 	color: #fff;
 }
 
 @media (max-width: 576px) {
-	.edit-page__card {
+	.enigme-page__card {
 		border-radius: 0.8rem;
 		padding: 1rem;
 	}
 
-	.edit-page form {
-		padding: 0.9rem;
+	.enigme-page form.enigme-form {
+		padding: 0.85rem;
 	}
 
-	.edit-page__actions {
+	.enigme-form__section {
+		padding: 0.85rem;
+	}
+
+	.enigme-page__actions {
 		flex-direction: column;
 		align-items: stretch;
 	}
 
-	.edit-page__actions .btn,
-	.edit-page__actions form {
+	.enigme-page__actions .btn,
+	.enigme-page__actions form,
+	.enigme-form__actions .btn {
 		width: 100%;
+	}
+
+	.enigme-form .form-check {
+		padding-right: 0.65rem;
 	}
 }

@@ -20,7 +20,7 @@ class EnigmeType extends AbstractType
         $existingChoices = $options['data']?->getChoices();
         $builder
             ->add('ordre', null, [
-                'label' => 'Identifiant de l\'énigme (ordre de passage)',
+                'label' => 'Ordre de passage',
                 'attr' => [
                     'class' => 'form-control'
                 ]

@@ -3,13 +3,18 @@
 {% block title %}Nouvelle énigme{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Créer une nouvelle énigme</h1>
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Créer une nouvelle énigme</h1>
+            <p class="enigme-page__subtitle">Renseignez les informations principales puis configurez le mode de réponse.</p>
+        </div>
 
-    {{ include('enigme/_form.html.twig') }}
+        {{ include('enigme/_form.html.twig') }}
 
-    <div class="mt-3">
-        <a href="{{ path('app_enigme_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}
