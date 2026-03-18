@@ -6,27 +6,39 @@ use App\Entity\Type;
 use App\Entity\Enigme;
 use App\Entity\Vignette;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\CallbackTransformer;
 
 class EnigmeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $existingChoices = $options['data']?->getChoices();
         $builder
-            ->add('titre', 
-                null, [
+            ->add('ordre', null, [
+                'label' => 'Identifiant de l\'énigme (ordre de passage)',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
+            ])
+            ->add(
+                'titre',
+                null,
+                [
                     'label' => 'Titre de l\'énigme',
                     'attr' => [
                         'class' => 'form-control'
                     ]
                 ]
             )
-            ->add('consigne', 
-                null, [
+            ->add(
+                'consigne',
+                null,
+                [
                     'label' => 'Consigne de l\'énigme',
                     'attr' => [
                         'class' => 'form-control',
@@ -42,8 +54,8 @@ class EnigmeType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'form-select'
-                ] 
-                ])
+                ]
+            ])
             ->add('vignette', EntityType::class, [
                 'class' => Vignette::class,
                 'choice_label' => 'information',
@@ -54,39 +66,61 @@ class EnigmeType extends AbstractType
                     'class' => 'form-select'
                 ]
             ])
-            ->add('codeSecret', 
-                null, [
+            ->add(
+                'codeSecret',
+                null,
+                [
                     'label' => 'Code secret de l\'énigme',
                     'attr' => [
                         'class' => 'form-control'
                     ]
                 ]
             )
+            ->add('lien', null, [
+                'label' => 'Lien associé à l\'énigme (image, vidéo, audio, etc...)',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
+            ])
+            ->add('reponseType', ChoiceType::class, [
+                'label' => 'Type de réponse',
+                'choices' => [
+                    'Réponse libre' => 'libre',
+                    'Réponse à choix (multiple)' => 'multiple',
+                ],
+                'expanded' => true,
+                'multiple' => false,
+                'mapped' => false,
+                'data' => (\is_array($existingChoices) && $existingChoices !== []) ? 'multiple' : 'libre',
+            ])
             ->add('choices', TextareaType::class, [
-                'label' => 'Choix de réponses (une par ligne, laisser vide pour réponse libre)',
+                'label' => 'Réponses possibles (une par ligne)',
                 'required' => false,
                 'attr' => ['class' => 'form-control', 'rows' => 5],
-                'help' => 'Si rempli, l\'énigme sera présentée sous forme de QCM.'
             ])
-        ;
+            ->add('solution', null, [
+                'label' => 'Solution de l\'énigme',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
+                
+            ]);
 
         $builder->get('choices')
-            ->addModelTransformer(new CallbackTransformer(
-                function ($choicesAsArray) {
-                    // transform the array to a string
-                    if (!$choicesAsArray) {
-                        return '';
-                    }
-                    return implode("\n", $choicesAsArray);
-                },
-                function ($choicesAsString) {
-                    // transform the string back to an array
-                    if (!$choicesAsString) {
-                        return [];
-                    }
-                    return array_filter(array_map('trim', explode("\n", $choicesAsString)));
+        ->addModelTransformer(new CallbackTransformer(
+            function ($choicesAsArray) {
+                if (!\is_array($choicesAsArray) || $choicesAsArray === []) {
+                    return '';
                 }
-            ));
+                return implode("\n", $choicesAsArray);
+            },
+            function ($choicesAsString) {
+                if ($choicesAsString === null || trim((string) $choicesAsString) === '') {
+                    return [];
+                }
+                return array_values(array_filter(array_map('trim', preg_split('/\R/', (string) $choicesAsString))));
+            }
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

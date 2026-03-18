@@ -44,6 +44,12 @@ class Enigme
     #[ORM\ManyToOne(inversedBy: 'enigme')]
     private ?Jeu $jeu = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lien = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $solution = null;
+
     
 
     
@@ -157,6 +163,30 @@ class Enigme
     public function setJeu(?Jeu $jeu): static
     {
         $this->jeu = $jeu;
+
+        return $this;
+    }
+
+    public function getLien(): ?string
+    {
+        return $this->lien;
+    }
+
+    public function setLien(?string $lien): static
+    {
+        $this->lien = $lien;
+
+        return $this;
+    }
+
+    public function getSolution(): ?string
+    {
+        return $this->solution;
+    }
+
+    public function setSolution(string $solution): static
+    {
+        $this->solution = $solution;
 
         return $this;
     }
