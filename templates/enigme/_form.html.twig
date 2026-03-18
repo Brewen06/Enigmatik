@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const radios = document.querySelectorAll(`input[name="${name}"]`);
     const blocLibre = document.getElementById('bloc-libre');
     const blocMultiple = document.getElementById('bloc-multiple');
-    const inputLibre = document.getElementById('{{ form.codeSecret.vars.id }}');
+    const inputLien = document.getElementById('bloc-lien');
+    const inputCodeSecret = document.getElementById('{{ form.codeSecret.vars.id }}');
     const inputMultiple = document.getElementById('{{ form.choices.vars.id }}');
 
     function refresh() {
@@ -25,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         blocLibre.style.display = isLibre ? '' : 'none';
         blocMultiple.style.display = isLibre ? 'none' : '';
 
-        inputLibre.disabled = !isLibre;
+        inputCodeSecret.disabled = !isLibre;
+        inputLien.disabled = isLibre;
         inputMultiple.disabled = isLibre;
     }
 

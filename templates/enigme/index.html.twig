@@ -20,6 +20,7 @@
                         <th>Titre</th>
                         <th>Type</th>
                         <th>Consigne</th>
+                        <th>Lien</th>
                         <th>Code Secret</th>
                         <th>Vignette</th>
                         <th class="text-end">Actions</th>
@@ -33,6 +34,7 @@
                         <td>{{ enigme.titre }}</td>
                         <td>{{ enigme.type.libelle }}</td>
                         <td>{{ enigme.consigne|slice(0, 50) }}...</td>
+                        <td>{{ enigme.lien }}</td>
                         <td>{{ enigme.codeSecret }}</td>
                         <td>
                             {% if enigme.vignette %}

@@ -33,6 +33,16 @@
                         </div>
                         {% endif %}
                     </div>
+                    <div class="mb-4">
+                        <h6 class="text-muted text-uppercase small fw-bold">Lien associé</h6>
+                        {% if enigme.lien %}
+                            <a href="{{ enigme.lien }}" target="_blank" class="btn btn-outline-primary">
+                                <i class="bi bi-link-45deg me-1"></i> Ouvrir le lien
+                            </a>
+                        {% else %}
+                            <p class="text-muted fst-italic">Aucun lien associé</p>
+                        {% endif %}
+                    </div>
 
                     <div {{ stimulus_controller('game', { 'checkUrl': path('app_enigme_check', {'id': enigme.id}) }) }}>
                         <form {{ stimulus_action('game', 'check', 'submit') }} class="mt-4">
