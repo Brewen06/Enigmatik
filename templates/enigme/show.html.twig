@@ -48,10 +48,22 @@
                         <form {{ stimulus_action('game', 'check', 'submit') }} class="mt-4">
                             {% if enigme.choices is not empty %}
                                 <div class="mb-3">
-                                    <p class="fw-bold mb-2">Choisissez la bonne réponse :</p>
+                                    <p class="fw-bold mb-2">
+                                        {{ quizHasMultipleSolutions ? 'Choisissez les bonnes réponses :' : 'Choisissez la bonne réponse :' }}
+                                    </p>
+                                    {% if quizHasMultipleSolutions %}
+                                        <p class="text-muted small mb-2">Plusieurs réponses sont attendues.</p>
+                                    {% endif %}
                                     {% for choice in enigme.choices %}
                                         <div class="form-check mb-2">
-                                            <input class="form-check-input" type="radio" name="answer" id="choice_{{ loop.index }}" value="{{ choice }}" {{ stimulus_target('game', 'input') }}>
+                                            <input
+                                                class="form-check-input"
+                                                type="{{ quizHasMultipleSolutions ? 'checkbox' : 'radio' }}"
+                                                name="{{ quizHasMultipleSolutions ? 'answer[]' : 'answer' }}"
+                                                id="choice_{{ loop.index }}"
+                                                value="{{ choice }}"
+                                                {{ stimulus_target('game', 'input') }}
+                                            >
                                             <label class="form-check-label" for="choice_{{ loop.index }}">
                                                 {{ choice }}
                                             </label>
@@ -61,7 +73,7 @@
                                 <button class="btn btn-primary w-100" type="submit">Vérifier</button>
                             {% else %}
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg" placeholder="Entrez le code secret..." {{ stimulus_target('game', 'input') }}>
+                                    <input type="text" class="form-control form-control-lg" placeholder="Entrez votre réponse..." {{ stimulus_target('game', 'input') }}>
                                     <button class="btn btn-primary" type="submit">Vérifier</button>
                                 </div>
                             {% endif %}
@@ -92,10 +104,10 @@
             </div>
 
             <hr class="my-4">
-
+{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
             <div class="d-flex justify-content-between align-items-center">
                 <a href="{{ path('app_jeu_index') }}" class="btn btn-success">Retour au jeu</a>
-                {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+                
                 <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-1"></i> Retour à la liste
                 </a>
@@ -105,8 +117,9 @@
                         </a>
                         {{ include('enigme/_delete_form.html.twig') }}
                     </div>
-                {% endif %}
+                
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -25,6 +25,14 @@ export default class extends Controller {
                 this.resultTarget.innerHTML = '<div class="alert alert-warning">Veuillez sélectionner une réponse.</div>';
                 return;
             }
+        } else if (inputs.length > 0 && inputs[0].type === 'checkbox') {
+            const checkedValues = inputs.filter(input => input.checked).map(input => input.value);
+            if (checkedValues.length > 0) {
+                answer = checkedValues;
+            } else {
+                this.resultTarget.innerHTML = '<div class="alert alert-warning">Veuillez sélectionner au moins une réponse.</div>';
+                return;
+            }
         } else {
             answer = this.inputTarget.value;
         }
@@ -41,8 +49,8 @@ export default class extends Controller {
         .then(data => {
             if (data.success) {
                 let message = '<div class="alert alert-success">Bravo ! Bonne réponse.</div>';
-                if (data.codeReponse) {
-                    message += `<div class="alert alert-info mt-2"><strong>Indice pour le code final :</strong> <span class="badge bg-warning text-dark fs-4">${data.codeReponse}</span></div>`;
+                if (data.codeSecret) {
+                    message += `<div class="alert alert-info mt-2"><strong>Code secret débloqué :</strong> <span class="badge bg-warning text-dark fs-4">${data.codeSecret}</span></div>`;
                 }
                 this.resultTarget.innerHTML = message;
                 this.inputTargets.forEach(input => input.disabled = true);

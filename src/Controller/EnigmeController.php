@@ -45,8 +45,11 @@ final class EnigmeController extends AbstractController
     #[Route('/{id}', name: 'app_enigme_show', methods: ['GET'])]
     public function show(Enigme $enigme): Response
     {
+        $expectedSolutions = $this->extractNormalizedSolutions((string) ($enigme->getSolution() ?? ''));
+
         return $this->render('enigme/show.html.twig', [
             'enigme' => $enigme,
+            'quizHasMultipleSolutions' => count($expectedSolutions) > 1,
         ]);
     }
 
@@ -56,14 +59,69 @@ final class EnigmeController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $answer = $data['answer'] ?? '';
 
-        if (strcasecmp(trim($answer), trim($enigme->getCodeSecret())) === 0) {
+        $expectedSolutions = $this->extractNormalizedSolutions((string) ($enigme->getSolution() ?? ''));
+        $normalizedCodeSecret = $this->normalizeAnswer((string) ($enigme->getCodeSecret() ?? ''));
+        $isValidAnswer = false;
+
+        if ($expectedSolutions !== []) {
+            if (is_array($answer)) {
+                $normalizedAnswers = $this->normalizeAnswerArray($answer);
+                $isValidAnswer = ($normalizedAnswers !== []) && ($normalizedAnswers === $expectedSolutions);
+            } else {
+                $normalizedAnswer = $this->normalizeAnswer((string) $answer);
+                $isValidAnswer = count($expectedSolutions) === 1
+                    && $normalizedAnswer !== ''
+                    && $normalizedAnswer === $expectedSolutions[0];
+            }
+        } elseif (!is_array($answer)) {
+            // Compatibilite pour les anciennes enigmes sans solution renseignee.
+            $normalizedAnswer = $this->normalizeAnswer((string) $answer);
+            $isValidAnswer = $normalizedAnswer !== '' && $normalizedCodeSecret !== '' && $normalizedAnswer === $normalizedCodeSecret;
+        }
+
+        if ($isValidAnswer) {
             return $this->json([
                 'success' => true,
-                'codeReponse' => $enigme->getCodeReponse()
+                'codeSecret' => $enigme->getCodeSecret(),
             ]);
         }
 
         return $this->json(['success' => false]);
+    }
+
+    private function normalizeAnswer(string $value): string
+    {
+        $normalized = trim($value);
+        $normalized = preg_replace('/\s+/', ' ', $normalized) ?? $normalized;
+
+        return mb_strtolower($normalized);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function extractNormalizedSolutions(string $solution): array
+    {
+        $parts = preg_split('/\R+/', $solution) ?: [];
+        $normalized = array_map(fn($value) => $this->normalizeAnswer((string) $value), $parts);
+        $normalized = array_values(array_unique(array_filter($normalized, fn(string $value) => $value !== '')));
+        sort($normalized);
+
+        return $normalized;
+    }
+
+    /**
+     * @param array<mixed> $answers
+     *
+     * @return list<string>
+     */
+    private function normalizeAnswerArray(array $answers): array
+    {
+        $normalized = array_map(fn($value) => $this->normalizeAnswer((string) $value), $answers);
+        $normalized = array_values(array_unique(array_filter($normalized, fn(string $value) => $value !== '')));
+        sort($normalized);
+
+        return $normalized;
     }
 
     #[Route('/{id}/modifier', name: 'app_enigme_edit', methods: ['GET', 'POST'])]
@@ -87,11 +145,36 @@ final class EnigmeController extends AbstractController
     #[Route('/{id}/supprimer', name: 'app_enigme_delete', methods: ['POST'])]
     public function delete(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$enigme->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $enigme->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($enigme);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_enigme_index', [], Response::HTTP_SEE_OTHER);
+    }
+    #[Route('/supprimer-toutes', name: 'app_enigme_delete_all', methods: ['POST'])]
+    public function deleteAll(Request $request, EnigmeRepository $enigmeRepository, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_enigme_all', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $enigmesASupprimer = $enigmeRepository->findAll();
+
+        foreach ($enigmesASupprimer as $enigmeASupprimer) {
+            $entityManager->remove($enigmeASupprimer);
+        }
+
+        $entityManager->flush();
+
+        $deletedCount = count($enigmesASupprimer);
+
+        if ($deletedCount > 0) {
+            $this->addFlash('success', sprintf('%d énigme(s) supprimée(s).', $deletedCount));
+        } else {
+            $this->addFlash('success', 'Aucune énigme à supprimer.');
+        }
+
+        return $this->redirectToRoute('app_enigme_index');
     }
 }

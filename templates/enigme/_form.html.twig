@@ -28,11 +28,15 @@
 {{ form_end(form) }}
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+function initEnigmeReponseTypeToggle() {
     const name = '{{ form.reponseType.vars.full_name }}';
     const radios = document.querySelectorAll(`input[name="${name}"]`);
     const blocMultiple = document.getElementById('bloc-multiple');
     const inputMultiple = document.getElementById('{{ form.choices.vars.id }}');
+
+    if (!radios.length) {
+        return;
+    }
 
     function refresh() {
         const selected = document.querySelector(`input[name="${name}"]:checked`)?.value;
@@ -47,7 +51,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    radios.forEach((radio) => radio.addEventListener('change', refresh));
+    radios.forEach((radio) => {
+        if (radio.dataset.choicesToggleBound === '1') {
+            return;
+        }
+
+        radio.addEventListener('change', refresh);
+        radio.dataset.choicesToggleBound = '1';
+    });
+
     refresh();
-});
+}
+
+document.addEventListener('DOMContentLoaded', initEnigmeReponseTypeToggle);
+document.addEventListener('turbo:load', initEnigmeReponseTypeToggle);
 </script>
