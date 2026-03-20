@@ -15,16 +15,6 @@ class ParametreFixtures extends Fixture
         $param1->setValeur('60');
         $manager->persist($param1);
 
-        $param2 = new Parametre();
-        $param2->setLibelle('Nombre d\'indices max');
-        $param2->setValeur('3');
-        $manager->persist($param2);
-
-        $param3 = new Parametre();
-        $param3->setLibelle('Pénalité par erreur (secondes)');
-        $param3->setValeur('30');
-        $manager->persist($param3);
-
         $manager->flush();
     }
 }

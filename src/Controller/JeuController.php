@@ -23,10 +23,13 @@ final class JeuController extends AbstractController
         $equipe = $equipeId ? $equipeRepository->find($equipeId) : null;
         $jeu = $jeuRepository->findOneBy([]);
 
+        $timerSeconds = $this->extractTimerSeconds($jeu);
+
         return $this->render('jeu/index.html.twig', [
             'jeu' => $jeu,
             'enigmes' => $enigmeRepository->findAll(),
             'equipe' => $equipe,
+            'timerSeconds' => $timerSeconds,
         ]);
     }
 
@@ -50,5 +53,25 @@ final class JeuController extends AbstractController
             'success' => false,
             'message' => 'Code incorrect. Vérifiez vos indices.'
         ]);
+    }
+    private function extractTimerSeconds(?Jeu $jeu): int
+    {
+        if (!$jeu) {
+            return 0;
+        }
+
+        foreach ($jeu->getParametres() as $parametre) {
+            $libelle = strtolower(trim((string) $parametre->getLibelle()));
+
+            if (!in_array($libelle, ['durée du jeu (minutes)', 'duree du jeu (minutes)', 'duree_jeu_minutes'], true)) {
+                continue;
+            }
+
+            $minutes = max(0, (int) $parametre->getValeur());
+
+            return $minutes * 60;
+        }
+
+        return 0;
     }
 }

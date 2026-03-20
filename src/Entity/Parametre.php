@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ParametreRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ParametreRepository::class)]
@@ -21,6 +22,9 @@ class Parametre
 
     #[ORM\Column(length: 255)]
     private ?string $valeur = null;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $choix = [];
 
     public function getId(): ?int
     {
@@ -59,6 +63,18 @@ class Parametre
     public function setValeur(string $valeur): static
     {
         $this->valeur = $valeur;
+
+        return $this;
+    }
+
+    public function getChoix(): array
+    {
+        return $this->choix;
+    }
+
+    public function setChoix(array $choix): static
+    {
+        $this->choix = $choix;
 
         return $this;
     }
