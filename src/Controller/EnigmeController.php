@@ -74,7 +74,6 @@ final class EnigmeController extends AbstractController
                     && $normalizedAnswer === $expectedSolutions[0];
             }
         } elseif (!is_array($answer)) {
-            // Compatibilite pour les anciennes enigmes sans solution renseignee.
             $normalizedAnswer = $this->normalizeAnswer((string) $answer);
             $isValidAnswer = $normalizedAnswer !== '' && $normalizedCodeSecret !== '' && $normalizedAnswer === $normalizedCodeSecret;
         }

@@ -14,33 +14,41 @@ class EquipeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom', 
-                null, [
+            ->add(
+                'nom',
+                null,
+                [
                     'label' => 'Nom de l\'équipe',
                     'attr' => [
                         'class' => 'form-control'
                     ]
                 ]
             )
-            ->add('avatar', EntityType::class, [
-                'class' => Avatar::class,
-                'choice_label' => 'nom',
-                'choice_attr' => static function (?Avatar $avatar): array {
-                    if (!$avatar) {
-                        return [];
-                    }
+            ->add(
+                'avatar',
+                EntityType::class,
+                [
+                    'class' => Avatar::class,
+                    'choice_label' => 'nom',
+                    'choice_attr' => static function (?Avatar $avatar): array {
+                        if (!$avatar) {
+                            return [];
+                        }
 
-                    return [
-                        'data-image' => $avatar->getImage(),
-                    ];
-                },
-                'label' => 'Avatar de l\'équipe',
-                'placeholder' => 'Choisir un avatar',
-                'required' => true,
-                'attr' => [
-                    'class' => 'form-select'
+                        $imagePath = ltrim($avatar->getImage() ?? '', '/');
+                        $imagePath = preg_replace('#^public/#', '', $imagePath) ?? $imagePath;
+
+                        return [
+                            'data-image' => $imagePath,
+                        ];
+                    },
+                    'label' => 'Avatar de l\'équipe',
+                    'placeholder' => 'Choisir un avatar',
+                    'required' => true,
+                    'attr' => [
+                        'class' => 'form-select'
+                    ]
                 ]
-            ]
             )
         ;
     }

@@ -20,14 +20,6 @@ class ParametreType extends AbstractType
         $existingChoices = $options['existing_choices'] ?? [];
         
         $builder
-            ->add('jeu', EntityType::class, [
-                'class' => Jeu::class,
-                'choice_label' => 'nom',
-                'label' => 'Jeu associé',
-                'attr' => [
-                    'class' => 'form-control'
-                ]
-            ])
             ->add('libelle', null, [
                 'label' => 'Nom du paramètre',
                 'attr' => [
@@ -48,17 +40,9 @@ class ParametreType extends AbstractType
             ->add('choix', TextareaType::class, [
                 'label' => 'Valeurs choisis (chrono, code_final, etc.)',
                 'required' => false,
-                'attr' => ['class' => 'form-control', 'rows' => 5],
+                'attr' => ['class' => 'form-control'],
             ])
-            ->add('valeur', IntegerType::class, [
-                'label' => 'Valeur',
-                'help' => 'Exemple: 60 pour une durée de 60 minutes',
-                'attr' => [
-                    'class' => 'form-control',
-                    'min' => 0,
-                    'step' => 1,
-                ],
-            ]);
+        ;
 
         $builder->get('choix')
             ->addModelTransformer(new CallbackTransformer(
