@@ -17,6 +17,8 @@ class ParametreType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $existingChoices = $options['existing_choices'] ?? [];
+        
         $builder
             ->add('jeu', EntityType::class, [
                 'class' => Jeu::class,
