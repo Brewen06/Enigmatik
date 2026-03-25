@@ -47,10 +47,16 @@ class ParametreType extends AbstractType
         $builder->get('choix')
             ->addModelTransformer(new CallbackTransformer(
                 function ($choicesAsArray) {
-                    return is_array($choicesAsArray) ? implode("\n", $choicesAsArray) : '';
+                    if (!\is_array($choicesAsArray) || $choicesAsArray === []) {
+                        return '';
+                    }
+                    return implode("\n", $choicesAsArray);
                 },
                 function ($choicesAsString) {
-                    return array_filter(array_map('trim', explode("\n", $choicesAsString)));
+                    if ($choicesAsString === null || trim((string) $choicesAsString) === '') {
+                        return [];
+                    }
+                    return array_values(array_filter(array_map('trim', preg_split('/\R/', (string) $choicesAsString))));
                 }
             ));
     }

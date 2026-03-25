@@ -16,6 +16,8 @@
                 <thead class="table-light">
                     <tr>
                         <th>Id</th>
+                        <th>Libellé</th>
+                        <th>Valeur</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -23,6 +25,8 @@
                 {% for parametre in parametres %}
                     <tr>
                         <td>{{ parametre.id }}</td>
+                        <td>{{ parametre.libelle }}</td>
+                        <td>{{ parametre.valeur }}</td>
                         <td class="text-end">
                             <div class="btn-group" role="group">
                                 <a href="{{ path('app_parametre_show', {'id': parametre.id}) }}" class="btn btn-info btn-sm text-white" title="Voir">

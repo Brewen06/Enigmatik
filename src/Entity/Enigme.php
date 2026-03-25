@@ -41,7 +41,7 @@ class Enigme
     #[ORM\ManyToOne(inversedBy: 'enigmes')]
     private ?Vignette $vignette = null;
 
-    #[ORM\ManyToOne(inversedBy: 'enigme')]
+    #[ORM\ManyToOne(inversedBy: 'enigmes')]
     private ?Jeu $jeu = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -49,10 +49,6 @@ class Enigme
 
     #[ORM\Column(length: 255)]
     private ?string $solution = null;
-
-    
-
-    
 
     public function getId(): ?int
     {
