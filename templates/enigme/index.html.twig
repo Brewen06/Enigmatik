@@ -16,6 +16,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Id</th>
+                        <th>Statut</th>
                         <th>Ordre</th>
                         <th>Titre</th>
                         <th>Type</th>
@@ -30,6 +31,13 @@
                 {% for enigme in enigmes %}
                     <tr>
                         <td>{{ enigme.id }}</td>
+                        <td>
+                            {% if enigme.active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactivée</span>
+                            {% endif %}
+                        </td>
                         <td>{{ enigme.ordre }}</td>
                         <td>{{ enigme.titre }}</td>
                         <td>{{ enigme.type.libelle }}</td>

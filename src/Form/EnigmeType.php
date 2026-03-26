@@ -6,6 +6,7 @@ use App\Entity\Type;
 use App\Entity\Enigme;
 use App\Entity\Vignette;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,6 +23,19 @@ class EnigmeType extends AbstractType
     {
         $existingChoices = $options['data']?->getChoices();
         $builder
+            ->add('active', CheckboxType::class, [
+                'label' => 'Énigme active (visible par les joueurs)',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-check-input'
+                ],
+                'label_attr' => [
+                    'class' => 'form-check-label fw-bold focus'
+                ],
+                'row_attr' => [
+                    'class' => 'form-check form-switch mb-3'
+                ]
+            ])
             ->add('ordre', null, [
                 'label' => 'Ordre de passage',
                 'attr' => [

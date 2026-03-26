@@ -12,16 +12,20 @@ class JeuType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('titre', 
-                null, [
+            ->add(
+                'titre',
+                null,
+                [
                     'label' => 'Titre du jeu',
                     'attr' => [
                         'class' => 'form-control'
                     ]
                 ]
             )
-            ->add('messageDeBienvenue', 
-                null, [
+            ->add(
+                'messageDeBienvenue',
+                null,
+                [
                     'label' => 'Message de bienvenue',
                     'attr' => [
                         'class' => 'form-control',
@@ -29,11 +33,25 @@ class JeuType extends AbstractType
                     ]
                 ]
             )
-            ->add('imageBienvenue', 
-                null, [
+            ->add(
+                'imageBienvenue',
+                null,
+                [
                     'label' => 'Image de bienvenue',
                     'attr' => [
                         'class' => 'form-control'
+                    ]
+                ]
+            )
+            ->add(
+                'codeFinal',
+                null,
+                [
+                    'label' => 'Code final pour gagner',
+                    'help' => 'Ce code devra être déduit par les joueurs grâce aux indices récoltés.',
+                    'attr' => [
+                        'class' => 'form-control',
+                        'placeholder' => 'Ex : BRAVO2026'
                     ]
                 ]
             )

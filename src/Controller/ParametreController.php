@@ -23,13 +23,17 @@ final class ParametreController extends AbstractController
     }
 
     #[Route('/creer', name: 'app_parametre_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, \App\Repository\JeuRepository $jeuRepository): Response
     {
         $parametre = new Parametre();
         $form = $this->createForm(ParametreType::class, $parametre);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $jeu = $jeuRepository->findOneBy([]);
+            if ($jeu) {
+                $parametre->setJeu($jeu);
+            }
             $entityManager->persist($parametre);
             $entityManager->flush();
 
@@ -71,7 +75,7 @@ final class ParametreController extends AbstractController
     #[Route('/{id}/supprimer', name: 'app_parametre_delete', methods: ['POST'])]
     public function delete(Request $request, Parametre $parametre, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$parametre->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $parametre->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($parametre);
             $entityManager->flush();
         }

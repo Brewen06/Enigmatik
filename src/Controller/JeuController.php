@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 #[Route('/jeu')]
 final class JeuController extends AbstractController
 {
@@ -27,7 +29,7 @@ final class JeuController extends AbstractController
 
         return $this->render('jeu/index.html.twig', [
             'jeu' => $jeu,
-            'enigmes' => $enigmeRepository->findAll(),
+            'enigmes' => $enigmeRepository->findBy(['active' => true], ['ordre' => 'ASC']),
             'equipe' => $equipe,
             'timerSeconds' => $timerSeconds,
         ]);
@@ -38,7 +40,7 @@ final class JeuController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         $submittedCode = $data['code'] ?? '';
-        
+
         $jeu = $jeuRepository->findOneBy([]);
         $correctCode = $jeu ? $jeu->getCodeFinal() : '';
 
@@ -54,6 +56,35 @@ final class JeuController extends AbstractController
             'message' => 'Code incorrect. Vérifiez vos indices.'
         ]);
     }
+
+    #[Route('/configuration', name: 'app_jeu_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_PROF')]
+    public function edit(Request $request, JeuRepository $jeuRepository, EntityManagerInterface $entityManager): Response
+    {
+        $jeu = $jeuRepository->findOneBy([]);
+
+        if (!$jeu) {
+            $jeu = new Jeu();
+            $jeu->setTitre('Nouvelle partie');
+            $entityManager->persist($jeu);
+        }
+
+        $form = $this->createForm(JeuType::class, $jeu);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            $this->addFlash('success', 'La configuration globale du jeu a été mise à jour !');
+
+            return $this->redirectToRoute('app_admin_dashboard');
+        }
+
+        return $this->render('jeu/edit.html.twig', [
+            'jeu' => $jeu,
+            'form' => $form->createView(),
+        ]);
+    }
+
     private function extractTimerSeconds(?Jeu $jeu): int
     {
         if (!$jeu) {

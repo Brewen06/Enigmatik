@@ -1,0 +1,144 @@
+<svg width="680" height="680" viewBox="0 0 680 680" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg-hex { fill: #EEEDFE; }
+      .bg-hex-inner { fill: #534AB7; }
+      .circuit-line { stroke: #AFA9EC; }
+      .node-dot { fill: #7F77DD; }
+      .brain-fill { fill: #7F77DD; }
+      .brain-stroke { stroke: #3C3489; }
+      .gear-fill { fill: #EEEDFE; stroke: #534AB7; }
+      .question-fill { fill: #BA7517; }
+      .question-glow { fill: #EF9F27; }
+      .spark { stroke: #BA7517; }
+      .icon-bg { fill: #CECBF6; }
+
+      @media (prefers-color-scheme: dark) {
+        .bg-hex { fill: #2C2C2A; }
+        .bg-hex-inner { fill: #3C3489; }
+        .circuit-line { stroke: #7F77DD; }
+        .node-dot { fill: #AFA9EC; }
+        .brain-fill { fill: #534AB7; }
+        .brain-stroke { stroke: #CECBF6; }
+        .gear-fill { fill: #3C3489; stroke: #7F77DD; }
+        .question-fill { fill: #FCDE5A; }
+        .question-glow { fill: #EF9F27; }
+        .spark { stroke: #FAC775; }
+        .icon-bg { fill: #26215C; }
+      }
+    </style>
+  </defs>
+
+  <!-- Hexagone de fond -->
+  <polygon class="bg-hex" points="340,40 590,185 590,495 340,640 90,495 90,185" stroke="none"/>
+
+  <!-- Hexagone intérieur (bordure) -->
+  <polygon class="bg-hex-inner" points="340,60 570,197 570,483 340,620 110,483 110,197" fill="none" stroke-width="3" stroke="currentColor" opacity="0.2"/>
+
+  <!-- Lignes de circuit -->
+  <g class="circuit-line" stroke-width="1.5" fill="none" opacity="0.6">
+    <path d="M160 230 L200 230 L200 260 L240 260"/>
+    <path d="M200 230 L200 200 L240 200"/>
+    <path d="M520 230 L480 230 L480 260 L440 260"/>
+    <path d="M480 230 L480 200 L440 200"/>
+    <path d="M160 450 L200 450 L200 420 L240 420"/>
+    <path d="M520 450 L480 450 L480 420 L440 420"/>
+    <path d="M290 530 L290 560 L340 560 L390 560 L390 530"/>
+  </g>
+
+  <!-- Noeuds de circuit -->
+  <g class="node-dot">
+    <rect x="236" y="256" width="8" height="8" rx="1"/>
+    <rect x="236" y="196" width="8" height="8" rx="1"/>
+    <rect x="436" y="256" width="8" height="8" rx="1"/>
+    <rect x="436" y="196" width="8" height="8" rx="1"/>
+    <rect x="236" y="416" width="8" height="8" rx="1"/>
+    <rect x="436" y="416" width="8" height="8" rx="1"/>
+    <rect x="336" y="556" width="8" height="8" rx="1"/>
+  </g>
+
+  <!-- Cerveau stylisé -->
+  <g transform="translate(340,330)">
+    <path class="brain-fill" d="
+      M-10,-80
+      C-40,-85 -80,-70 -90,-45
+      C-100,-20 -90,10 -75,25
+      C-85,40 -80,65 -60,75
+      C-45,82 -25,78 -15,65
+      C-12,70 -10,75 -10,80
+      L-10,-80 Z
+    " stroke-width="0" opacity="0.9"/>
+    <path class="brain-fill" d="
+      M10,-80
+      C40,-85 80,-70 90,-45
+      C100,-20 90,10 75,25
+      C85,40 80,65 60,75
+      C45,82 25,78 15,65
+      C12,70 10,75 10,80
+      L10,-80 Z
+    " stroke-width="0" opacity="0.9"/>
+
+    <!-- Sillon central -->
+    <line x1="0" y1="-80" x2="0" y2="80" class="brain-stroke" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Sillons gauche -->
+    <path class="brain-stroke" fill="none" stroke-width="1.5" stroke-linecap="round"
+      d="M-30,-55 C-50,-40 -55,-20 -45,0"/>
+    <path class="brain-stroke" fill="none" stroke-width="1.5" stroke-linecap="round"
+      d="M-60,-20 C-70,5 -65,30 -50,45"/>
+    <path class="brain-stroke" fill="none" stroke-width="1.5" stroke-linecap="round"
+      d="M-20,20 C-35,35 -35,55 -25,65"/>
+
+    <!-- Sillons droit -->
+    <path class="brain-stroke" fill="none" stroke-width="1.5" stroke-linecap="round"
+      d="M30,-55 C50,-40 55,-20 45,0"/>
+    <path class="brain-stroke" fill="none" stroke-width="1.5" stroke-linecap="round"
+      d="M60,-20 C70,5 65,30 50,45"/>
+    <path class="brain-stroke" fill="none" stroke-width="1.5" stroke-linecap="round"
+      d="M20,20 C35,35 35,55 25,65"/>
+  </g>
+
+  <!-- Point d'interrogation -->
+  <text x="340" y="370" text-anchor="middle" dominant-baseline="central"
+    font-family="serif" font-weight="900" font-size="110"
+    class="question-fill" opacity="0.92">?</text>
+
+  <!-- Engrenage -->
+  <g transform="translate(430, 390)">
+    <g class="gear-fill" stroke-width="1.5">
+      <polygon points="0,-22 4,-18 4,-14 -4,-14 -4,-18"/>
+      <polygon points="22,0 18,-4 14,-4 14,4 18,4"/>
+      <polygon points="-22,0 -18,-4 -14,-4 -14,4 -18,4"/>
+      <polygon points="15.5,-15.5 13,-10 10,-13"/>
+      <polygon points="-15.5,-15.5 -13,-10 -10,-13"/>
+      <polygon points="15.5,15.5 13,10 10,13"/>
+      <polygon points="-15.5,15.5 -13,10 -10,13"/>
+      <circle cx="0" cy="0" r="14"/>
+      <circle cx="0" cy="0" r="6" fill="none" class="gear-fill"/>
+    </g>
+  </g>
+
+  <!-- Éclairs -->
+  <g class="spark" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8">
+    <polyline points="180,290 188,308 178,308 188,328"/>
+    <polyline points="500,290 492,308 502,308 492,328"/>
+  </g>
+
+  <!-- Petits points réseau neuronal -->
+  <g class="node-dot" opacity="0.5">
+    <circle cx="200" cy="360" r="4"/>
+    <circle cx="215" cy="385" r="3"/>
+    <circle cx="195" cy="405" r="4"/>
+    <circle cx="480" cy="360" r="4"/>
+    <circle cx="465" cy="385" r="3"/>
+    <circle cx="485" cy="405" r="4"/>
+  </g>
+  <g class="circuit-line" stroke-width="1" opacity="0.35" fill="none">
+    <line x1="200" y1="360" x2="215" y2="385"/>
+    <line x1="215" y1="385" x2="195" y2="405"/>
+    <line x1="200" y1="360" x2="195" y2="405"/>
+    <line x1="480" y1="360" x2="465" y2="385"/>
+    <line x1="465" y1="385" x2="485" y2="405"/>
+    <line x1="480" y1="360" x2="485" y2="405"/>
+  </g>
+</svg>

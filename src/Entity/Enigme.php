@@ -50,6 +50,9 @@ class Enigme
     #[ORM\Column(length: 255)]
     private ?string $solution = null;
 
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $active = true;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -187,6 +190,15 @@ class Enigme
         return $this;
     }
 
-    
-    
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
+    }
 }

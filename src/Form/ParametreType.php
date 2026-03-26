@@ -8,7 +8,6 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,29 +17,45 @@ class ParametreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $existingChoices = $options['existing_choices'] ?? [];
-        
+
         $builder
-            ->add('libelle', null, [
-                'label' => 'Nom du paramètre',
-                'attr' => [
-                    'class' => 'form-control'
-                ]
-            ])
             ->add('reponseType', ChoiceType::class, [
-                'label' => 'Type de réponse',
+                'label' => 'Type de paramètre',
                 'choices' => [
-                    'Temporalité' => 'Mettre un : chrono, une date, etc.',
-                    'Chiffre/Nombre' => 'Pour les règles et les scores : code_final, nombre de tentatives, etc.',
+                    'Système (Règles globales, textes, toggles...)' => 'systeme',
+                    'Numérique - Temps (Minuteur, pénalités...)' => 'temps',
+                    'Numérique - Nombre (Scores, essais...)' => 'nombre',
                 ],
                 'expanded' => true,
                 'multiple' => false,
                 'mapped' => false,
-                'data' => (\is_array($existingChoices) && $existingChoices !== []) ? 'temporalité' : 'chiffre/nombre',
+                'data' => 'systeme',
+                'attr' => ['class' => 'mb-3 parametre-type-selector']
+            ])
+            ->add('libelle', null, [
+                'label' => 'Nom du paramètre',
+                'help' => 'Exemples : Max tentatives, Pénalité erreur, Afficher chronomètre, etc.',
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Saisissez le nom du paramètre...'
+                ]
+            ])
+            ->add('valeur', null, [
+                'label' => 'Valeur par défaut',
+                'help' => 'Exemple: 60 (pour un temps), 3 (pour des essais), oui/non (pour une option)',
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
             ->add('choix', TextareaType::class, [
-                'label' => 'Valeurs choisis (chrono, code_final, etc.)',
+                'label' => 'Paramètres avancés / Options multiples (Optionnel)',
+                'help' => 'Si besoin de plusieurs valeurs, entrez une valeur par ligne. Laissez vide sinon.',
                 'required' => false,
-                'attr' => ['class' => 'form-control'],
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4,
+                    'placeholder' => "Option 1\nOption 2\n..."
+                ],
             ])
         ;
 

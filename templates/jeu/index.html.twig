@@ -130,33 +130,32 @@
                     </div>
                 </div>
             {% endfor %}
+        </div>
 
-            <div class="tw-relative tw-group tw-perspective-1000 tw-w-64 tw-h-96 tw-cursor-pointer"
-                 data-board-target="card"
-                 data-action="click->board#flipCard">
-                <div class="tw-relative tw-w-full tw-h-full tw-transition-all tw-duration-500 tw-transform-style-3d tw-shadow-xl tw-rounded-xl">
-                    <div class="tw-absolute tw-w-full tw-h-full tw-backface-hidden tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-yellow-500 tw-bg-gray-900 tw-flex tw-flex-col tw-items-center tw-justify-center tw-text-white">
-                        <div class="tw-text-6xl tw-mb-4">🔐</div>
-                        <h3 class="tw-text-2xl tw-font-bold tw-text-yellow-400 tw-uppercase tw-tracking-wider">Code Final</h3>
-                        <p class="tw-mt-4 tw-text-sm tw-text-gray-300 tw-px-4 tw-text-center">Rassemblez les indices données pour déverrouiller le système</p>
+        <div class="tw-mt-12 tw-max-w-2xl tw-mx-auto">
+            <div class="tw-bg-gray-900 tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-yellow-500 tw-shadow-2xl">
+                <div class="tw-bg-yellow-500 tw-py-3 tw-px-6 tw-flex tw-justify-between tw-items-center">
+                    <h3 class="tw-text-xl tw-font-bold tw-text-gray-900 tw-uppercase tw-tracking-wider"><i class="tw-text-2xl tw-mr-2">🔐</i> Verrou Final</h3>
+                    <span class="tw-text-gray-900 tw-font-semibold tw-text-sm">Trouvez pour gagner</span>
+                </div>
+                <div class="tw-p-8 tw-flex tw-flex-col md:tw-flex-row tw-items-center tw-gap-4">
+                    <div class="tw-flex-1 tw-w-full">
+                        <label for="finalCode" class="tw-block tw-text-yellow-400 tw-text-sm tw-font-bold tw-mb-2">Saisir le Code final</label>
+                        <input type="text" 
+                                id="finalCode"
+                                data-board-target="finalCodeInput"
+                                class="tw-w-full tw-px-4 tw-py-3 tw-bg-gray-800 tw-border-2 tw-border-gray-600 tw-rounded tw-text-white tw-text-center tw-text-xl tw-tracking-[0.2em] tw-uppercase tw-placeholder-gray-500 focus:tw-outline-none focus:tw-border-yellow-400 focus:tw-ring-1 focus:tw-ring-yellow-400 transition-colors"
+                                placeholder="VOTRE CODE"
+                                maxlength="20">
                     </div>
-
-                    <div class="tw-absolute tw-w-full tw-h-full tw-backface-hidden tw-rotate-y-180 tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-yellow-500 tw-bg-gray-800 tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4">
-                        <h3 class="tw-text-xl tw-font-bold tw-text-yellow-400 tw-mb-4">Saisir le Code</h3>
-                        <div class="tw-w-full tw-space-y-4">
-                            <input type="text" 
-                                   data-board-target="finalCodeInput"
-                                   class="tw-w-full tw-px-4 tw-py-2 tw-bg-gray-700 tw-border tw-border-yellow-500 tw-rounded tw-text-white tw-text-center tw-tracking-widest tw-uppercase tw-placeholder-gray-500 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-yellow-400"
-                                   placeholder="XXXXX"
-                                   maxlength="10">
-                            <button data-action="click->board#checkFinalCode"
-                                    class="tw-w-full tw-py-2 tw-bg-yellow-500 hover:tw-bg-yellow-400 tw-text-gray-900 tw-font-bold tw-rounded tw-transition-colors">
-                                VALIDER
-                            </button>
-                            <div data-board-target="finalMessage" class="tw-text-sm tw-text-center tw-min-h-[20px]"></div>
-                        </div>
+                    <div class="tw-w-full md:tw-w-auto tw-flex tw-flex-col">
+                        <button data-action="click->board#checkFinalCode"
+                                class="tw-w-full tw-mt-6 md:tw-mt-6 tw-px-8 tw-py-3 tw-bg-yellow-500 hover:tw-bg-yellow-400 tw-text-gray-900 tw-font-bold tw-text-lg tw-rounded tw-transition-colors tw-shadow-lg transform active:tw-scale-95">
+                            DÉVERROUILLER
+                        </button>
                     </div>
                 </div>
+                <div data-board-target="finalMessage" class="tw-text-center tw-pb-6 tw-min-h-[40px] tw-text-lg"></div>
             </div>
         </div>
     </div>
