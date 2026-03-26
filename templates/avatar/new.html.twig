@@ -3,13 +3,18 @@
 {% block title %}Nouvel avatar{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>Créer un nouvel avatar</h1>
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Créer un nouvel avatar</h1>
+            <p class="enigme-page__subtitle">Ajoutez un avatar pour enrichir l'identité visuelle des équipes.</p>
+        </div>
 
-    {{ include('avatar/_form.html.twig') }}
+        {{ include('avatar/_form.html.twig') }}
 
-    <div class="mt-3">
-        <a href="{{ path('app_avatar_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_avatar_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}
