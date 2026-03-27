@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/enigme')]
 final class EnigmeController extends AbstractController
@@ -151,6 +152,28 @@ final class EnigmeController extends AbstractController
 
         return $this->redirectToRoute('app_enigme_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}/toggle-active', name: 'app_enigme_toggle_active', methods: ['POST'])]
+    #[IsGranted('ROLE_PROF')]
+    public function toggleActive(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
+    {
+        $tokenId = 'toggle_active' . $enigme->getId();
+
+        if (!$this->isCsrfTokenValid($tokenId, $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $enigme->setActive(!$enigme->isActive());
+        $entityManager->flush();
+
+        $this->addFlash(
+            'success',
+            sprintf('Énigme "%s" %s.', (string) $enigme->getTitre(), $enigme->isActive() ? 'activée' : 'désactivée')
+        );
+
+        return $this->redirectToRoute('app_jeu_index');
+    }
+
     #[Route('/supprimer-toutes', name: 'app_enigme_delete_all', methods: ['POST'])]
     public function deleteAll(Request $request, EnigmeRepository $enigmeRepository, EntityManagerInterface $entityManager): Response
     {

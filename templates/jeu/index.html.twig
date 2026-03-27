@@ -114,20 +114,32 @@
 {% endif %}
         <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-8 tw-justify-items-center">
             {% for enigme in enigmes %}
-                <div class="tw-w-64 tw-h-96 tw-cursor-pointer tw-transition-transform hover:tw-scale-105"
-                     data-action="click->board#openEnigma"
-                     data-board-title-param="{{ enigme.titre }}"
-                     data-board-desc-param="{{ enigme.consigne|slice(0, 150) }}..."
-                     data-board-type-param="{{ enigme.type.libelle }}"
-                     data-board-vignette-param="{% if enigme.vignette %}{{ enigme.vignette.information }}{% endif %}"
-                     data-board-url-param="{{ path('app_enigme_show', {'id': enigme.id}) }}"
-                     data-board-index-param="{{ loop.index }}">
-                    <div class="tw-w-full tw-h-full tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-blue-500 tw-bg-white tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-shadow-xl">
+                <div class="tw-w-64 tw-flex tw-flex-col tw-gap-3">
+                    <div class="tw-h-96 tw-cursor-pointer tw-transition-transform hover:tw-scale-105 {% if not enigme.active %}tw-opacity-70{% endif %}"
+                         data-action="click->board#openEnigma"
+                         data-board-title-param="{{ enigme.titre }}"
+                         data-board-desc-param="{{ enigme.consigne|slice(0, 150) }}..."
+                         data-board-type-param="{{ enigme.type.libelle }}"
+                         data-board-vignette-param="{% if enigme.vignette %}{{ enigme.vignette.information }}{% endif %}"
+                         data-board-url-param="{{ path('app_enigme_show', {'id': enigme.id}) }}"
+                         data-board-index-param="{{ loop.index }}">
+                    <div class="tw-w-full tw-h-full tw-rounded-xl tw-overflow-hidden tw-border-4 {% if enigme.active %}tw-border-blue-500{% else %}tw-border-gray-400{% endif %} tw-bg-white tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-shadow-xl">
                         <div class="tw-text-5xl tw-mb-4">🧩</div>
                         <h3 class="tw-text-xl tw-font-bold tw-text-blue-600 tw-text-center">Énigme {{ loop.index }}</h3>
                         <p class="tw-mt-2 tw-text-sm tw-text-gray-500 tw-text-center">{{ enigme.titre }}</p>
                         <span class="tw-mt-2 tw-inline-block tw-bg-blue-100 tw-text-blue-800 tw-text-xs tw-px-2 tw-py-1 tw-rounded-full">{{ enigme.type.libelle }}</span>
+                    <br>
+                        {% if canManageEnigmes %}
+                        <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="tw-flex tw-justify-center">
+                            <input type="hidden" name="_token" value="{{ csrf_token('toggle_active' ~ enigme.id) }}">
+                            <button type="submit" class="tw-text-xs tw-font-semibold tw-px-3 tw-py-2 tw-rounded-full {% if enigme.active %}tw-bg-red-100 tw-text-red-700 hover:tw-bg-red-200{% else %}tw-bg-green-100 tw-text-green-700 hover:tw-bg-green-200{% endif %}">
+                                {% if enigme.active %}Désactiver {% else %}Activer{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
                     </div>
+                </div>
+
                 </div>
             {% endfor %}
         </div>

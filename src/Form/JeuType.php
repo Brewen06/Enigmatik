@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Jeu;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -55,6 +56,19 @@ class JeuType extends AbstractType
                     ]
                 ]
             )
+            ->add('active', CheckboxType::class, [
+                'label' => 'Énigme active (visible par les joueurs)',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-check-input'
+                ],
+                'label_attr' => [
+                    'class' => 'form-check-label fw-bold focus'
+                ],
+                'row_attr' => [
+                    'class' => 'form-check form-switch mb-3'
+                ]
+            ])
         ;
     }
 

@@ -24,14 +24,19 @@ final class JeuController extends AbstractController
         $equipeId = $request->query->get('equipe_id');
         $equipe = $equipeId ? $equipeRepository->find($equipeId) : null;
         $jeu = $jeuRepository->findOneBy([]);
+        $canManageEnigmes = $this->isGranted('ROLE_PROF') || $this->isGranted('ROLE_ADMIN');
+        $enigmes = $canManageEnigmes
+            ? $enigmeRepository->findBy([], ['ordre' => 'ASC'])
+            : $enigmeRepository->findBy(['active' => true], ['ordre' => 'ASC']);
 
         $timerSeconds = $this->extractTimerSeconds($jeu);
 
         return $this->render('jeu/index.html.twig', [
             'jeu' => $jeu,
-            'enigmes' => $enigmeRepository->findBy(['active' => true], ['ordre' => 'ASC']),
+            'enigmes' => $enigmes,
             'equipe' => $equipe,
             'timerSeconds' => $timerSeconds,
+            'canManageEnigmes' => $canManageEnigmes,
         ]);
     }
 

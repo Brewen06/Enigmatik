@@ -35,13 +35,13 @@
                             {% if enigme.active %}
                                 <span class="badge bg-success">Active</span>
                             {% else %}
-                                <span class="badge bg-danger">Inactivée</span>
+                                <span class="badge bg-danger">Désactivée</span>
                             {% endif %}
                         </td>
                         <td>{{ enigme.ordre }}</td>
                         <td>{{ enigme.titre }}</td>
                         <td>{{ enigme.type.libelle }}</td>
-                        <td>{{ enigme.consigne|slice(0, 100) }}...</td>
+                        <td>{{ enigme.consigne|slice(0, 100) }}</td>
                         <td>{{ enigme.lien }}</td>
                         <td>{{ enigme.codeSecret }}</td>
                         <td>
