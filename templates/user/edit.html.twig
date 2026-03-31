@@ -3,16 +3,16 @@
 {% block title %}Edit User{% endblock %}
 
 {% block body %}
-<section class="edit-page">
-    <div class="edit-page__card">
-        <div class="edit-page__header">
-            <h1 class="edit-page__title">Modifier utilisateur</h1>
-            <p class="edit-page__subtitle">Révisez le profil utilisateur avant validation.</p>
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Modifier utilisateur</h1>
+            <p class="enigme-page__subtitle">Révisez le profil utilisateur avant validation.</p>
         </div>
 
         {{ include('user/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-        <div class="edit-page__actions mt-4 d-flex flex-wrap gap-2">
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
             <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
             {{ include('user/_delete_form.html.twig') }}
         </div>

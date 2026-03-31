@@ -3,16 +3,16 @@
 {% block title %}Modifier la vignette{% endblock %}
 
 {% block body %}
-<section class="edit-page">
-    <div class="edit-page__card">
-        <div class="edit-page__header">
-            <h1 class="edit-page__title">Modifier la vignette</h1>
-            <p class="edit-page__subtitle">Actualisez les informations de la vignette en toute sécurité.</p>
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Modifier la vignette</h1>
+            <p class="enigme-page__subtitle">Actualisez les informations de la vignette en toute sécurité.</p>
         </div>
 
         {{ include('vignette/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-        <div class="edit-page__actions mt-4 d-flex flex-wrap gap-2">
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
             <a href="{{ path('app_vignette_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
             {{ include('vignette/_delete_form.html.twig') }}
         </div>

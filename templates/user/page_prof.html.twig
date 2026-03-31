@@ -3,25 +3,25 @@
 {% block title %}Espace Professeur{% endblock %}
 
 {% block body %}
-<div class="tw-container tw-mx-auto tw-py-8">
-    <div class="tw-flex tw-justify-between tw-items-center tw-mb-8">
-        <h1 class="tw-text-3xl tw-font-bold tw-text-gray-800">🎓 Espace Professeur</h1>
+<div class="prof-space">
+    <div class="prof-space__header">
+        <h1 class="prof-space__title">🎓 Espace Professeur</h1>
         <a href="{{ path('app_index') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
     </div>
 
-    <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 tw-gap-8">
-        <div class="card tw-shadow-md tw-border-0">
-            <div class="card-body tw-p-6">
-                <h3 class="card-title tw-font-bold tw-mb-4">📋 Gestion des Équipes</h3>
-                <p class="card-text tw-text-gray-600 tw-mb-4">Suivez la progression des équipes et gérez leurs accès.</p>
+    <div class="prof-space__grid">
+        <div class="card prof-space__card">
+            <div class="card-body">
+                <h3 class="card-title">📋 Gestion des Équipes</h3>
+                <p class="card-text">Suivez la progression des équipes et gérez leurs accès.</p>
                 <a href="{{ path('app_equipe_index') }}" class="btn btn-primary">Voir les équipes</a>
             </div>
         </div>
 
-        <div class="card tw-shadow-md tw-border-0">
-            <div class="card-body tw-p-6">
-                <h3 class="card-title tw-font-bold tw-mb-4">🧩 Gestion des Énigmes</h3>
-                <p class="card-text tw-text-gray-600 tw-mb-4">Créez et modifiez les énigmes du jeu.</p>
+        <div class="card prof-space__card">
+            <div class="card-body">
+                <h3 class="card-title">🧩 Gestion des Énigmes</h3>
+                <p class="card-text">Créez et modifiez les énigmes du jeu.</p>
                 <!-- Lien vers la gestion des énigmes si elle existe, sinon placeholder -->
                 <button class="btn btn-secondary" disabled>Gérer les énigmes (Bientôt)</button>
             </div>
