@@ -41,7 +41,7 @@ class Enigme
     #[ORM\ManyToOne(inversedBy: 'enigmes')]
     private ?Vignette $vignette = null;
 
-    #[ORM\ManyToOne(inversedBy: 'enigmes')]
+    #[ORM\ManyToOne(inversedBy: 'enigme')]
     private ?Jeu $jeu = null;
 
     #[ORM\Column(length: 255, nullable: true)]

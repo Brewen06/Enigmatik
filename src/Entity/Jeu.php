@@ -31,6 +31,9 @@ class Jeu
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $codeFinal = null;
 
+    #[ORM\Column]
+    private bool $active = true;
+
     /**
      * @var Collection<int, Parametre>
      */
@@ -48,11 +51,6 @@ class Jeu
         $this->parametres = new ArrayCollection();
         $this->enigme = new ArrayCollection();
     }
-
-    
-
-    
-
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +100,18 @@ class Jeu
     public function setCodeFinal(?string $codeFinal): static
     {
         $this->codeFinal = $codeFinal;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }
@@ -165,6 +175,4 @@ class Jeu
 
         return $this;
     }
-
-    
 }

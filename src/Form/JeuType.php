@@ -4,9 +4,10 @@ namespace App\Form;
 
 use App\Entity\Jeu;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class JeuType extends AbstractType
 {
@@ -36,12 +37,26 @@ class JeuType extends AbstractType
             )
             ->add(
                 'imageBienvenue',
-                null,
+                FileType::class,
                 [
                     'label' => 'Image de bienvenue',
+                    'required' => false,
+                    'mapped' => false,
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '1024k',
+                            'mimeTypes' => [
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                            ],
+                            'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG, WEBP)',
+                        ]),
+                    ],
                     'attr' => [
-                        'class' => 'form-control'
-                    ]
+                        'class' => 'file-input form-control',
+
+                    ],
                 ]
             )
             ->add(
@@ -56,19 +71,6 @@ class JeuType extends AbstractType
                     ]
                 ]
             )
-            ->add('active', CheckboxType::class, [
-                'label' => 'Énigme active (visible par les joueurs)',
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-check-input'
-                ],
-                'label_attr' => [
-                    'class' => 'form-check-label fw-bold focus'
-                ],
-                'row_attr' => [
-                    'class' => 'form-check form-switch mb-3'
-                ]
-            ])
         ;
     }
 
