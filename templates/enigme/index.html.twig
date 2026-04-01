@@ -59,6 +59,16 @@
                                 <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}" class="btn btn-warning btn-sm text-white" title="Modifier">
                                     <i class="bi bi-pencil"></i>
                                 </a>
+                                <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_active' ~ enigme.id) }}">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm {{ enigme.active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                        title="{{ enigme.active ? 'Désactiver' : 'Activer' }}"
+                                    >
+                                        <i class="bi {{ enigme.active ? 'bi-toggle-on' : 'bi-toggle-off' }}"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

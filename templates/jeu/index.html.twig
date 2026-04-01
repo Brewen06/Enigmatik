@@ -130,10 +130,16 @@
                         <span class="tw-mt-2 tw-inline-block tw-bg-blue-100 tw-text-blue-800 tw-text-xs tw-px-2 tw-py-1 tw-rounded-full">{{ enigme.type.libelle }}</span>
                     <br>
                         {% if canManageEnigmes %}
-                        <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="tw-flex tw-justify-center">
+                        <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="tw-flex tw-justify-center" onclick="event.stopPropagation();">
                             <input type="hidden" name="_token" value="{{ csrf_token('toggle_active' ~ enigme.id) }}">
-                            <button type="submit" class="tw-text-xs tw-font-semibold tw-px-3 tw-py-2 tw-rounded-full {% if enigme.active %}tw-bg-red-100 tw-text-red-700 hover:tw-bg-red-200{% else %}tw-bg-green-100 tw-text-green-700 hover:tw-bg-green-200{% endif %}">
-                                {% if enigme.active %}Désactiver {% else %}Activer{% endif %}
+                            <button
+                                type="submit"
+                                onclick="event.stopPropagation();"
+                                class="tw-inline-flex tw-items-center tw-gap-2 tw-text-xs tw-font-semibold tw-px-3 tw-py-2 tw-rounded-full tw-border {% if enigme.active %}tw-border-red-300 tw-bg-red-50 tw-text-red-700 hover:tw-bg-red-100{% else %}tw-border-green-300 tw-bg-green-50 tw-text-green-700 hover:tw-bg-green-100{% endif %}"
+                                title="{{ enigme.active ? 'Désactiver' : 'Activer' }}"
+                            >
+                                <i class="bi {{ enigme.active ? 'bi-toggle-on' : 'bi-toggle-off' }}"></i>
+                                {{ enigme.active ? 'Désactiver' : 'Activer' }}
                             </button>
                         </form>
                         {% endif %}

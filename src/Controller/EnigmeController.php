@@ -171,7 +171,13 @@ final class EnigmeController extends AbstractController
             sprintf('Énigme "%s" %s.', (string) $enigme->getTitre(), $enigme->isActive() ? 'activée' : 'désactivée')
         );
 
-        return $this->redirectToRoute('app_jeu_index');
+        $referer = $request->headers->get('referer');
+
+        if ($referer) {
+            return $this->redirect($referer);
+        }
+
+        return $this->redirectToRoute('app_enigme_index');
     }
 
     #[Route('/supprimer-toutes', name: 'app_enigme_delete_all', methods: ['POST'])]
