@@ -48,7 +48,7 @@ class JeuType extends AbstractType
                             'mimeTypes' => [
                                 'image/jpeg',
                                 'image/png',
-                                'image/webp',
+                                'image/webp', 
                             ],
                             'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG, WEBP)',
                         ]),

@@ -61,7 +61,8 @@ final class EnigmeController extends AbstractController
         $answer = $data['answer'] ?? '';
 
         $expectedSolutions = $this->extractNormalizedSolutions((string) ($enigme->getSolution() ?? ''));
-        $normalizedIndice = $this->normalizeAnswer((string) ($enigme->getIndice() ?? ''));
+        $indice = $this->getIndiceOrNull($enigme);
+        $normalizedIndice = $this->normalizeAnswer((string) ($indice ?? ''));
         $isValidAnswer = false;
 
         if ($expectedSolutions !== []) {
@@ -82,11 +83,24 @@ final class EnigmeController extends AbstractController
         if ($isValidAnswer) {
             return $this->json([
                 'success' => true,
-                'indice' => $enigme->getIndice(),
+                'indice' => $indice,
             ]);
         }
 
         return $this->json(['success' => false]);
+    }
+
+    private function getIndiceOrNull(Enigme $enigme): ?string
+    {
+        $getter = 'getIndice';
+
+        if (!is_callable([$enigme, $getter])) {
+            return null;
+        }
+
+        $value = $enigme->{$getter}();
+
+        return $value !== null ? (string) $value : null;
     }
 
     private function normalizeAnswer(string $value): string
@@ -204,5 +218,21 @@ final class EnigmeController extends AbstractController
         }
 
         return $this->redirectToRoute('app_enigme_index');
+    }
+    #[Route('/{id}/frise', name: 'app_enigme_frise', methods: ['POST'])]
+    public function frise(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
+    {
+        if (!$this->isCsrfTokenValid('frise' . $enigme->getId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $enigme->setAfficherFrise(!$enigme->isAfficherFrise());
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_enigme_index');
+
+        return $this->render('enigme/frise.html.twig', [
+            'enigme' => $enigme,
+        ]);
     }
 }

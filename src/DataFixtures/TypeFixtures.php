@@ -8,15 +8,10 @@ use Doctrine\Persistence\ObjectManager;
 
 class TypeFixtures extends Fixture
 {
-    public const TYPE_PUZZLE = 'type_puzzle';
     public const TYPE_QUIZ = 'type_quiz';
-    public const TYPE_DIFFERENCE = 'type_difference';
-    public const TYPE_CRYPTOGRAPHIE = 'type_cryptographie';
     public const TYPE_REPONSE_OUVERTE = 'type_reponse_ouverte';
-    public const TYPE_CASSE_TETE = 'type_casse_tete';
-    public const TYPE_VISUEL = 'type_visuel';
-    public const TYPE_LOGIQUE = 'type_logique';
-    public const TYPE_MOTS_MELES = 'type_mots_meles';
+    public const TYPE_QCM = 'type_qcm';
+    public const TYPE_VRAI_FAUX = 'type_vrai_faux';
 
     public function load(ObjectManager $manager): void
     {
@@ -26,14 +21,19 @@ class TypeFixtures extends Fixture
         $this->addReference(self::TYPE_QUIZ, $type1);
 
         $type2 = new Type();
-        $type2->setLibelle('Différence d\'images');
+        $type2->setLibelle('Réponse ouverte');
         $manager->persist($type2);
-        $this->addReference(self::TYPE_DIFFERENCE, $type2);
+        $this->addReference(self::TYPE_REPONSE_OUVERTE, $type2);
 
         $type3 = new Type();
-        $type3->setLibelle('Réponse ouverte');
+        $type3->setLibelle('QCM');
         $manager->persist($type3);
-        $this->addReference(self::TYPE_REPONSE_OUVERTE, $type3);
+        $this->addReference(self::TYPE_QCM, $type3);
+
+        $type4 = new Type();
+        $type4->setLibelle('Vrai/Faux');
+        $manager->persist($type4);
+        $this->addReference(self::TYPE_VRAI_FAUX, $type4);
 
         $manager->flush();
     }
