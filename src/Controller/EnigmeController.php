@@ -138,6 +138,27 @@ final class EnigmeController extends AbstractController
         return $normalized;
     }
 
+    private function toggleAfficherFrise(Enigme $enigme): void
+    {
+        $methodPairs = [
+            ['isAfficherFrise', 'setAfficherFrise'],
+            ['getAfficherFrise', 'setAfficherFrise'],
+            ['isFrise', 'setFrise'],
+            ['getFrise', 'setFrise'],
+        ];
+
+        foreach ($methodPairs as [$getter, $setter]) {
+            if (is_callable([$enigme, $getter]) && is_callable([$enigme, $setter])) {
+                $currentValue = (bool) $enigme->{$getter}();
+                $enigme->{$setter}(!$currentValue);
+
+                return;
+            }
+        }
+
+        throw new \LogicException('Aucun couple getter/setter de frise compatible trouvé sur Enigme.');
+    }
+
     #[Route('/{id}/modifier', name: 'app_enigme_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
     {
@@ -219,20 +240,30 @@ final class EnigmeController extends AbstractController
 
         return $this->redirectToRoute('app_enigme_index');
     }
-    #[Route('/{id}/frise', name: 'app_enigme_frise', methods: ['POST'])]
-    public function frise(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/frise', name: 'app_enigme_frise', methods: ['GET'])]
+    public function frise(Enigme $enigme): Response
+    {
+        return $this->render('enigme/frise.html.twig', [
+            'enigme' => $enigme,
+        ]);
+    }
+
+    #[Route('/{id}/frise/toggle', name: 'app_enigme_frise_toggle', methods: ['POST'])]
+    public function toggleFrise(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
     {
         if (!$this->isCsrfTokenValid('frise' . $enigme->getId(), $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
         }
 
-        $enigme->setAfficherFrise(!$enigme->isAfficherFrise());
+        $this->toggleAfficherFrise($enigme);
         $entityManager->flush();
 
-        return $this->redirectToRoute('app_enigme_index');
+        $referer = $request->headers->get('referer');
 
-        return $this->render('enigme/frise.html.twig', [
-            'enigme' => $enigme,
-        ]);
+        if ($referer) {
+            return $this->redirect($referer);
+        }
+
+        return $this->redirectToRoute('app_enigme_frise', ['id' => $enigme->getId()]);
     }
 }

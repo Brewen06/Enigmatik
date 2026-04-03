@@ -35,6 +35,11 @@ class TypeFixtures extends Fixture
         $manager->persist($type4);
         $this->addReference(self::TYPE_VRAI_FAUX, $type4);
 
+        $type5 = new Type();
+        $type5->setLibelle('frise');
+        $manager->persist($type5);
+        $this->addReference('type_frise', $type5);
+
         $manager->flush();
     }
 }

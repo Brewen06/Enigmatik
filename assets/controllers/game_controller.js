@@ -74,4 +74,12 @@ export default class extends Controller {
         const timerElement = document.getElementById('timer');
         let timeLeft = parseInt(timerElement.dataset.timeLeft, 10);
     }
+
+    timelineGame() {
+        const minAnnee = parseInt(timelineElement.dataset.minYear, 10);
+        const maxAnnee = parseInt(timelineElement.dataset.maxYear, 10);
+        const currentAnnee = parseInt(timelineElement.dataset.currentYear, 10);
+        const positionAnnee = ((currentAnnee - minAnnee) / (maxAnnee - minAnnee)) * 100;
+        timelineElement.querySelector('.timeline-marker').style.left = `${positionAnnee}%`;
+    }
 }

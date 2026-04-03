@@ -43,7 +43,9 @@
                             <p class="text-muted fst-italic">Aucun lien associé</p>
                         {% endif %}
                     </div>
-
+                        {% if type and type.libelle == 'frise' %}
+                            {{ include('enigme/' ~ enigme.id ~ '/frise.html.twig') }}
+                        {% endif %}
                     <div {{ stimulus_controller('game', { 'checkUrl': path('app_enigme_check', {'id': enigme.id}) }) }}>
                         <form {{ stimulus_action('game', 'check', 'submit') }} class="mt-4">
                             {% if enigme.choices is not empty %}

@@ -174,6 +174,20 @@ class EnigmeType extends AbstractType
                 }
             }
         });
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var Enigme|null $enigme */
+            $enigme = $event->getData();
+            $form = $event->getForm();
+
+            if ($enigme === null || $enigme->getId() === null) {
+                return;
+            }
+
+            $choices = $enigme->getChoices();
+            if (is_array($choices) && count($choices) > 0) {
+                $form->get('reponseType')->setData('multiple');
+            }
+        });
     }
 
     /**
