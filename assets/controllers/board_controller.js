@@ -20,6 +20,8 @@ export default class extends Controller {
 
     static values = {
         validateUrl: String,
+        victoryUrl: String,
+        teamId: Number,
         timerSeconds: Number,
     };
 
@@ -27,6 +29,14 @@ export default class extends Controller {
         console.log('Board controller connected');
         this.timerInterval = null;
         this.remainingSeconds = this.timerSecondsValue || 0;
+
+        if (this.hasModalTarget) {
+            if (this.hasSeenIntroModal()) {
+                this.modalTarget.classList.add('tw-hidden');
+            } else {
+                this.modalTarget.classList.remove('tw-hidden');
+            }
+        }
 
         if (this.hasTimerTarget && this.remainingSeconds > 0) {
             this.startTimer();
@@ -106,7 +116,29 @@ export default class extends Controller {
 
     closeModal(event) {
         event.preventDefault();
+        this.markIntroModalSeen();
         this.modalTarget.classList.add('tw-hidden');
+    }
+
+    getIntroStorageKey() {
+        const teamId = this.hasTeamIdValue ? this.teamIdValue : 0;
+        return 'enigmatik:intro_seen:' + String(teamId || 0);
+    }
+
+    hasSeenIntroModal() {
+        try {
+            return window.sessionStorage.getItem(this.getIntroStorageKey()) === '1';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    markIntroModalSeen() {
+        try {
+            window.sessionStorage.setItem(this.getIntroStorageKey(), '1');
+        } catch (error) {
+            // Ignore storage errors (private mode, blocked storage, etc.)
+        }
     }
 
     closeEnigmaModal(event) {
@@ -182,6 +214,10 @@ export default class extends Controller {
                 if (data.success) {
                     messageDiv.innerHTML = '<span class="tw-text-green-400 tw-font-bold">' + data.message + '</span>';
                     this.finalCodeInputTarget.disabled = true;
+
+                    if (this.hasVictoryUrlValue) {
+                        window.location.href = this.victoryUrlValue;
+                    }
                 } else {
                     messageDiv.innerHTML = '<span class="tw-text-red-400 tw-font-bold">' + data.message + '</span>';
                 }

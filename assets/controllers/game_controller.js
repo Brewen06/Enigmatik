@@ -52,8 +52,8 @@ export default class extends Controller {
             .then(data => {
                 if (data.success) {
                     let message = '<div class="alert alert-success">Bravo ! Bonne réponse.</div>';
-                    if (data.codeSecret) {
-                        message += `<div class="alert alert-info mt-2"><strong>Code secret débloqué :</strong> <span class="badge bg-warning text-dark fs-4">${data.codeSecret}</span></div>`;
+                    if (data.indice) {
+                        message += `<div class="alert alert-info mt-2"><strong>Indice débloqué :</strong> <span class="badge bg-warning text-dark fs-4">${data.indice}</span></div>`;
                     }
                     this.resultTarget.innerHTML = message;
                     this.inputTargets.forEach(input => input.disabled = true);

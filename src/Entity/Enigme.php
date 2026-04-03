@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\EnigmeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,8 +27,8 @@ class Enigme
     #[ORM\Column(type: Types::TEXT)]
     private ?string $consigne = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $codeSecret = null;
+    #[ORM\Column(name: 'code_secret', length: 50)]
+    private ?string $indice = null;
 
     #[ORM\Column(length: 2, nullable: true)]
     private ?string $codeReponse = null;
@@ -130,16 +128,26 @@ class Enigme
         return $this;
     }
 
-    public function getCodeSecret(): ?string
+    public function getIndice(): ?string
     {
-        return $this->codeSecret;
+        return $this->indice;
     }
 
-    public function setCodeSecret(string $codeSecret): static
+    public function setIndice(string $indice): static
     {
-        $this->codeSecret = $codeSecret;
+        $this->indice = $indice;
 
         return $this;
+    }
+
+    public function isIndice(): bool
+    {
+        return (string) $this->indice !== '';
+    }
+
+    public function hasIndice(): bool
+    {
+        return $this->isIndice();
     }
 
     public function getVignette(): ?Vignette

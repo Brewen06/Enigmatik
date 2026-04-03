@@ -51,7 +51,7 @@ final class EnigmeControllerTest extends WebTestCase
             'enigme[ordre]' => 'Testing',
             'enigme[titre]' => 'Testing',
             'enigme[consigne]' => 'Testing',
-            'enigme[codeSecret]' => 'Testing',
+            'enigme[indice]' => 'Testing',
             'enigme[type]' => 'Testing',
             'enigme[vignette]' => 'Testing',
         ]);
@@ -68,7 +68,7 @@ final class EnigmeControllerTest extends WebTestCase
         $fixture->setOrdre('My Title');
         $fixture->setTitre('My Title');
         $fixture->setConsigne('My Title');
-        $fixture->setCodeSecret('My Title');
+        $fixture->setIndice('My Title');
         $fixture->setType('My Title');
         $fixture->setVignette('My Title');
 
@@ -90,7 +90,7 @@ final class EnigmeControllerTest extends WebTestCase
         $fixture->setOrdre('Value');
         $fixture->setTitre('Value');
         $fixture->setConsigne('Value');
-        $fixture->setCodeSecret('Value');
+        $fixture->setIndice('Value');
         $fixture->setType('Value');
         $fixture->setVignette('Value');
 
@@ -103,7 +103,7 @@ final class EnigmeControllerTest extends WebTestCase
             'enigme[ordre]' => 'Something New',
             'enigme[titre]' => 'Something New',
             'enigme[consigne]' => 'Something New',
-            'enigme[codeSecret]' => 'Something New',
+            'enigme[indice]' => 'Something New',
             'enigme[type]' => 'Something New',
             'enigme[vignette]' => 'Something New',
         ]);
@@ -115,7 +115,7 @@ final class EnigmeControllerTest extends WebTestCase
         self::assertSame('Something New', $fixture[0]->getOrdre());
         self::assertSame('Something New', $fixture[0]->getTitre());
         self::assertSame('Something New', $fixture[0]->getConsigne());
-        self::assertSame('Something New', $fixture[0]->getCodeSecret());
+        self::assertSame('Something New', $fixture[0]->getIndice());
         self::assertSame('Something New', $fixture[0]->getType());
         self::assertSame('Something New', $fixture[0]->getVignette());
     }
@@ -127,7 +127,7 @@ final class EnigmeControllerTest extends WebTestCase
         $fixture->setOrdre('Value');
         $fixture->setTitre('Value');
         $fixture->setConsigne('Value');
-        $fixture->setCodeSecret('Value');
+        $fixture->setIndice('Value');
         $fixture->setType('Value');
         $fixture->setVignette('Value');
 

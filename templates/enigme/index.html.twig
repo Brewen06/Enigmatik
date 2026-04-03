@@ -22,7 +22,7 @@
                         <th>Type</th>
                         <th>Consigne</th>
                         <th>Lien</th>
-                        <th>Code Secret</th>
+                        <th>Indice</th>
                         <th>Vignette</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -43,7 +43,7 @@
                         <td>{{ enigme.type.libelle }}</td>
                         <td>{{ enigme.consigne|slice(0, 100) }}</td>
                         <td>{{ enigme.lien }}</td>
-                        <td>{{ enigme.codeSecret }}</td>
+                        <td>{{ enigme.indice }}</td>
                         <td>
                             {% if enigme.vignette %}
                                 <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" width="50" class="img-thumbnail">

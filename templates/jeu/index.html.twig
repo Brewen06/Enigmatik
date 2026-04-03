@@ -23,12 +23,14 @@
         </div>
     {% endif %}
 
-    <div class="tw-container tw-mx-auto tw-px-4" 
+    <div class="tw-container tw-relative tw-mx-auto tw-px-4" 
          data-controller="board" 
          data-board-validate-url-value="{{ path('app_jeu_validate_final_code') }}"
+         data-board-victory-url-value="{{ path('app_jeu_victoire') }}"
+         data-board-team-id-value="{{ equipe ? equipe.id : 0 }}"
          data-board-timer-seconds-value="{{ timerSeconds }}">
-        <div data-board-target="modal" class="tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm">
-            <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-2xl tw-w-full tw-relative tw-shadow-2xl tw-border-4 tw-border-green-500">
+        <div data-board-target="modal" class="tw-hidden tw-absolute tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-p-4 tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm tw-overflow-y-auto">
+            <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-2xl tw-w-full tw-my-4 tw-relative tw-shadow-2xl tw-border-4 tw-border-green-500">
                 <button data-action="click->board#closeModal" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-gray-800 tw-transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-8 tw-w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -36,23 +38,21 @@
                 </button>
                 
                 <div class="tw-text-center">
-                    <h2 class="tw-text-3xl tw-font-bold tw-text-green-700 tw-mb-6">Contexte</h2>
+                    <h2 class="tw-text-3xl tw-font-bold tw-text-green-700 tw-mb-6">Débriefing de mission</h2>
                     <div class="tw-text-left tw-bg-green-50 tw-p-6 tw-rounded-lg tw-border tw-border-green-200">
                         <p class="tw-text-lg tw-text-gray-800 tw-mb-4">
-                            <strong class="tw-font-bold">Bienvenue {{ equipe }}!</strong><br> Votre équipe résolvera des énigmes sur le domaine de l'informatique afin d'en apprendre d'avantage. Votre objectif est :
+                            <strong class="tw-font-bold">Bienvenue {{ equipe ? equipe.nom : 'équipe' }}.</strong><br>
+                            Votre mission consiste à résoudre des énigmes en informatique pour collecter les indices nécessaires à l'ouverture du verrou final.
                         </p>
                         <ul class="tw-space-y-3 tw-text-gray-700">
                             <li class="tw-flex tw-items-start">
-                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">1</span>
-                                Résolvez les énigmes proposées.
+                                Analysez chaque consigne avec méthode et validez les énigmes une par une.
                             </li>
                             <li class="tw-flex tw-items-start">
-                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">2</span>
-                                Chaque énigme résolue vous donne un indice du code secret.
+                                Exploitez les indices obtenus pour reconstituer le code final de votre équipe.
                             </li>
                             <li class="tw-flex tw-items-start">
-                                <span class="tw-bg-green-200 tw-text-green-800 tw-font-bold tw-rounded-full tw-w-6 tw-h-6 tw-flex tw-items-center tw-justify-center tw-mr-3 tw-flex-shrink-0">3</span>
-                                Entrez le code sur la carte Cadenas 🔐 pour gagner.
+                                Saisissez le code final dans la zone dédiée pour terminer la mission.
                             </li>
                         </ul>
                     </div>
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <div data-board-target="enigmaModal" class="tw-hidden tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm">
+        <div data-board-target="enigmaModal" class="tw-hidden tw-absolute tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-p-4 tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm tw-overflow-y-auto">
             <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-lg tw-w-full tw-relative tw-shadow-2xl tw-border-4 tw-border-blue-500">
                 <button data-action="click->board#closeEnigmaModal" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-gray-800 tw-transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-8 tw-w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +124,6 @@
                          data-board-url-param="{{ path('app_enigme_show', {'id': enigme.id}) }}"
                          data-board-index-param="{{ loop.index }}">
                     <div class="tw-w-full tw-h-full tw-rounded-xl tw-overflow-hidden tw-border-4 {% if enigme.active %}tw-border-blue-500{% else %}tw-border-gray-400{% endif %} tw-bg-white tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-shadow-xl">
-                        <div class="tw-text-5xl tw-mb-4">🧩</div>
                         <h3 class="tw-text-xl tw-font-bold tw-text-blue-600 tw-text-center">Énigme {{ loop.index }}</h3>
                         <p class="tw-mt-2 tw-text-sm tw-text-gray-500 tw-text-center">{{ enigme.titre }}</p>
                         <span class="tw-mt-2 tw-inline-block tw-bg-blue-100 tw-text-blue-800 tw-text-xs tw-px-2 tw-py-1 tw-rounded-full">{{ enigme.type.libelle }}</span>
@@ -167,7 +166,8 @@
                                 maxlength="20">
                     </div>
                     <div class="tw-w-full md:tw-w-auto tw-flex tw-flex-col">
-                        <button data-action="click->board#checkFinalCode"
+                        <button type="button"
+                                data-action="click->board#checkFinalCode"
                                 class="tw-w-full tw-mt-6 md:tw-mt-6 tw-px-8 tw-py-3 tw-bg-yellow-500 hover:tw-bg-yellow-400 tw-text-gray-900 tw-font-bold tw-text-lg tw-rounded tw-transition-colors tw-shadow-lg transform active:tw-scale-95">
                             DÉVERROUILLER
                         </button>

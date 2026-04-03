@@ -84,10 +84,10 @@ class EnigmeType extends AbstractType
                 ]
             ])
             ->add(
-                'codeSecret',
+                'indice',
                 null,
                 [
-                    'label' => 'Code secret de l\'énigme',
+                    'label' => 'Indice',
                     'attr' => [
                         'class' => 'form-control'
                     ]

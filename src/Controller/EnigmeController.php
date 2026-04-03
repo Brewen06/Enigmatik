@@ -61,7 +61,7 @@ final class EnigmeController extends AbstractController
         $answer = $data['answer'] ?? '';
 
         $expectedSolutions = $this->extractNormalizedSolutions((string) ($enigme->getSolution() ?? ''));
-        $normalizedCodeSecret = $this->normalizeAnswer((string) ($enigme->getCodeSecret() ?? ''));
+        $normalizedIndice = $this->normalizeAnswer((string) ($enigme->getIndice() ?? ''));
         $isValidAnswer = false;
 
         if ($expectedSolutions !== []) {
@@ -76,13 +76,13 @@ final class EnigmeController extends AbstractController
             }
         } elseif (!is_array($answer)) {
             $normalizedAnswer = $this->normalizeAnswer((string) $answer);
-            $isValidAnswer = $normalizedAnswer !== '' && $normalizedCodeSecret !== '' && $normalizedAnswer === $normalizedCodeSecret;
+            $isValidAnswer = $normalizedAnswer !== '' && $normalizedIndice !== '' && $normalizedAnswer === $normalizedIndice;
         }
 
         if ($isValidAnswer) {
             return $this->json([
                 'success' => true,
-                'codeSecret' => $enigme->getCodeSecret(),
+                'indice' => $enigme->getIndice(),
             ]);
         }
 

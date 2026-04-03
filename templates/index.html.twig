@@ -18,9 +18,7 @@
                         <p class="tw-font-semibold tw-text-gray-800 tw-mb-0">{{ equipe.nom }}</p>
                     </div>
                 </div>
-                <a href="{{ path('app_jeu_index', {'equipe_id': equipe.id}) }}" class="btn btn-success btn-lg tw-font-bold tw-px-8 tw-py-3 tw-rounded-full tw-shadow-md hover:tw-shadow-xl tw-transition tw-duration-300">
-                    ▶ Reprendre la partie ({{ equipe.nom }})
-                </a>
+                <a href="{{ path('app_jeu_index', {'equipe_id': equipe.id}) }}" class="btn btn-success tw-inline-flex tw-items-center tw-justify-center tw-font-bold tw-leading-none tw-px-8 tw-py-3 tw-rounded-full tw-shadow-md hover:tw-shadow-xl tw-transition tw-duration-300 tw-whitespace-nowrap">Reprendre la partie</a>
             {% else %}
                 <a href="{{ path('app_equipe_creer') }}" class="btn btn-primary btn-lg tw-font-bold tw-px-8 tw-py-3 tw-rounded-full tw-shadow-md hover:tw-shadow-xl tw-transition tw-duration-300">
                     Créer votre équipe

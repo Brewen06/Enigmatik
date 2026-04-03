@@ -89,7 +89,11 @@ final class JeuController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+    #[Route('/victoire', name: 'app_jeu_victoire', methods: ['GET'])]
+    public function victoire(): Response
+    {
+        return $this->render('jeu/victoire.html.twig');
+    }
     private function extractTimerSeconds(?Jeu $jeu): int
     {
         if (!$jeu) {
@@ -97,13 +101,19 @@ final class JeuController extends AbstractController
         }
 
         foreach ($jeu->getParametres() as $parametre) {
-            $libelle = strtolower(trim((string) $parametre->getLibelle()));
+            if (!method_exists($parametre, 'getLibelle') || !method_exists($parametre, 'getValeur')) {
+                continue;
+            }
+
+            $getLibelle = 'getLibelle';
+            $getValeur = 'getValeur';
+            $libelle = strtolower(trim((string) $parametre->{$getLibelle}()));
 
             if (!in_array($libelle, ['durée du jeu (minutes)', 'duree du jeu (minutes)', 'duree_jeu_minutes'], true)) {
                 continue;
             }
 
-            $minutes = max(0, (int) $parametre->getValeur());
+            $minutes = max(0, (int) $parametre->{$getValeur}());
 
             return $minutes * 60;
         }
