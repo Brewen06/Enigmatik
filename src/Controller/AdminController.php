@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\EnigmeRepository;
 use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_admin_dashboard')]
-    public function dashboard(EquipeRepository $equipeRepository): Response
+    public function dashboard(EquipeRepository $equipeRepository, EnigmeRepository $enigmeRepository): Response
     {
         $activeGames = $equipeRepository->createQueryBuilder('e')
             ->select('e.id, e.nom, e.startedAt, e.enigmeActuelle, a.image AS avatarImage')
@@ -24,6 +25,13 @@ class AdminController extends AbstractController
             ->orderBy('e.startedAt', 'DESC')
             ->getQuery()
             ->getArrayResult();
+
+        $totalActiveEnigmes = (int) $enigmeRepository->createQueryBuilder('en')
+            ->select('COUNT(en.id)')
+            ->where('en.active = :active')
+            ->setParameter('active', true)
+            ->getQuery()
+            ->getSingleScalarResult();
 
         $historyGames = $equipeRepository->createQueryBuilder('e')
             ->where('e.finishedAt IS NOT NULL')
@@ -34,6 +42,7 @@ class AdminController extends AbstractController
         return $this->render('admin/dashboard.html.twig', [
             'activeGames' => $activeGames,
             'historyGames' => $historyGames,
+            'totalActiveEnigmes' => $totalActiveEnigmes,
         ]);
     }
 
@@ -54,10 +63,6 @@ class AdminController extends AbstractController
             ->getResult();
 
         foreach ($finishedGames as $finishedGame) {
-            foreach ($finishedGame->getAvatars() as $avatar) {
-                $avatar->setEquipe(null);
-            }
-
             $entityManager->remove($finishedGame);
         }
 
@@ -74,4 +79,32 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin_dashboard');
     }
 
+    #[Route('/delete-active', name: 'app_admin_delete_active', methods: ['POST'])]
+    public function deleteActiveGames(Request $request, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_active_games', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $activeGames = $equipeRepository->createQueryBuilder('e')
+            ->where('e.finishedAt IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($activeGames as $activeGame) {
+            $entityManager->remove($activeGame);
+        }
+
+        $entityManager->flush();
+
+        $deletedCount = count($activeGames);
+
+        if ($deletedCount > 0) {
+            $this->addFlash('success', sprintf('%d partie(s) en cours supprimée(s).', $deletedCount));
+        } else {
+            $this->addFlash('success', 'Aucune partie en cours à supprimer.');
+        }
+
+        return $this->redirectToRoute('app_admin_dashboard');
+    }
 }

@@ -34,6 +34,9 @@ class Equipe
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $finishedAt = null;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $enigmesResolues = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -110,6 +113,59 @@ class Equipe
 
         return $this;
     }
+
+    /**
+     * @return list<int>
+     */
+    public function getEnigmesResolues(): array
+    {
+        $values = $this->enigmesResolues ?? [];
+        $values = array_map(static fn(mixed $value): int => (int) $value, $values);
+        $values = array_values(array_unique(array_filter($values, static fn(int $value): bool => $value > 0)));
+        sort($values);
+
+        return $values;
+    }
+
+    /**
+     * @param array<mixed>|null $enigmesResolues
+     */
+    public function setEnigmesResolues(?array $enigmesResolues): static
+    {
+        $this->enigmesResolues = $enigmesResolues ?? [];
+
+        return $this;
+    }
+
+    public function addEnigmeResolue(int $enigmeId): bool
+    {
+        if ($enigmeId <= 0) {
+            return false;
+        }
+
+        $resolved = $this->getEnigmesResolues();
+
+        if (in_array($enigmeId, $resolved, true)) {
+            return false;
+        }
+
+        $resolved[] = $enigmeId;
+        sort($resolved);
+        $this->enigmesResolues = $resolved;
+
+        return true;
+    }
+
+    public function hasEnigmeResolue(int $enigmeId): bool
+    {
+        return in_array($enigmeId, $this->getEnigmesResolues(), true);
+    }
+
+    public function getNombreEnigmesResolues(): int
+    {
+        return count($this->getEnigmesResolues());
+    }
+
     public function __toString(): string
     {
         return $this->nom ?? 'Equipe';

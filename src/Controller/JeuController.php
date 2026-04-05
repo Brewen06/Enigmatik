@@ -23,6 +23,11 @@ final class JeuController extends AbstractController
     {
         $equipeId = $request->query->get('equipe_id');
         $equipe = $equipeId ? $equipeRepository->find($equipeId) : null;
+
+        if ($equipe) {
+            $request->getSession()->set('equipe_id', $equipe->getId());
+        }
+
         $jeu = $jeuRepository->findOneBy([]);
         $canManageEnigmes = $this->isGranted('ROLE_PROF') || $this->isGranted('ROLE_ADMIN');
         $enigmes = $canManageEnigmes

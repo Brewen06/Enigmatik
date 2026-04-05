@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Enigme;
 use App\Form\EnigmeType;
 use App\Repository\EnigmeRepository;
+use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,8 +56,13 @@ final class EnigmeController extends AbstractController
     }
 
     #[Route('/{id}/check', name: 'app_enigme_check', methods: ['POST'])]
-    public function check(Request $request, Enigme $enigme): Response
-    {
+    public function check(
+        Request $request,
+        Enigme $enigme,
+        EntityManagerInterface $entityManager,
+        EquipeRepository $equipeRepository,
+        EnigmeRepository $enigmeRepository
+    ): Response {
         $data = json_decode($request->getContent(), true);
         $answer = $data['answer'] ?? '';
 
@@ -81,6 +87,8 @@ final class EnigmeController extends AbstractController
         }
 
         if ($isValidAnswer) {
+            $this->updateEquipeProgression($request, $enigme, $entityManager, $equipeRepository, $enigmeRepository);
+
             return $this->json([
                 'success' => true,
                 'indice' => $indice,
@@ -136,6 +144,53 @@ final class EnigmeController extends AbstractController
         sort($normalized);
 
         return $normalized;
+    }
+
+    private function updateEquipeProgression(
+        Request $request,
+        Enigme $enigme,
+        EntityManagerInterface $entityManager,
+        EquipeRepository $equipeRepository,
+        EnigmeRepository $enigmeRepository
+    ): void {
+        $session = $request->getSession();
+
+        if (!$session) {
+            return;
+        }
+
+        $equipeId = (int) $session->get('equipe_id', 0);
+
+        if ($equipeId <= 0) {
+            return;
+        }
+
+        $equipe = $equipeRepository->find($equipeId);
+
+        if (!$equipe) {
+            return;
+        }
+
+        $isNewResolution = $equipe->addEnigmeResolue((int) $enigme->getId());
+
+        if (!$isNewResolution) {
+            return;
+        }
+
+        $solvedCount = $equipe->getNombreEnigmesResolues();
+        $equipe->setPosition($solvedCount);
+
+        $enigmeOrdre = max(1, (int) ($enigme->getOrdre() ?? 1));
+        $equipe->setEnigmeActuelle(max((int) ($equipe->getEnigmeActuelle() ?? 1), $enigmeOrdre + 1));
+
+        $activeEnigmes = $enigmeRepository->findBy(['active' => true]);
+        $totalActiveEnigmes = count($activeEnigmes);
+
+        if ($totalActiveEnigmes > 0 && $solvedCount >= $totalActiveEnigmes && $equipe->getFinishedAt() === null) {
+            $equipe->setFinishedAt(new \DateTimeImmutable());
+        }
+
+        $entityManager->flush();
     }
 
     private function toggleAfficherFrise(Enigme $enigme): void

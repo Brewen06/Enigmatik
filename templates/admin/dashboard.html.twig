@@ -15,7 +15,15 @@
         <div class="col-md-12 mb-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h2 class="h5 mb-0"><i class="bi bi-play-circle me-2"></i>Parties en cours</h2>
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        <h2 class="h5 mb-0"><i class="bi bi-play-circle me-2"></i>Parties en cours</h2>
+                        <form method="post" action="{{ path('app_admin_delete_active') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer toutes les parties en cours ?');" class="mb-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_active_games') }}">
+                            <button type="submit" class="btn btn-sm btn-outline-light fw-bold">
+                                <i class="bi bi-trash me-1"></i> Supprimer les parties en cours
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <div class="card-body">
                     {% if activeGames is empty %}
@@ -45,7 +53,13 @@
                                             </td>
                                             <td>{{ game.startedAt ? game.startedAt|date('d/m/Y H:i') : '-' }}</td>
                                             <td>
-                                                <span class="badge bg-primary">Enigme {{ game.enigmeActuelle }}</span>
+                                                {% if totalActiveEnigmes == 0 %}
+                                                    <span class="badge bg-secondary">Aucune énigme</span>
+                                                {% elseif game.enigmeActuelle > totalActiveEnigmes %}
+                                                    <span class="badge bg-success">Terminé</span>
+                                                {% else %}
+                                                    <span class="badge bg-primary">Enigme {{ game.enigmeActuelle }}</span>
+                                                {% endif %}
                                             </td>
                                             <td>
                                                 <a href="{{ path('app_equipe_show', {'id': game.id}) }}" class="btn btn-sm btn-outline-info">Détails</a>
@@ -63,7 +77,10 @@
         <div class="col-md-12">
             <div class="card shadow-sm">
                 <div class="card-header bg-secondary text-white">
-                    <h2 class="h5 mb-0"><i class="bi bi-clock-history me-2"></i>Historique des parties</h2>
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        <h2 class="h5 mb-0"><i class="bi bi-clock-history me-2"></i>Historique des parties</h2>
+                        {{ include('admin/_delete.html.twig') }}
+                    </div>
                 </div>
                 <div class="card-body">
                     {% if historyGames is empty %}
@@ -102,7 +119,6 @@
                 </div>
             </div>
         </div>
-        {{ include('admin/_delete.html.twig') }}
     </div>
 </div>
 {% endblock %}
