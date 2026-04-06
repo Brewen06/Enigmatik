@@ -34,6 +34,9 @@ class Jeu
     #[ORM\Column]
     private bool $active = true;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private int $timerMinutes = 0;
+
     /**
      * @var Collection<int, Parametre>
      */
@@ -112,6 +115,18 @@ class Jeu
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getTimerMinutes(): int
+    {
+        return $this->timerMinutes;
+    }
+
+    public function setTimerMinutes(int $timerMinutes): static
+    {
+        $this->timerMinutes = max(0, $timerMinutes);
 
         return $this;
     }

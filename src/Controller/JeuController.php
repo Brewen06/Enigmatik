@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Equipe;
 use App\Entity\Jeu;
 use App\Form\JeuType;
 use App\Repository\EnigmeRepository;
@@ -9,6 +10,7 @@ use App\Repository\EquipeRepository;
 use App\Repository\JeuRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,8 +23,13 @@ final class JeuController extends AbstractController
     #[Route(name: 'app_jeu_index', methods: ['GET'])]
     public function index(JeuRepository $jeuRepository, EnigmeRepository $enigmeRepository, Request $request, EquipeRepository $equipeRepository): Response
     {
-        $equipeId = $request->query->get('equipe_id');
-        $equipe = $equipeId ? $equipeRepository->find($equipeId) : null;
+        $equipeId = (int) $request->query->get('equipe_id', 0);
+
+        if ($equipeId <= 0) {
+            $equipeId = (int) $request->getSession()->get('equipe_id', 0);
+        }
+
+        $equipe = $equipeId > 0 ? $equipeRepository->find($equipeId) : null;
 
         if ($equipe) {
             $request->getSession()->set('equipe_id', $equipe->getId());
@@ -35,26 +42,42 @@ final class JeuController extends AbstractController
             : $enigmeRepository->findBy(['active' => true], ['ordre' => 'ASC']);
 
         $timerSeconds = $this->extractTimerSeconds($jeu);
+        $timerRuntime = $this->computeTimerRuntime($equipe, $timerSeconds);
 
         return $this->render('jeu/index.html.twig', [
             'jeu' => $jeu,
             'enigmes' => $enigmes,
             'equipe' => $equipe,
-            'timerSeconds' => $timerSeconds,
+            'timerSeconds' => $timerRuntime['remainingSeconds'],
+            'timerLocked' => $timerRuntime['locked'],
             'canManageEnigmes' => $canManageEnigmes,
         ]);
     }
 
     #[Route('/validate-final-code', name: 'app_jeu_validate_final_code', methods: ['POST'])]
-    public function validateFinalCode(Request $request, JeuRepository $jeuRepository): \Symfony\Component\HttpFoundation\JsonResponse
+    public function validateFinalCode(Request $request, JeuRepository $jeuRepository, EquipeRepository $equipeRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $submittedCode = $data['code'] ?? '';
+        $submittedTeamId = (int) ($data['teamId'] ?? 0);
+
+        $equipeId = $submittedTeamId > 0
+            ? $submittedTeamId
+            : (int) $request->getSession()->get('equipe_id', 0);
 
         $jeu = $jeuRepository->findOneBy([]);
         $correctCode = $jeu ? $jeu->getCodeFinal() : '';
 
         if ($correctCode && strtoupper(trim($submittedCode)) === strtoupper($correctCode)) {
+            if ($equipeId > 0) {
+                $equipe = $equipeRepository->find($equipeId);
+
+                if ($equipe && $equipe->getFinishedAt() === null) {
+                    $equipe->setFinishedAt(new \DateTimeImmutable());
+                    $entityManager->flush();
+                }
+            }
+
             return $this->json([
                 'success' => true,
                 'message' => 'Félicitations ! Vous avez déverrouillé le système !'
@@ -105,6 +128,11 @@ final class JeuController extends AbstractController
             return 0;
         }
 
+        $configuredTimerMinutes = $jeu->getTimerMinutes();
+        if ($configuredTimerMinutes > 0) {
+            return $configuredTimerMinutes * 60;
+        }
+
         foreach ($jeu->getParametres() as $parametre) {
             if (!method_exists($parametre, 'getLibelle') || !method_exists($parametre, 'getValeur')) {
                 continue;
@@ -124,5 +152,28 @@ final class JeuController extends AbstractController
         }
 
         return 0;
+    }
+
+    /**
+     * @return array{remainingSeconds: int, locked: bool}
+     */
+    private function computeTimerRuntime(?Equipe $equipe, int $timerSeconds): array
+    {
+        if ($timerSeconds <= 0 || !$equipe || !$equipe->getStartedAt()) {
+            return [
+                'remainingSeconds' => max(0, $timerSeconds),
+                'locked' => false,
+            ];
+        }
+
+        $startedAt = $equipe->getStartedAt();
+        $endTime = $equipe->getFinishedAt() ?? new \DateTimeImmutable();
+        $elapsedSeconds = max(0, $endTime->getTimestamp() - $startedAt->getTimestamp());
+        $remainingSeconds = max(0, $timerSeconds - $elapsedSeconds);
+
+        return [
+            'remainingSeconds' => $remainingSeconds,
+            'locked' => $equipe->getFinishedAt() !== null,
+        ];
     }
 }

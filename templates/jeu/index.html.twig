@@ -28,7 +28,8 @@
          data-board-validate-url-value="{{ path('app_jeu_validate_final_code') }}"
          data-board-victory-url-value="{{ path('app_jeu_victoire') }}"
          data-board-team-id-value="{{ equipe ? equipe.id : 0 }}"
-         data-board-timer-seconds-value="{{ timerSeconds }}">
+            data-board-timer-seconds-value="{{ timerSeconds }}"
+            data-board-timer-locked-value="{{ timerLocked ? 'true' : 'false' }}">
         <div data-board-target="modal" class="tw-hidden tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-p-4 tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm tw-overflow-y-auto">
             <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-2xl tw-w-full tw-my-4 tw-relative tw-shadow-2xl tw-border-4 tw-border-green-500">
                 <button data-action="click->board#closeModal" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-gray-800 tw-transition-colors">
@@ -86,6 +87,7 @@
         {% if timerSeconds > 0 %}
     <div class="tw-mb-6 tw-flex tw-justify-center">
         <div class="tw-inline-flex tw-items-center tw-gap-3 tw-rounded-lg tw-border tw-border-amber-300 tw-bg-amber-50 tw-px-4 tw-py-2 tw-shadow-sm">
+            <i class="bi bi-stopwatch-fill tw-text-xl tw-text-amber-900" aria-hidden="true"></i>
             <span class="tw-font-semibold tw-text-amber-900">Temps restant</span>
             <span data-board-target="timer" class="tw-text-2xl tw-font-bold tw-tabular-nums tw-text-amber-900">00:00</span>
         </div>

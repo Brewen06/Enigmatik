@@ -28,6 +28,23 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2"><i class="bi bi-stopwatch-fill text-success me-2"></i>Chronomètre de la partie</h2>
+                        <p class="text-muted mb-2">Réglez la durée limite appliquée à toutes les équipes directement ici.</p>
+                        <p class="mb-3">
+                            <span class="badge bg-success-subtle text-success-emphasis border">Durée actuelle : {{ timerMinutes }} min</span>
+                        </p>
+                        {{ form_start(timerForm) }}
+                            <div class="mb-3">
+                                {{ form_row(timerForm.timerMinutes) }}
+                            </div>
+                            <button type="submit" class="btn btn-success fw-bold">Enregistrer le chronomètre</button>
+                        {{ form_end(timerForm) }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

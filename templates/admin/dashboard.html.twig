@@ -91,23 +91,39 @@
                                 <thead>
                                     <tr>
                                         <th>Équipe</th>
-                                        <th>Début</th>
-                                        <th>Fin</th>
+                                        <th>Avatar</th>
                                         <th>Durée</th>
+                                        <th>Temps restant</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for game in historyGames %}
                                         <tr>
                                             <td>{{ game.nom }}</td>
-                                            <td>{{ game.startedAt ? game.startedAt|date('d/m/Y H:i') : '-' }}</td>
-                                            <td>{{ game.finishedAt ? game.finishedAt|date('d/m/Y H:i') : '-' }}</td>
+                                            <td>
+                                                {% if game.avatarImage %}
+                                                    <img src="{{ asset(game.avatarImage | replace({'public/': ''})) }}" alt="Avatar" style="height: 30px; width: 30px; object-fit: cover;" class="rounded-circle">
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
                                             <td>
                                                 {% if game.startedAt and game.finishedAt %}
                                                     {% set duration = game.finishedAt.diff(game.startedAt) %}
                                                     {{ duration.format('%Hh %Im %Ss') }}
                                                 {% else %}
                                                     -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if game.remainingSeconds is not null %}
+                                                    {% set remainingMinutes = (game.remainingSeconds / 60)|round(0, 'floor') %}
+                                                    {% set remainingSeconds = game.remainingSeconds % 60 %}
+                                                    <span class="badge {{ game.remainingSeconds > 0 ? 'bg-success' : 'bg-danger' }}">
+                                                        {{ '%02d:%02d'|format(remainingMinutes, remainingSeconds) }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
                                                 {% endif %}
                                             </td>
                                         </tr>

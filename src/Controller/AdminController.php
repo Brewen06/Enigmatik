@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Jeu;
 use App\Repository\EnigmeRepository;
 use App\Repository\EquipeRepository;
+use App\Repository\JeuRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_admin_dashboard')]
-    public function dashboard(EquipeRepository $equipeRepository, EnigmeRepository $enigmeRepository): Response
+    public function dashboard(EquipeRepository $equipeRepository, EnigmeRepository $enigmeRepository, JeuRepository $jeuRepository): Response
     {
         $activeGames = $equipeRepository->createQueryBuilder('e')
             ->select('e.id, e.nom, e.startedAt, e.enigmeActuelle, a.image AS avatarImage')
@@ -33,17 +35,70 @@ class AdminController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        $jeu = $jeuRepository->findOneBy([]);
+        $timerSeconds = $this->extractTimerSeconds($jeu);
+
         $historyGames = $equipeRepository->createQueryBuilder('e')
+            ->select('e.id, e.nom, e.startedAt, e.finishedAt, a.image AS avatarImage')
+            ->leftJoin('e.avatar', 'a')
             ->where('e.finishedAt IS NOT NULL')
             ->orderBy('e.finishedAt', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
+
+        $historyGames = array_map(function (array $game) use ($timerSeconds): array {
+            $startedAt = $game['startedAt'] ?? null;
+            $finishedAt = $game['finishedAt'] ?? null;
+
+            if ($timerSeconds <= 0 || !$startedAt instanceof \DateTimeInterface || !$finishedAt instanceof \DateTimeInterface) {
+                $game['remainingSeconds'] = null;
+
+                return $game;
+            }
+
+            $elapsedSeconds = max(0, $finishedAt->getTimestamp() - $startedAt->getTimestamp());
+            $game['remainingSeconds'] = max(0, $timerSeconds - $elapsedSeconds);
+
+            return $game;
+        }, $historyGames);
 
         return $this->render('admin/dashboard.html.twig', [
             'activeGames' => $activeGames,
             'historyGames' => $historyGames,
             'totalActiveEnigmes' => $totalActiveEnigmes,
         ]);
+    }
+
+    private function extractTimerSeconds(?Jeu $jeu): int
+    {
+        if (!$jeu) {
+            return 0;
+        }
+
+        $configuredTimerMinutes = $jeu->getTimerMinutes();
+        if ($configuredTimerMinutes > 0) {
+            return $configuredTimerMinutes * 60;
+        }
+
+        foreach ($jeu->getParametres() as $parametre) {
+            if (!method_exists($parametre, 'getLibelle') || !method_exists($parametre, 'getValeur')) {
+                continue;
+            }
+
+            $getLibelle = 'getLibelle';
+            $getValeur = 'getValeur';
+            $libelle = strtolower(trim((string) $parametre->{$getLibelle}()));
+
+            if (!in_array($libelle, ['durée du jeu (minutes)', 'duree du jeu (minutes)', 'duree_jeu_minutes'], true)) {
+                continue;
+            }
+
+            $minutes = max(0, (int) $parametre->{$getValeur}());
+
+            return $minutes * 60;
+        }
+
+        return 0;
     }
 
     #[Route('/delete', name: 'app_admin_delete', methods: ['GET', 'POST'])]

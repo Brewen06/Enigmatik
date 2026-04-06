@@ -23,6 +23,7 @@ export default class extends Controller {
         victoryUrl: String,
         teamId: Number,
         timerSeconds: Number,
+        timerLocked: Boolean,
     };
 
     connect() {
@@ -38,8 +39,10 @@ export default class extends Controller {
             }
         }
 
-        if (this.hasTimerTarget && this.remainingSeconds > 0) {
+        if (this.hasTimerTarget && this.remainingSeconds > 0 && !this.timerLockedValue) {
             this.startTimer();
+        } else if (this.hasTimerTarget) {
+            this.updateTimerDisplay();
         }
     }
 
@@ -206,7 +209,8 @@ export default class extends Controller {
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: JSON.stringify({
-                    code: code
+                    code: code,
+                    teamId: this.hasTeamIdValue ? this.teamIdValue : 0,
                 }),
             })
             .then((response) => response.json())
