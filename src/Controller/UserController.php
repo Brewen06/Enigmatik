@@ -6,12 +6,12 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/user')]
+#[Route('/utilisateur')]
 final class UserController extends AbstractController
 {
     #[Route(name: 'app_user_index', methods: ['GET'])]
@@ -22,7 +22,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/creer', name: 'app_user_creer', methods: ['GET', 'POST'])]
+    #[Route('/creer', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
@@ -36,21 +36,21 @@ final class UserController extends AbstractController
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('user/creer.html.twig', [
+        return $this->render('user/new.html.twig', [
             'user' => $user,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_user_liste', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_user_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(User $user): Response
     {
-        return $this->render('user/liste.html.twig', [
+        return $this->render('user/show.html.twig', [
             'user' => $user,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/modifier', name: 'app_user_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(UserType::class, $user);
@@ -68,7 +68,7 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
+    #[Route('/{id}/supprimer', name: 'app_user_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
@@ -77,5 +77,27 @@ final class UserController extends AbstractController
         }
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/admin', name: 'app_admin', methods: ['GET'])]
+    public function admin(UserRepository $userRepository): Response
+    {
+        return $this->render('user/admin.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/prof', name: 'app_prof', methods: ['GET'])]
+    public function prof(UserRepository $userRepository): Response
+    {
+        return $this->render('user/prof.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/page_prof', name: 'app_page_prof', methods: ['GET'])]
+    public function pageProf(): Response
+    {
+        return $this->render('user/page_prof.html.twig');
     }
 }

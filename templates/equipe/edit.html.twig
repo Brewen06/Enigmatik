@@ -3,11 +3,19 @@
 {% block title %}Edit Equipe{% endblock %}
 
 {% block body %}
-    <h1>Edit Equipe</h1>
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Modifier l'équipe</h1>
+            <p class="enigme-page__subtitle">Modifiez les données de l'équipe et confirmez.</p>
+        </div>
 
-    {{ include('equipe/_form.html.twig', {'button_label': 'Update'}) }}
+        {{ include('equipe/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
 
-    <a href="{{ path('app_equipe_index') }}">back to list</a>
-
-    {{ include('equipe/_delete_form.html.twig') }}
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_equipe_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+            {{ include('equipe/_delete_form.html.twig') }}
+        </div>
+    </div>
+</section>
 {% endblock %}

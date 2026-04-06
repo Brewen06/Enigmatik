@@ -1,4 +1,49 @@
+<<<<<<< HEAD
 {{ form_start(form) }}
     {{ form_widget(form) }}
     <button class="btn">{{ button_label|default('Créez votre équipe') }}</button>
+=======
+{{ form_start(form, {'attr': {'class': 'enigme-form'}}) }}
+<div class="enigme-form__section">
+    {{ form_row(form.nom) }}
+
+    <div
+        class="mb-3"
+        data-controller="avatar-preview"
+        data-avatar-preview-asset-base-value="{{ asset('') }}"
+    >
+        {{ form_label(form.avatar) }}
+        {{ form_widget(form.avatar, {
+            attr: (form.avatar.vars.attr ?? {})|merge({
+                'data-avatar-preview-target': 'select',
+                'data-action': 'change->avatar-preview#update'
+            })
+        }) }}
+        {{ form_errors(form.avatar) }}
+
+        <div
+            id="avatar-preview-wrapper"
+            data-avatar-preview-target="wrapper"
+            class="mt-3 d-none"
+        >
+            <p class="text-muted mb-2">Aperçu de l'avatar sélectionné</p>
+            <img
+                id="avatar-preview-image"
+                data-avatar-preview-target="image"
+                src=""
+                alt="Aperçu avatar"
+                class="rounded-circle border"
+                style="width: 80px; height: 80px; object-fit: cover"
+            />
+        </div>
+    </div>
+</div>
+{{ form_rest(form) }}
+
+<div class="enigme-form__actions mt-3">
+    <button class="btn btn-primary">
+        {{ button_label|default('Enregistrer') }}
+    </button>
+</div>
+>>>>>>> Connexion
 {{ form_end(form) }}

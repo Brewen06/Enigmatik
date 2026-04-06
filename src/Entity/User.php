@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Table(name:"`tbl_user`")]
+#[ORM\Table(name: 'tbl_user')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -31,9 +31,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
-
-    #[ORM\Column(length: 50, nullable: true)]
-    private ?string $Nom = null;
 
     public function getId(): ?int
     {
@@ -68,7 +65,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -115,17 +111,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // @deprecated, to be removed when upgrading to Symfony 8
     }
-
-    public function getNom(): ?string
-    {
-        return $this->Nom;
-    }
-
-    public function setNom(?string $Nom): static
-    {
-        $this->Nom = $Nom;
-
-        return $this;
-    }
-    
 }

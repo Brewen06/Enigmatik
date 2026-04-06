@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle équipe{% endblock %}
+
+{% block body %}
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Créer une nouvelle équipe</h1>
+            <p class="enigme-page__subtitle">Définissez l'équipe et sélectionnez son avatar de départ.</p>
+        </div>
+
+        {{ include('equipe/_form.html.twig') }}
+
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_equipe_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+<<<<<<< HEAD
 {% block title %}Edit Jeu{% endblock %}
 
 {% block body %}
@@ -10,4 +11,25 @@
     <a href="{{ path('app_jeu_index') }}">back to list</a>
 
     {{ include('jeu/_delete_form.html.twig') }}
+=======
+{% block title %}Configuration du jeu{% endblock %}
+
+{% block body %}
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Configuration du jeu</h1>
+            <p class="enigme-page__subtitle">Ajustez la configuration globale puis enregistrez les changements.</p>
+        </div>
+
+        {{ form_start(form, {'attr': {'class': 'enigme-form'}}) }}
+            {{ form_widget(form) }}
+            <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+                <a href="{{ path('app_admin_dashboard') }}" class="btn btn-outline-secondary">Retour au tableau de bord</a>
+                <button type="submit" class="btn btn-primary">Mettre a jour</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</section>
+>>>>>>> Connexion
 {% endblock %}

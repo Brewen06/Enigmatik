@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramétrage{% endblock %}
+
+{% block body %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0 text-white">Paramétrage</h1>
+    </div>
+
+    <div class="card-body p-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2"><i class="bi bi-bar-chart-fill text-warning me-2"></i>Classement des équipes</h2>
+                        <p class="text-muted mb-3">Visualisez qui est en tête avec un score, une progression et le temps de jeu.</p>
+                        <a href="{{ path('app_equipe_classement') }}" class="btn btn-warning fw-bold">Ouvrir le classement</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2"><i class="bi bi-people-fill text-primary me-2"></i>Suivi des équipes</h2>
+                        <p class="text-muted mb-3">Consultez la progression détaillée de chaque équipe et les énigmes déjà validées.</p>
+                        <a href="{{ path('app_equipe_index') }}" class="btn btn-primary fw-bold">Voir les équipes</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h2 class="h5 mb-2"><i class="bi bi-stopwatch-fill text-success me-2"></i>Chronomètre de la partie</h2>
+                        <p class="text-muted mb-2">Réglez la durée limite appliquée à toutes les équipes directement ici.</p>
+                        <p class="mb-3">
+                            <span class="badge bg-success-subtle text-success-emphasis border">Durée actuelle : {{ timerMinutes }} min</span>
+                        </p>
+                        {{ form_start(timerForm) }}
+                            <div class="mb-3">
+                                {{ form_row(timerForm.timerMinutes) }}
+                            </div>
+                            <button type="submit" class="btn btn-success fw-bold">Enregistrer le chronomètre</button>
+                        {{ form_end(timerForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

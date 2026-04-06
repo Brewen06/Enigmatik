@@ -9,11 +9,15 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+<<<<<<< HEAD
         app_equipe_provider:
             entity:
                 class: App\Entity\Equipe
                 property: nom
 
+=======
+        # used to reload user from session & other features (e.g. switch_user)
+>>>>>>> Connexion
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -27,8 +31,11 @@ security:
                 enable_csrf: true
             logout:
                 path: app_logout
+<<<<<<< HEAD
 
                 
+=======
+>>>>>>> Connexion
                 # where to redirect after logout
                 # target: app_any_route
 
@@ -41,11 +48,48 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+<<<<<<< HEAD
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/prof, roles: ROLE_PROF }
          - { path: ^/equipe/créer, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         
             
+=======
+        # contrôle d'accès aux routes user
+         - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin/dashboard, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/user/prof, roles: ROLE_PROF }
+         - { path: ^/user/*/delete, roles: ROLE_ADMIN }
+         - { path: ^/user/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+        # contrôle d'accès aux routes equipe
+         - { path: ^/equipe/creer , roles: PUBLIC_ACCESS }
+         - { path: ^/equipe/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/equipe/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/equipe, roles: [ROLE_PROF, ROLE_ADMIN] }
+        # contrôle d'accès à la route jeu
+         - { path: ^/jeu, roles: PUBLIC_ACCESS }
+         - { path: ^/jeu/configuration, roles: ROLE_ADMIN }
+        # contrôle d'accès aux routes enigme
+         - { path: ^/enigme/creer, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/enigme/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/enigme/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/enigme, roles: PUBLIC_ACCESS }
+        # contrôle d'accès aux routes paramètres
+         - { path: ^/parametre, roles: ROLE_ADMIN }
+         - { path: ^/parametre/*/edit, roles: ROLE_ADMIN }
+         - { path: ^/parametre/*/delete, roles: ROLE_ADMIN }
+         - { path: ^/parametre/creer, roles: ROLE_ADMIN }
+        # contrôle d'accès aux routes type-enigme
+         - { path: ^/type, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/type/creer, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/type/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
+         - { path: ^/type/*/edit, roles: [ROLE_PROF, ROLE_ADMIN] }
+
+
+    role_hierarchy:
+        ROLE_ADMIN:       ROLE_PROF
+        ROLE_PROF:        ROLE_USER
+>>>>>>> Connexion
 
 when@test:
     security:

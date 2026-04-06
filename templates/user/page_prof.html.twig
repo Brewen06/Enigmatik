@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace Professeur{% endblock %}
+
+{% block body %}
+<div class="prof-space">
+    <div class="prof-space__header">
+        <h1 class="prof-space__title">🎓 Espace Professeur</h1>
+        <a href="{{ path('app_index') }}" class="btn btn-outline-secondary">Retour à l'accueil</a>
+    </div>
+
+    <div class="prof-space__grid">
+        <div class="card prof-space__card">
+            <div class="card-body">
+                <h3 class="card-title">📋 Gestion des Équipes</h3>
+                <p class="card-text">Suivez la progression des équipes et gérez leurs accès.</p>
+                <a href="{{ path('app_equipe_index') }}" class="btn btn-primary">Voir les équipes</a>
+            </div>
+        </div>
+
+        <div class="card prof-space__card">
+            <div class="card-body">
+                <h3 class="card-title">🧩 Gestion des Énigmes</h3>
+                <p class="card-text">Créez, modifiez et activez/désactivez les énigmes du jeu.</p>
+                <a href="{{ path('app_enigme_index') }}" class="btn btn-primary">Gérer les énigmes</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

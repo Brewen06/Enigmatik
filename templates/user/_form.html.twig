@@ -1,4 +1,14 @@
+<<<<<<< HEAD
 {{ form_start(form) }}
     {{ form_widget(form) }}
     <button class="btn">{{ button_label|default('Save') }}</button>
+=======
+{{ form_start(form, {'attr': {'class': 'enigme-form'}}) }}
+    <div class="enigme-form__section">
+        {{ form_widget(form) }}
+    </div>
+    <div class="enigme-form__actions mt-3">
+        <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+>>>>>>> Connexion
 {{ form_end(form) }}

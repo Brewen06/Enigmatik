@@ -1,0 +1,165 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Jeu;
+use App\Repository\EnigmeRepository;
+use App\Repository\EquipeRepository;
+use App\Repository\JeuRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[Route('/admin')]
+#[IsGranted('ROLE_PROF')]
+class AdminController extends AbstractController
+{
+    #[Route('/dashboard', name: 'app_admin_dashboard')]
+    public function dashboard(EquipeRepository $equipeRepository, EnigmeRepository $enigmeRepository, JeuRepository $jeuRepository): Response
+    {
+        $activeGames = $equipeRepository->createQueryBuilder('e')
+            ->select('e.id, e.nom, e.startedAt, e.enigmeActuelle, a.image AS avatarImage')
+            ->leftJoin('e.avatar', 'a')
+            ->where('e.finishedAt IS NULL')
+            ->orderBy('e.startedAt', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $totalActiveEnigmes = (int) $enigmeRepository->createQueryBuilder('en')
+            ->select('COUNT(en.id)')
+            ->where('en.active = :active')
+            ->setParameter('active', true)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $jeu = $jeuRepository->findOneBy([]);
+        $timerSeconds = $this->extractTimerSeconds($jeu);
+
+        $historyGames = $equipeRepository->createQueryBuilder('e')
+            ->select('e.id, e.nom, e.startedAt, e.finishedAt, a.image AS avatarImage')
+            ->leftJoin('e.avatar', 'a')
+            ->where('e.finishedAt IS NOT NULL')
+            ->orderBy('e.finishedAt', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $historyGames = array_map(function (array $game) use ($timerSeconds): array {
+            $startedAt = $game['startedAt'] ?? null;
+            $finishedAt = $game['finishedAt'] ?? null;
+
+            if ($timerSeconds <= 0 || !$startedAt instanceof \DateTimeInterface || !$finishedAt instanceof \DateTimeInterface) {
+                $game['remainingSeconds'] = null;
+
+                return $game;
+            }
+
+            $elapsedSeconds = max(0, $finishedAt->getTimestamp() - $startedAt->getTimestamp());
+            $game['remainingSeconds'] = max(0, $timerSeconds - $elapsedSeconds);
+
+            return $game;
+        }, $historyGames);
+
+        return $this->render('admin/dashboard.html.twig', [
+            'activeGames' => $activeGames,
+            'historyGames' => $historyGames,
+            'totalActiveEnigmes' => $totalActiveEnigmes,
+        ]);
+    }
+
+    private function extractTimerSeconds(?Jeu $jeu): int
+    {
+        if (!$jeu) {
+            return 0;
+        }
+
+        $configuredTimerMinutes = $jeu->getTimerMinutes();
+        if ($configuredTimerMinutes > 0) {
+            return $configuredTimerMinutes * 60;
+        }
+
+        foreach ($jeu->getParametres() as $parametre) {
+            if (!method_exists($parametre, 'getLibelle') || !method_exists($parametre, 'getValeur')) {
+                continue;
+            }
+
+            $getLibelle = 'getLibelle';
+            $getValeur = 'getValeur';
+            $libelle = strtolower(trim((string) $parametre->{$getLibelle}()));
+
+            if (!in_array($libelle, ['durée du jeu (minutes)', 'duree du jeu (minutes)', 'duree_jeu_minutes'], true)) {
+                continue;
+            }
+
+            $minutes = max(0, (int) $parametre->{$getValeur}());
+
+            return $minutes * 60;
+        }
+
+        return 0;
+    }
+
+    #[Route('/delete', name: 'app_admin_delete', methods: ['GET', 'POST'])]
+    public function deleteAll(Request $request, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository): Response
+    {
+        if (!$request->isMethod('POST')) {
+            return $this->redirectToRoute('app_admin_dashboard');
+        }
+
+        if (!$this->isCsrfTokenValid('delete_finished_games', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $finishedGames = $equipeRepository->createQueryBuilder('e')
+            ->where('e.finishedAt IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($finishedGames as $finishedGame) {
+            $entityManager->remove($finishedGame);
+        }
+
+        $entityManager->flush();
+
+        $deletedCount = count($finishedGames);
+
+        if ($deletedCount > 0) {
+            $this->addFlash('success', sprintf('%d partie(s) terminée(s) supprimée(s).', $deletedCount));
+        } else {
+            $this->addFlash('success', 'Aucune partie terminée à supprimer.');
+        }
+
+        return $this->redirectToRoute('app_admin_dashboard');
+    }
+
+    #[Route('/delete-active', name: 'app_admin_delete_active', methods: ['POST'])]
+    public function deleteActiveGames(Request $request, EntityManagerInterface $entityManager, EquipeRepository $equipeRepository): Response
+    {
+        if (!$this->isCsrfTokenValid('delete_active_games', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $activeGames = $equipeRepository->createQueryBuilder('e')
+            ->where('e.finishedAt IS NULL')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($activeGames as $activeGame) {
+            $entityManager->remove($activeGame);
+        }
+
+        $entityManager->flush();
+
+        $deletedCount = count($activeGames);
+
+        if ($deletedCount > 0) {
+            $this->addFlash('success', sprintf('%d partie(s) en cours supprimée(s).', $deletedCount));
+        } else {
+            $this->addFlash('success', 'Aucune partie en cours à supprimer.');
+        }
+
+        return $this->redirectToRoute('app_admin_dashboard');
+    }
+}

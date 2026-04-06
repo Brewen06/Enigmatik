@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel utilisateur{% endblock %}
+
+{% block body %}
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Créer un nouvel utilisateur</h1>
+            <p class="enigme-page__subtitle">Renseignez les informations d'acces et le role de l'utilisateur.</p>
+        </div>
+
+        {{ include('user/_form.html.twig') }}
+
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

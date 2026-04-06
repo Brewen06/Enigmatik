@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails Vignette{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h1 class="h3 mb-0 text-white">Détails de la vignette</h1>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th class="w-25 bg-light">Id</th>
+                        <td>{{ vignette.id }}</td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Image</th>
+                        <td>
+                            <img src="{{ asset(vignette.image | replace({'public/': ''})) }}" alt="{{ vignette.information }}" width="200" class="img-thumbnail">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Information</th>
+                        <td>{{ vignette.information }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex gap-2 mt-4">
+                <a href="{{ path('app_vignette_index') }}" class="btn btn-secondary">
+                    &larr; Retour à la liste
+                </a>
+                <a href="{{ path('app_vignette_edit', {'id': vignette.id}) }}" class="btn btn-warning text-white">
+                    Modifier
+                </a>
+                {{ include('vignette/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

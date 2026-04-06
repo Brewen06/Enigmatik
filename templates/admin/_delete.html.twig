@@ -1,0 +1,19 @@
+<form
+    method="post"
+    action="{{ path('app_admin_delete') }}"
+    onsubmit="
+        return confirm(
+            'Êtes-vous sûr de vouloir supprimer l\'historique des équipes terminées ?',
+        );
+    "
+    class="mb-0"
+>
+    <input
+        type="hidden"
+        name="_token"
+        value="{{ csrf_token('delete_finished_games') }}"
+    />
+    <button type="submit" class="btn btn-sm btn-outline-light fw-bold">
+        <i class="bi bi-trash me-1"></i> Supprimer l'historique
+    </button>
+</form>

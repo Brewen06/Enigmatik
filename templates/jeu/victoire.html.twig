@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+{% block title %}Enigmatik - Jeu{% endblock %}
+{% block body %}
+<section class="victoire-page">
+    <div class="victoire-page__card">
+        <div class="victoire-page__header">
+            <h1 class="victoire-page__title">Félicitations !</h1>
+            <p class="victoire-page__subtitle">Vous avez résolu toutes les énigmes et trouvé le code final. Vous êtes officiellement un maître de l'Enigmatik !</p>
+        </div>
+        <div class="victoire-page__content text-center">
+            <p class="mt-4 fs-4">Merci d'avoir joué à Enigmatik. Nous espérons que vous avez apprécié l'expérience et que vous reviendrez bientôt pour de nouvelles aventures énigmatiques !</p>
+            <a href="{{ path('app_jeu_index') }}" class="btn btn-primary mt-3">Rejouer</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

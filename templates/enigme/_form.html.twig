@@ -1,0 +1,68 @@
+{{ form_start(form, {'attr': {'class': 'enigme-form'}}) }}
+    <div class="enigme-form__section">
+        <h2 class="enigme-form__section-title">Informations générales</h2>
+        <div class="row g-3">
+            <div class="col-md-4">{{ form_row(form.ordre) }}</div>
+            <div class="col-md-8">{{ form_row(form.titre) }}</div>
+            <div class="col-md-6">{{ form_row(form.type) }}</div>
+            <div class="col-md-6">{{ form_row(form.vignette) }}</div>
+            <div class="col-12">{{ form_row(form.consigne) }}</div>
+            <div class="col-12" id="bloc-lien">{{ form_row(form.lien) }}</div>
+        </div>
+    </div>
+
+    <div class="enigme-form__section">
+        <h2 class="enigme-form__section-title">Configuration de la réponse</h2>
+        {{ form_row(form.reponseType) }}
+
+        <div id="bloc-libre">{{ form_row(form.indice) }}</div>
+        <div id="bloc-multiple">{{ form_row(form.choices) }}</div>
+        {{ form_row(form.solution) }}
+    </div>
+
+    {{ form_rest(form) }}
+
+    <div class="enigme-form__actions mt-3">
+        <button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+{{ form_end(form) }}
+
+<script>
+function initEnigmeReponseTypeToggle() {
+    const name = '{{ form.reponseType.vars.full_name }}';
+    const radios = document.querySelectorAll(`input[name="${name}"]`);
+    const blocMultiple = document.getElementById('bloc-multiple');
+    const inputMultiple = document.getElementById('{{ form.choices.vars.id }}');
+
+    if (!radios.length) {
+        return;
+    }
+
+    function refresh() {
+        const selected = document.querySelector(`input[name="${name}"]:checked`)?.value;
+        const isLibre = selected === 'libre';
+
+        if (blocMultiple) {
+            blocMultiple.style.display = isLibre ? 'none' : '';
+        }
+
+        if (inputMultiple) {
+            inputMultiple.disabled = isLibre;
+        }
+    }
+
+    radios.forEach((radio) => {
+        if (radio.dataset.choicesToggleBound === '1') {
+            return;
+        }
+
+        radio.addEventListener('change', refresh);
+        radio.dataset.choicesToggleBound = '1';
+    });
+
+    refresh();
+}
+
+document.addEventListener('DOMContentLoaded', initEnigmeReponseTypeToggle);
+document.addEventListener('turbo:load', initEnigmeReponseTypeToggle);
+</script>

@@ -3,6 +3,7 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
+<<<<<<< HEAD
     <form method="post">
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -29,4 +30,44 @@
             Passer à la création de votre équipe.
         </a>
     </form>
+=======
+<div class="auth-shell tw-flex tw-justify-center tw-items-center tw-min-h-[60vh]">
+    <div class="card tw-shadow-lg tw-w-full tw-max-w-md">
+        <div class="card-header bg-primary text-white tw-text-center tw-py-4">
+            <h1 class="h3 mb-0 tw-font-bold">Connexion</h1>
+        </div>
+        <div class="card-body tw-p-8">
+            <form method="post">
+                {% if error %}
+                    <div class="alert alert-danger tw-mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                {% if app.user %}
+                    <div class="alert alert-info tw-mb-4">
+                        Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}" class="alert-link">Se déconnecter</a>
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="username" class="form-label tw-font-semibold">Email</label>
+                    <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control form-control-lg" autocomplete="email" required autofocus placeholder="votre@email.com">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="password" class="form-label tw-font-semibold">Mot de passe</label>
+                    <input type="password" name="_password" id="password" class="form-control form-control-lg" autocomplete="current-password" required placeholder="********">
+                </div>
+
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+                <div class="d-grid">
+                    <button class="btn btn-primary btn-lg tw-font-bold" type="submit">
+                        Se connecter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+>>>>>>> Connexion
 {% endblock %}

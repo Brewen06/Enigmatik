@@ -1,3 +1,430 @@
+
+:root {
+	--app-bg: #eef4fb;
+	--app-surface: #ffffff;
+	--app-surface-muted: #f7faff;
+	--app-border: #d9e3f3;
+	--app-title: #1e2942;
+	--app-text: #4d5c78;
+	--app-shadow-soft: 0 10px 24px rgba(27, 44, 74, 0.12);
+	--app-shadow-strong: 0 16px 34px rgba(25, 40, 68, 0.16);
+
+	--enigme-shell-bg: #eef3fb;
+	--enigme-card-bg: #ffffffcc;
+	--enigme-border: #d6dfef;
+	--enigme-title: #1f2a44;
+	--enigme-subtitle: #5b657c;
+	--enigme-accent-start: #2459e0;
+	--enigme-accent-end: #129a72;
+	--enigme-focus-ring: rgba(36, 89, 224, 0.18);
+
+	--prof-shell-bg: #e9f3fb;
+	--prof-card-border: #d7e2f0;
+	--prof-title: #1c2840;
+	--prof-text: #536179;
+	--prof-shadow: 0 16px 34px rgba(27, 47, 78, 0.15);
+}
+
 body {
-    background-color: skyblue;
+	background: var(--app-bg);
+	color: var(--app-text);
+	font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+.container.mt-5.pt-5.mb-5.flex-grow-1 {
+	animation: app-fade-in 300ms ease-out;
+}
+
+@keyframes app-fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.navbar.bg-dark {
+	background: #1f3552 !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: 0 8px 20px rgba(17, 31, 53, 0.22);
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+	letter-spacing: 0.01em;
+}
+
+.dropdown-menu-dark {
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	box-shadow: 0 12px 26px rgba(0, 0, 0, 0.25);
+}
+
+footer.bg-dark {
+	background: #1a3148 !important;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.alert {
+	border: 0;
+	border-radius: 0.75rem;
+	box-shadow: 0 8px 18px rgba(28, 43, 71, 0.14);
+}
+
+.card {
+	border: 1px solid var(--app-border);
+	border-radius: 1rem;
+	box-shadow: var(--app-shadow-soft);
+	overflow: hidden;
+	background: var(--app-surface);
+}
+
+.card.shadow-sm,
+.card.shadow-lg {
+	box-shadow: var(--app-shadow-strong) !important;
+}
+
+.card-header.bg-primary {
+	background: #0f7fcb !important;
+	border-bottom: 0;
+	padding: 1rem 1.15rem;
+}
+
+.card-header h1,
+.card-header .h3 {
+	letter-spacing: 0.01em;
+	margin-bottom: 0;
+}
+
+.card .table {
+	margin-bottom: 0;
+	--bs-table-bg: transparent;
+}
+
+.card .table thead th {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #5e6f8d;
+	background: #f3f8ff;
+	border-bottom-color: #dbe6f7;
+	vertical-align: middle;
+	white-space: nowrap;
+	padding-top: 0.8rem;
+	padding-bottom: 0.8rem;
+}
+
+.card .table tbody td {
+	vertical-align: middle;
+	border-color: #ebf1fa;
+	padding-top: 0.72rem;
+	padding-bottom: 0.72rem;
+}
+
+.card .table-hover > tbody > tr:hover > * {
+	background-color: #f6faff;
+}
+
+.badge {
+	letter-spacing: 0.03em;
+	font-weight: 600;
+}
+
+.btn {
+	transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.btn:hover {
+	transform: translateY(-1px);
+}
+
+.btn-group .btn {
+	border-radius: 0.5rem !important;
+	margin-right: 0.2rem;
+}
+
+.btn-group .btn:last-child {
+	margin-right: 0;
+}
+
+.enigme-page {
+	max-width: 980px;
+	margin: 0 auto;
+}
+
+.enigme-page__card {
+	background: var(--enigme-shell-bg);
+	border: 1px solid var(--enigme-border);
+	border-radius: 1.1rem;
+	box-shadow: 0 14px 30px rgba(29, 43, 77, 0.14);
+	padding: clamp(1.25rem, 0.9rem + 1.3vw, 2.1rem);
+}
+
+.enigme-page__header {
+	margin-bottom: 1.1rem;
+}
+
+.enigme-page__title {
+	color: var(--enigme-title);
+	font-size: clamp(1.45rem, 1.1rem + 1.2vw, 2rem);
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	margin-bottom: 0.35rem;
+}
+
+.enigme-page__subtitle {
+	color: var(--enigme-subtitle);
+	margin-bottom: 0;
+}
+
+.enigme-page form.enigme-form {
+	background: var(--enigme-card-bg);
+	backdrop-filter: blur(3px);
+	border: 1px solid #e6ecf7;
+	border-radius: 0.9rem;
+	padding: 1.15rem;
+	display: grid;
+	gap: 1rem;
+}
+
+.enigme-form__section {
+	background: #fff;
+	border: 1px solid #e7edf8;
+	border-radius: 0.8rem;
+	padding: 1rem;
+	box-shadow: inset 0 1px 0 #fff;
+}
+
+.enigme-form__section-title {
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: #283a5e;
+	margin-bottom: 0.9rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.enigme-form .form-label {
+	font-weight: 600;
+	color: #2e3d5d;
+	margin-bottom: 0.35rem;
+}
+
+.enigme-form .form-control,
+.enigme-form .form-select,
+.enigme-form textarea {
+	border-radius: 0.65rem;
+	border-color: #ccd8ea;
+	background-color: #fff;
+}
+
+.enigme-form .form-control:focus,
+.enigme-form .form-select:focus,
+.enigme-form textarea:focus {
+	border-color: #81a6ff;
+	box-shadow: 0 0 0 0.2rem var(--enigme-focus-ring);
+}
+
+.enigme-form .form-check {
+	padding: 0.55rem 0.8rem 0.55rem 2rem;
+	border: 1px solid #dce6f5;
+	border-radius: 0.65rem;
+	background: #f8fbff;
+	margin-bottom: 0.45rem;
+}
+
+.enigme-form .form-check-input:checked {
+	background-color: #2f68f2;
+	border-color: #2f68f2;
+}
+
+.enigme-form .btn.btn-primary {
+	border: 0;
+	border-radius: 999px;
+	padding: 0.58rem 1.35rem;
+	font-weight: 600;
+	background: var(--enigme-accent-start);
+	box-shadow: 0 10px 20px rgba(24, 78, 146, 0.2);
+}
+
+.enigme-form .btn.btn-primary:hover {
+	filter: brightness(0.96);
+	box-shadow: 0 12px 24px rgba(24, 78, 146, 0.26);
+}
+
+.enigme-form__actions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.enigme-page__actions {
+	align-items: center;
+}
+
+.enigme-page__actions form {
+	border: 0;
+	background: transparent;
+	padding: 0;
+}
+
+.enigme-page__actions form .btn {
+	border: 1px solid #dc3545;
+	color: #dc3545;
+	background: #fff;
+	border-radius: 999px;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	font-weight: 600;
+}
+
+.enigme-page__actions form .btn:hover {
+	background-color: #dc3545;
+	color: #fff;
+	box-shadow: 0 10px 18px rgba(220, 53, 69, 0.22);
+}
+
+.prof-space,
+.prof-list {
+	max-width: 1080px;
+	margin: 0 auto;
+	background: var(--prof-shell-bg);
+	border: 1px solid var(--prof-card-border);
+	border-radius: 1.1rem;
+	box-shadow: var(--prof-shadow);
+	padding: clamp(1.15rem, 0.8rem + 1.1vw, 1.9rem);
+}
+
+.prof-space__header,
+.prof-list__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.9rem;
+	margin-bottom: 1.2rem;
+}
+
+.prof-space__title,
+.prof-list__title {
+	margin: 0;
+	font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);
+	font-weight: 700;
+	color: var(--prof-title);
+	letter-spacing: 0.01em;
+}
+
+.prof-space__grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.prof-space__card,
+.prof-list__card {
+	border: 1px solid #dce5f3;
+	border-radius: 0.9rem;
+	box-shadow: 0 10px 20px rgba(26, 43, 73, 0.12);
+	overflow: hidden;
+}
+
+.prof-space__card .card-body {
+	padding: 1.3rem;
+}
+
+.prof-space__card .card-title {
+	font-weight: 700;
+	margin-bottom: 0.75rem;
+	color: #233555;
+}
+
+.prof-space__card .card-text {
+	color: var(--prof-text);
+	margin-bottom: 1rem;
+}
+
+.prof-list__card thead th {
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+.prof-list__email {
+	font-weight: 600;
+	color: #223553;
+}
+
+.landing-shell,
+.auth-shell {
+	background: #f1f7ff;
+	border: 1px solid #dce6f5;
+	border-radius: 1rem;
+	box-shadow: var(--app-shadow-soft);
+	padding: clamp(1.25rem, 0.9rem + 1.2vw, 2rem);
+}
+
+.auth-shell .card {
+	border: 1px solid #d8e3f5;
+	box-shadow: 0 14px 30px rgba(27, 45, 75, 0.16);
+}
+
+@media (max-width: 768px) {
+	.prof-space,
+	.prof-list {
+		padding: 1rem;
+		border-radius: 0.85rem;
+	}
+
+	.prof-space__header,
+	.prof-list__header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.prof-space__header .btn,
+	.prof-list__header .btn {
+		width: 100%;
+	}
+
+	.prof-space__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.prof-list__card td,
+	.prof-list__card th {
+		white-space: nowrap;
+	}
+
+	.prof-list__card .text-end {
+		text-align: left !important;
+	}
+}
+
+@media (max-width: 576px) {
+	.enigme-page__card {
+		border-radius: 0.8rem;
+		padding: 1rem;
+	}
+
+	.enigme-page form.enigme-form {
+		padding: 0.85rem;
+	}
+
+	.enigme-form__section {
+		padding: 0.85rem;
+	}
+
+	.enigme-page__actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.enigme-page__actions .btn,
+	.enigme-page__actions form,
+	.enigme-form__actions .btn {
+		width: 100%;
+	}
+
+	.enigme-form .form-check {
+		padding-right: 0.65rem;
+	}
 }

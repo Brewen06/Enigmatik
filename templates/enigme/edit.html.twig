@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier une enigme{% endblock %}
+
+{% block body %}
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Modifier une énigme</h1>
+            <p class="enigme-page__subtitle">Ajustez les paramètres de l'énigme puis enregistrez.</p>
+        </div>
+
+        {{ include('enigme/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+            {{ include('enigme/_delete_form.html.twig') }}
+        </div>
+    </div>
+</section>
+{% endblock %}

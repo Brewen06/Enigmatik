@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord Enseignant{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Tableau de Bord Enseignant</h1>
+        <a href="{{ path('app_jeu_edit') }}" class="btn btn-warning fw-bold shadow-sm">
+            <i class="bi bi-gear-fill me-1"></i> Configurer le jeu
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        <h2 class="h5 mb-0"><i class="bi bi-play-circle me-2"></i>Parties en cours</h2>
+                        <form method="post" action="{{ path('app_admin_delete_active') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer toutes les parties en cours ?');" class="mb-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_active_games') }}">
+                            <button type="submit" class="btn btn-sm btn-outline-light fw-bold">
+                                <i class="bi bi-trash me-1"></i> Supprimer les parties en cours
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if activeGames is empty %}
+                        <p class="text-muted">Aucune partie en cours.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Équipe</th>
+                                        <th>Avatar</th>
+                                        <th>Début</th>
+                                        <th>Progression</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in activeGames %}
+                                        <tr>
+                                            <td class="fw-bold">{{ game.nom }}</td>
+                                            <td>
+                                                {% if game.avatarImage %}
+                                                    <img src="{{ asset(game.avatarImage | replace({'public/': ''})) }}" alt="Avatar" style="height: 30px; width: 30px; object-fit: cover;" class="rounded-circle">
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ game.startedAt ? game.startedAt|date('d/m/Y H:i') : '-' }}</td>
+                                            <td>
+                                                {% if totalActiveEnigmes == 0 %}
+                                                    <span class="badge bg-secondary">Aucune énigme</span>
+                                                {% elseif game.enigmeActuelle > totalActiveEnigmes %}
+                                                    <span class="badge bg-success">Terminé</span>
+                                                {% else %}
+                                                    <span class="badge bg-primary">Enigme {{ game.enigmeActuelle }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ path('app_equipe_show', {'id': game.id}) }}" class="btn btn-sm btn-outline-info">Détails</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        <h2 class="h5 mb-0"><i class="bi bi-clock-history me-2"></i>Historique des parties</h2>
+                        {{ include('admin/_delete.html.twig') }}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if historyGames is empty %}
+                        <p class="text-muted">Aucun historique disponible.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Équipe</th>
+                                        <th>Avatar</th>
+                                        <th>Durée</th>
+                                        <th>Temps restant</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in historyGames %}
+                                        <tr>
+                                            <td>{{ game.nom }}</td>
+                                            <td>
+                                                {% if game.avatarImage %}
+                                                    <img src="{{ asset(game.avatarImage | replace({'public/': ''})) }}" alt="Avatar" style="height: 30px; width: 30px; object-fit: cover;" class="rounded-circle">
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if game.startedAt and game.finishedAt %}
+                                                    {% set duration = game.finishedAt.diff(game.startedAt) %}
+                                                    {{ duration.format('%Hh %Im %Ss') }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if game.remainingSeconds is not null %}
+                                                    {% set remainingMinutes = (game.remainingSeconds / 60)|round(0, 'floor') %}
+                                                    {% set remainingSeconds = game.remainingSeconds % 60 %}
+                                                    <span class="badge {{ game.remainingSeconds > 0 ? 'bg-success' : 'bg-danger' }}">
+                                                        {{ '%02d:%02d'|format(remainingMinutes, remainingSeconds) }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

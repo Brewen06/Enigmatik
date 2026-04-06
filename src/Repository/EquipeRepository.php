@@ -16,6 +16,34 @@ class EquipeRepository extends ServiceEntityRepository
         parent::__construct($registry, Equipe::class);
     }
 
+    /**
+     * @return list<Equipe>
+     */
+    public function findAllWithAvatar(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.avatar', 'a')
+            ->addSelect('a')
+            ->orderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return list<Equipe>
+     */
+    public function findForRanking(): array
+    {
+        return $this->createQueryBuilder('e')
+            ->leftJoin('e.avatar', 'a')
+            ->addSelect('a')
+            ->orderBy('e.position', 'DESC')
+            ->addOrderBy('e.finishedAt', 'ASC')
+            ->addOrderBy('e.startedAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Equipe[] Returns an array of Equipe objects
     //     */

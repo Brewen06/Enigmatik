@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau type d'énigme{% endblock %}
+
+{% block body %}
+<section class="enigme-page">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header">
+            <h1 class="enigme-page__title">Créer un nouveau type d'énigme</h1>
+            <p class="enigme-page__subtitle">Structurez les categories d'enigmes pour faciliter l'organisation.</p>
+        </div>
+
+        {{ include('type/_form.html.twig') }}
+
+        <div class="enigme-page__actions mt-4 d-flex flex-wrap gap-2">
+            <a href="{{ path('app_type_index') }}" class="btn btn-outline-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

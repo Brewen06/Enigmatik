@@ -1,0 +1,4 @@
+<form method="post" action="{{ path('app_vignette_delete', {'id': vignette.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette vignette?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vignette.id) }}">
+    <button class="btn">Supprimer</button>
+</form>
