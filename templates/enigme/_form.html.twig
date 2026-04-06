@@ -6,8 +6,69 @@
             <div class="col-md-8">{{ form_row(form.titre) }}</div>
             <div class="col-md-6">{{ form_row(form.type) }}</div>
             <div class="col-md-6">{{ form_row(form.vignette) }}</div>
+            <div class="col-12" id="bloc-image-requise" style="display: none;">
+                <div class="alert alert-info mb-0">
+                    Ce type d'énigme utilise des images. Ajoutez au moins un <strong>lien</strong> ou une <strong>vignette</strong>.
+                </div>
+            </div>
+            <div class="col-12" id="bloc-frise-modele" style="display: none;">
+                <div class="frise-form-panel">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <h3 class="h6 mb-0">Configuration de la frise</h3>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-reset-frise-form">Réinitialiser</button>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">{{ form_row(form.yearStart) }}</div>
+                        <div class="col-md-6">{{ form_row(form.yearEnd) }}</div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <label class="btn btn-primary btn-sm mb-0">
+                            <i class="bi bi-cloud-upload me-1"></i>Importer des images
+                            <input type="file" accept="image/*" multiple hidden data-frise-upload>
+                        </label>
+                        <input type="hidden" data-frise-upload-token value="{{ csrf_token('vignette_quick_upload') }}">
+                        <input type="hidden" data-frise-delete-token value="{{ csrf_token('vignette_quick_delete') }}">
+                    </div>
+
+                    <p class="mb-3 text-muted small">
+                        Glissez les images de la banque vers la frise, puis ordonnez-les de gauche à droite (plus ancien vers plus récent).
+                    </p>
+
+                    {{ form_widget(form.frisePayload) }}
+
+                    <div class="frise-form-editor" data-frise-form-editor data-upload-url="{{ path('app_vignette_quick_upload') }}" data-delete-url="{{ path('app_vignette_quick_delete') }}" data-initial-order="{{ friseItemsForm|default([])|json_encode|e('html_attr') }}">
+                        <div class="frise-form-dropzone frise-form-dropzone--bank" data-frise-form-bank>
+                            {% for vignette in availableVignettes|default([]) %}
+                                <article class="frise-form-card" draggable="true" data-vignette-id="{{ vignette.id }}" data-vignette-image="{{ vignette.image }}" data-vignette-label="{{ vignette.information }}">
+                                    <img src="{{ asset(vignette.image|replace({'public/': ''})) }}" alt="{{ vignette.information }}">
+                                    <p>{{ vignette.information|slice(0, 70) }}</p>
+                                    <div class="frise-form-card__actions">
+                                        <button type="button" class="btn btn-sm btn-outline-success" data-action="place"><i class="bi bi-check-circle me-1"></i>Placer</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </article>
+                            {% else %}
+                                <p class="text-muted fst-italic mb-0">Aucune vignette disponible.</p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="frise-form-board mt-3">
+                            <h4 class="h6 mb-2">Frise configurée</h4>
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span>Plus ancien</span>
+                                <span>Plus récent</span>
+                            </div>
+                            <div class="frise-form-line"></div>
+                            <div class="frise-form-dropzone frise-form-dropzone--track mt-2" data-frise-form-track></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-12">{{ form_row(form.consigne) }}</div>
             <div class="col-12" id="bloc-lien">{{ form_row(form.lien) }}</div>
+            <div class="col-12">{{ form_row(form.indice) }}</div>
         </div>
     </div>
 
@@ -15,7 +76,6 @@
         <h2 class="enigme-form__section-title">Configuration de la réponse</h2>
         {{ form_row(form.reponseType) }}
 
-        <div id="bloc-libre">{{ form_row(form.indice) }}</div>
         <div id="bloc-multiple">{{ form_row(form.choices) }}</div>
         {{ form_row(form.solution) }}
     </div>
@@ -63,6 +123,472 @@ function initEnigmeReponseTypeToggle() {
     refresh();
 }
 
+function initTypeHelpers() {
+    const typeSelect = document.getElementById('{{ form.type.vars.id }}');
+    const imageBlock = document.getElementById('bloc-image-requise');
+    const friseBlock = document.getElementById('bloc-frise-modele');
+    const consigneInput = document.getElementById('{{ form.consigne.vars.id }}');
+    const choicesInput = document.getElementById('{{ form.choices.vars.id }}');
+    const solutionInput = document.getElementById('{{ form.solution.vars.id }}');
+    const frisePayloadInput = document.getElementById('{{ form.frisePayload.vars.id }}');
+
+    if (!typeSelect) {
+        return;
+    }
+
+    function refreshTypeBlocks() {
+        const selected = typeSelect.options[typeSelect.selectedIndex];
+        const reponseSection = document.querySelector('.enigme-form__section:nth-of-type(2)');
+        const solutionInput = document.getElementById('{{ form.solution.vars.id }}');
+        const choicesInput = document.getElementById('{{ form.choices.vars.id }}');
+        const reponseTypeInputs = document.querySelectorAll('input[name="{{ form.reponseType.vars.full_name }}"]');
+
+        if (!selected) {
+            if (imageBlock) {
+                imageBlock.style.display = 'none';
+            }
+            if (friseBlock) {
+                friseBlock.style.display = 'none';
+            }
+            if (reponseSection) {
+                reponseSection.style.display = '';
+            }
+            if (solutionInput) {
+                solutionInput.disabled = false;
+            }
+            if (choicesInput) {
+                choicesInput.disabled = false;
+            }
+            if (frisePayloadInput) {
+                frisePayloadInput.disabled = true;
+            }
+            reponseTypeInputs.forEach((input) => {
+                input.disabled = false;
+            });
+            return;
+        }
+
+        const label = (selected.textContent || '').trim().toLowerCase();
+        const imageUsage = selected.dataset.imageUsage || 'non';
+        const isFrise = label.includes('frise');
+        const requiresImage = imageUsage !== 'non';
+
+        if (imageBlock) {
+            imageBlock.style.display = requiresImage ? '' : 'none';
+        }
+
+        if (friseBlock) {
+            friseBlock.style.display = isFrise ? '' : 'none';
+        }
+
+        if (reponseSection) {
+            reponseSection.style.display = isFrise ? 'none' : '';
+        }
+
+        if (solutionInput) {
+            solutionInput.disabled = isFrise;
+        }
+
+        if (choicesInput) {
+            choicesInput.disabled = isFrise;
+        }
+
+        if (consigneInput && isFrise && !consigneInput.value.trim()) {
+            consigneInput.value = "Replace les images dans l'ordre chronologique, du plus ancien au plus récent.";
+        }
+
+        if (frisePayloadInput) {
+            frisePayloadInput.disabled = !isFrise;
+        }
+
+        reponseTypeInputs.forEach((input) => {
+            input.disabled = isFrise;
+        });
+    }
+
+    if (typeSelect.dataset.bindTypeHelpers !== '1') {
+        typeSelect.addEventListener('change', refreshTypeBlocks);
+        typeSelect.dataset.bindTypeHelpers = '1';
+    }
+
+    refreshTypeBlocks();
+}
+
+function initFriseConfiguratorInForm() {
+    const editor = document.querySelector('[data-frise-form-editor]');
+    const payloadInput = document.getElementById('{{ form.frisePayload.vars.id }}');
+    const resetButton = document.getElementById('btn-reset-frise-form');
+    const uploadInput = document.querySelector('[data-frise-upload]');
+    const uploadTokenInput = document.querySelector('[data-frise-upload-token]');
+    const deleteTokenInput = document.querySelector('[data-frise-delete-token]');
+    const uploadUrl = editor?.dataset.uploadUrl || '';
+    const deleteUrl = editor?.dataset.deleteUrl || '';
+
+    if (!editor || !payloadInput || editor.dataset.boundFriseFormEditor === '1') {
+        return;
+    }
+
+    const bank = editor.querySelector('[data-frise-form-bank]');
+    const track = editor.querySelector('[data-frise-form-track]');
+
+    if (!bank || !track) {
+        return;
+    }
+
+    let draggedCard = null;
+
+    function cardsIn(container) {
+        return Array.from(container.querySelectorAll('.frise-form-card'));
+    }
+
+    function createCard(vignette) {
+        const card = document.createElement('article');
+        card.className = 'frise-form-card';
+        card.draggable = true;
+        card.dataset.vignetteId = String(vignette.id || '');
+        card.dataset.vignetteImage = String(vignette.image || '');
+        card.dataset.vignetteLabel = String(vignette.information || 'Vignette');
+
+        card.innerHTML = `
+            <img src="/${String(vignette.image || '').replace(/^public\//, '')}" alt="${String(vignette.information || 'Vignette')}">
+            <p>${String(vignette.information || 'Vignette')}</p>
+            <div class="frise-form-card__actions">
+                <button type="button" class="btn btn-sm btn-outline-success" data-action="place"><i class="bi bi-check-circle me-1"></i>Placer</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete"><i class="bi bi-trash"></i></button>
+            </div>
+        `;
+
+        return card;
+    }
+
+    function moveCardToTrack(card) {
+        track.appendChild(card);
+        refreshPayload();
+    }
+
+    async function deleteCard(card) {
+        const vignetteId = Number(card.dataset.vignetteId || 0);
+        if (vignetteId <= 0 || !deleteUrl) {
+            card.remove();
+            refreshPayload();
+            return;
+        }
+
+        const confirmDelete = window.confirm('Supprimer cette image ?');
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('_token', deleteTokenInput?.value || '');
+            formData.append('id', String(vignetteId));
+
+            const response = await fetch(deleteUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                card.remove();
+                refreshPayload();
+            }
+        } catch (error) {
+            console.warn('Suppression impossible.', error);
+        }
+    }
+
+    function refreshPayload() {
+        cardsIn(track).forEach((card, index) => {
+            let badge = card.querySelector('[data-role="position"]');
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'frise-form-step';
+                badge.setAttribute('data-role', 'position');
+                card.prepend(badge);
+            }
+            badge.textContent = String(index + 1);
+        });
+
+        cardsIn(bank).forEach((card) => {
+            const badge = card.querySelector('[data-role="position"]');
+            if (badge) {
+                badge.remove();
+            }
+        });
+
+        const ids = cardsIn(track)
+            .map((card) => Number(card.dataset.vignetteId || 0))
+            .filter((id) => id > 0);
+
+        payloadInput.value = JSON.stringify(ids);
+    }
+
+    function bindCard(card) {
+        if (card.dataset.dragBound === '1') {
+            return;
+        }
+
+        card.addEventListener('dragstart', () => {
+            draggedCard = card;
+            card.classList.add('dragging');
+        });
+
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            draggedCard = null;
+        });
+
+        card.querySelector('[data-action="place"]')?.addEventListener('click', () => {
+            moveCardToTrack(card);
+        });
+
+        card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+            deleteCard(card);
+        });
+
+        card.dataset.dragBound = '1';
+    }
+
+    function handleDragOver(container, event) {
+        event.preventDefault();
+        if (!draggedCard) {
+            return;
+        }
+
+        const targetCard = event.target.closest('.frise-form-card');
+        if (!targetCard || targetCard === draggedCard || targetCard.parentElement !== container) {
+            return;
+        }
+
+        const rect = targetCard.getBoundingClientRect();
+        const before = event.clientY < rect.top + rect.height / 2;
+
+        container.insertBefore(draggedCard, before ? targetCard : targetCard.nextSibling);
+    }
+
+    function handleDrop(container, event) {
+        event.preventDefault();
+        if (!draggedCard) {
+            return;
+        }
+
+        if (draggedCard.parentElement !== container) {
+            container.appendChild(draggedCard);
+        }
+
+        refreshPayload();
+    }
+
+    [bank, track].forEach((container) => {
+        container.addEventListener('dragover', (event) => handleDragOver(container, event));
+        container.addEventListener('drop', (event) => handleDrop(container, event));
+    });
+
+    cardsIn(editor).forEach(bindCard);
+
+    if (resetButton && resetButton.dataset.boundResetFriseForm !== '1') {
+        resetButton.addEventListener('click', () => {
+            cardsIn(track).forEach((card) => bank.appendChild(card));
+            refreshPayload();
+        });
+        resetButton.dataset.boundResetFriseForm = '1';
+    }
+
+    if (uploadInput && uploadInput.dataset.boundUploadFrise !== '1') {
+        uploadInput.addEventListener('change', async (event) => {
+            const files = Array.from(event.target.files || []);
+
+            for (const file of files) {
+                if (!file.type.startsWith('image/') || !uploadUrl) {
+                    continue;
+                }
+
+                try {
+                    const formData = new FormData();
+                    formData.append('_token', uploadTokenInput?.value || '');
+                    formData.append('file', file);
+                    formData.append('information', file.name.replace(/\.[^.]+$/, ''));
+
+                    const response = await fetch(uploadUrl, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (response.ok && data.success && data.vignette) {
+                        const card = createCard(data.vignette);
+                        bank.appendChild(card);
+                        bindCard(card);
+                    }
+                } catch (error) {
+                    console.warn('Upload de vignette impossible.', error);
+                }
+            }
+
+            uploadInput.value = '';
+            refreshPayload();
+        });
+        uploadInput.dataset.boundUploadFrise = '1';
+    }
+
+    const initialRaw = editor.dataset.initialOrder || '[]';
+    try {
+        const initialItems = JSON.parse(initialRaw);
+        if (Array.isArray(initialItems) && initialItems.length > 0) {
+            const ordered = initialItems
+                .map((item) => ({
+                    vignetteId: Number(item.vignetteId || 0),
+                    position: Number(item.position || 0),
+                }))
+                .filter((item) => item.vignetteId > 0 && item.position > 0)
+                .sort((a, b) => a.position - b.position);
+
+            ordered.forEach((item) => {
+                const card = editor.querySelector(`.frise-form-card[data-vignette-id="${item.vignetteId}"]`);
+                if (card) {
+                    track.appendChild(card);
+                }
+            });
+        }
+    } catch (error) {
+        console.warn('Impossible de lire les données initiales de la frise.', error);
+    }
+
+    refreshPayload();
+    editor.dataset.boundFriseFormEditor = '1';
+}
+
 document.addEventListener('DOMContentLoaded', initEnigmeReponseTypeToggle);
 document.addEventListener('turbo:load', initEnigmeReponseTypeToggle);
+document.addEventListener('DOMContentLoaded', initTypeHelpers);
+document.addEventListener('turbo:load', initTypeHelpers);
+document.addEventListener('DOMContentLoaded', initFriseConfiguratorInForm);
+document.addEventListener('turbo:load', initFriseConfiguratorInForm);
 </script>
+
+<style>
+    .frise-form-panel {
+        border: 1px solid #d9e2f0;
+        border-radius: 1rem;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        padding: 1.15rem;
+        box-shadow: 0 12px 24px rgba(33, 50, 84, 0.08);
+    }
+
+    .frise-form-editor {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .frise-form-dropzone {
+        min-height: 120px;
+        border: 1px dashed #b8c7df;
+        border-radius: 0.95rem;
+        background: #f8fbff;
+        padding: 0.85rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem;
+        align-items: flex-start;
+    }
+
+    .frise-form-dropzone--bank {
+        max-height: 320px;
+        overflow: auto;
+    }
+
+    .frise-form-dropzone--track {
+        min-height: 145px;
+    }
+
+    .frise-form-line {
+        height: 3px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #1f74db 0%, #24a46c 100%);
+    }
+
+    .frise-form-card {
+        width: 180px;
+        border: 1px solid #d8e4f6;
+        border-radius: 0.9rem;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(26, 43, 73, 0.08);
+        padding: 0.5rem;
+        cursor: grab;
+        user-select: none;
+        position: relative;
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .frise-form-card.dragging {
+        opacity: 0.55;
+    }
+
+    .frise-form-card img {
+        width: 100%;
+        height: 88px;
+        object-fit: cover;
+        border-radius: 0.65rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .frise-form-card p {
+        font-size: 0.8rem;
+        margin: 0;
+        line-height: 1.2;
+        color: #334461;
+    }
+
+    .frise-form-card__actions {
+        display: flex;
+        gap: 0.4rem;
+    }
+
+    .frise-form-card__actions .btn {
+        flex: 1;
+        border-radius: 0.65rem;
+    }
+
+    .frise-form-board {
+        border: 1px solid #dce6f5;
+        border-radius: 0.95rem;
+        background: #fff;
+        padding: 1rem;
+    }
+
+    .frise-form-step {
+        position: absolute;
+        top: -0.45rem;
+        right: -0.45rem;
+        width: 1.45rem;
+        height: 1.45rem;
+        border-radius: 999px;
+        background: #2367d8;
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 3px 10px rgba(35, 103, 216, 0.35);
+    }
+
+    @media (max-width: 992px) {
+        .frise-form-card {
+            width: 100%;
+            max-width: 240px;
+        }
+
+        .frise-form-dropzone--bank {
+            max-height: 260px;
+        }
+    }
+</style>

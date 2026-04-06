@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TypeRepository::class)]
 class Type
 {
+    public const IMAGE_USAGE_NONE = 'non';
+    public const IMAGE_USAGE = 'oui';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -18,6 +21,9 @@ class Type
 
     #[ORM\Column(length: 50)]
     private ?string $libelle = null;
+
+    #[ORM\Column(length: 20, options: ['default' => self::IMAGE_USAGE_NONE])]
+    private string $imageUsage = self::IMAGE_USAGE_NONE;
 
     /**
      * @var Collection<int, Enigme>
@@ -51,6 +57,42 @@ class Type
         $this->libelle = $libelle;
 
         return $this;
+    }
+
+    public function getImageUsage(): string
+    {
+        return $this->normalizeImageUsageValue($this->imageUsage);
+    }
+
+    public function setImageUsage(string $imageUsage): static
+    {
+        $this->imageUsage = $this->normalizeImageUsageValue($imageUsage);
+
+        return $this;
+    }
+
+    public function requiresImage(): bool
+    {
+        return $this->getImageUsage() !== self::IMAGE_USAGE_NONE;
+    }
+
+    public function getImageUsageLabel(): string
+    {
+        return match ($this->getImageUsage()) {
+            self::IMAGE_USAGE => 'Oui',
+            default => 'Non',
+        };
+    }
+
+    private function normalizeImageUsageValue(string $imageUsage): string
+    {
+        $normalized = mb_strtolower(trim($imageUsage));
+
+        return match ($normalized) {
+            'non', 'none', '' => self::IMAGE_USAGE_NONE,
+            'oui', 'single', 'difference' => self::IMAGE_USAGE,
+            default => throw new \InvalidArgumentException('Valeur imageUsage invalide.'),
+        };
     }
 
     /**

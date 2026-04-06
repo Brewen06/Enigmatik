@@ -48,6 +48,15 @@ class Enigme
     #[ORM\Column(length: 255)]
     private ?string $solution = null;
 
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $friseItems = [];
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $yearStart = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $yearEnd = null;
+
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $active = true;
 
@@ -194,6 +203,42 @@ class Enigme
     public function setSolution(string $solution): static
     {
         $this->solution = $solution;
+
+        return $this;
+    }
+
+    public function getFriseItems(): ?array
+    {
+        return $this->friseItems;
+    }
+
+    public function setFriseItems(?array $friseItems): static
+    {
+        $this->friseItems = $friseItems ?? [];
+
+        return $this;
+    }
+
+    public function getYearStart(): ?int
+    {
+        return $this->yearStart ?? 1960;
+    }
+
+    public function setYearStart(?int $yearStart): static
+    {
+        $this->yearStart = $yearStart;
+
+        return $this;
+    }
+
+    public function getYearEnd(): ?int
+    {
+        return $this->yearEnd ?? 2025;
+    }
+
+    public function setYearEnd(?int $yearEnd): static
+    {
+        $this->yearEnd = $yearEnd;
 
         return $this;
     }

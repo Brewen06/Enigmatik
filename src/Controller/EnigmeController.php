@@ -6,6 +6,7 @@ use App\Entity\Enigme;
 use App\Form\EnigmeType;
 use App\Repository\EnigmeRepository;
 use App\Repository\EquipeRepository;
+use App\Repository\VignetteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,8 +26,12 @@ final class EnigmeController extends AbstractController
     }
 
     #[Route('/creer', name: 'app_enigme_creer', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, EnigmeRepository $enigmeRepository): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        EnigmeRepository $enigmeRepository,
+        VignetteRepository $vignetteRepository
+    ): Response {
         $enigme = new Enigme();
         $form = $this->createForm(EnigmeType::class, $enigme);
         $form->handleRequest($request);
@@ -44,6 +49,8 @@ final class EnigmeController extends AbstractController
         return $this->render('enigme/new.html.twig', [
             'enigme' => $enigme,
             'form' => $form,
+            'availableVignettes' => $vignetteRepository->findAll(),
+            'friseItemsForm' => [],
         ]);
     }
 
@@ -63,14 +70,68 @@ final class EnigmeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_enigme_show', methods: ['GET'])]
-    public function show(Enigme $enigme): Response
+    public function show(Enigme $enigme, VignetteRepository $vignetteRepository): Response
     {
         $expectedSolutions = $this->extractNormalizedSolutions((string) ($enigme->getSolution() ?? ''));
+        $friseItems = $this->buildFriseItemsForView($enigme, $vignetteRepository);
+        $canManageFrise = $this->isGranted('ROLE_PROF') || $this->isGranted('ROLE_ADMIN');
 
         return $this->render('enigme/show.html.twig', [
             'enigme' => $enigme,
             'quizHasMultipleSolutions' => count($expectedSolutions) > 1,
+            'friseItems' => $friseItems,
+            'availableVignettes' => $canManageFrise ? $vignetteRepository->findAll() : [],
+            'canManageFrise' => $canManageFrise,
         ]);
+    }
+
+    /**
+     * @return list<array{vignetteId:int, position:int, information:string, image:string}>
+     */
+    private function buildFriseItemsForView(Enigme $enigme, VignetteRepository $vignetteRepository): array
+    {
+        $rawItems = $enigme->getFriseItems();
+        if (!is_array($rawItems) || $rawItems === []) {
+            return [];
+        }
+
+        $positionsByVignetteId = [];
+        $ids = [];
+        foreach ($rawItems as $rawItem) {
+            $vignetteId = (int) ($rawItem['vignetteId'] ?? 0);
+            $position = (int) ($rawItem['position'] ?? 0);
+            if ($vignetteId <= 0 || $position <= 0) {
+                continue;
+            }
+
+            $positionsByVignetteId[$vignetteId] = $position;
+            $ids[] = $vignetteId;
+        }
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $vignettes = $vignetteRepository->findBy(['id' => array_values(array_unique($ids))]);
+        $items = [];
+
+        foreach ($vignettes as $vignette) {
+            $id = (int) ($vignette->getId() ?? 0);
+            if ($id <= 0 || !isset($positionsByVignetteId[$id])) {
+                continue;
+            }
+
+            $items[] = [
+                'vignetteId' => $id,
+                'position' => $positionsByVignetteId[$id],
+                'information' => (string) ($vignette->getInformation() ?? ''),
+                'image' => (string) ($vignette->getImage() ?? ''),
+            ];
+        }
+
+        usort($items, static fn(array $a, array $b): int => $a['position'] <=> $b['position']);
+
+        return array_values($items);
     }
 
     #[Route('/{id}/check', name: 'app_enigme_check', methods: ['POST'])]
@@ -83,6 +144,23 @@ final class EnigmeController extends AbstractController
     ): Response {
         $data = json_decode($request->getContent(), true);
         $answer = $data['answer'] ?? '';
+
+        if ($enigme->getType()?->getLibelle() === 'frise') {
+            $expectedOrder = $this->extractExpectedFriseOrder($enigme);
+            $submittedOrder = $this->normalizeFriseAnswer($answer);
+            $isValidFrise = $expectedOrder !== [] && $submittedOrder === $expectedOrder;
+
+            if ($isValidFrise) {
+                $this->updateEquipeProgression($request, $enigme, $entityManager, $equipeRepository, $enigmeRepository);
+
+                return $this->json([
+                    'success' => true,
+                    'indice' => $this->getIndiceOrNull($enigme),
+                ]);
+            }
+
+            return $this->json(['success' => false]);
+        }
 
         $expectedSolutions = $this->extractNormalizedSolutions((string) ($enigme->getSolution() ?? ''));
         $indice = $this->getIndiceOrNull($enigme);
@@ -164,6 +242,48 @@ final class EnigmeController extends AbstractController
         return $normalized;
     }
 
+    /**
+     * @return list<int>
+     */
+    private function extractExpectedFriseOrder(Enigme $enigme): array
+    {
+        $items = $enigme->getFriseItems();
+        if (!is_array($items) || $items === []) {
+            return [];
+        }
+
+        usort($items, static fn(array $a, array $b): int => (int) ($a['position'] ?? 0) <=> (int) ($b['position'] ?? 0));
+
+        $order = [];
+        foreach ($items as $item) {
+            $id = (int) ($item['vignetteId'] ?? 0);
+            if ($id > 0) {
+                $order[] = $id;
+            }
+        }
+
+        return $order;
+    }
+
+    /**
+     * @param mixed $answer
+     *
+     * @return list<int>
+     */
+    private function normalizeFriseAnswer(mixed $answer): array
+    {
+        if (is_string($answer)) {
+            $decoded = json_decode($answer, true);
+            $answer = is_array($decoded) ? $decoded : [];
+        }
+
+        if (!is_array($answer)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('intval', $answer), static fn(int $id): bool => $id > 0));
+    }
+
     private function updateEquipeProgression(
         Request $request,
         Enigme $enigme,
@@ -233,8 +353,12 @@ final class EnigmeController extends AbstractController
     }
 
     #[Route('/{id}/modifier', name: 'app_enigme_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Enigme $enigme, EntityManagerInterface $entityManager): Response
-    {
+    public function edit(
+        Request $request,
+        Enigme $enigme,
+        EntityManagerInterface $entityManager,
+        VignetteRepository $vignetteRepository
+    ): Response {
         $form = $this->createForm(EnigmeType::class, $enigme);
         $form->handleRequest($request);
 
@@ -247,6 +371,8 @@ final class EnigmeController extends AbstractController
         return $this->render('enigme/edit.html.twig', [
             'enigme' => $enigme,
             'form' => $form,
+            'availableVignettes' => $vignetteRepository->findAll(),
+            'friseItemsForm' => $enigme->getFriseItems() ?? [],
         ]);
     }
 
@@ -314,11 +440,76 @@ final class EnigmeController extends AbstractController
         return $this->redirectToRoute('app_enigme_index');
     }
     #[Route('/{id}/frise', name: 'app_enigme_frise', methods: ['GET'])]
-    public function frise(Enigme $enigme): Response
+    public function frise(Enigme $enigme, VignetteRepository $vignetteRepository): Response
     {
-        return $this->render('enigme/frise.html.twig', [
+        $canManageFrise = $this->isGranted('ROLE_PROF') || $this->isGranted('ROLE_ADMIN');
+
+        return $this->render('enigme/frise_page.html.twig', [
             'enigme' => $enigme,
+            'friseItems' => $this->buildFriseItemsForView($enigme, $vignetteRepository),
+            'availableVignettes' => $canManageFrise ? $vignetteRepository->findAll() : [],
+            'canManageFrise' => $canManageFrise,
         ]);
+    }
+
+    #[Route('/{id}/frise/configurer', name: 'app_enigme_frise_configure', methods: ['POST'])]
+    public function configureFrise(
+        Request $request,
+        Enigme $enigme,
+        EntityManagerInterface $entityManager,
+        VignetteRepository $vignetteRepository
+    ): Response {
+        if (!$this->isGranted('ROLE_PROF') && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Accès réservé aux organisateurs.');
+        }
+
+        if (!$this->isCsrfTokenValid('frise_configure' . $enigme->getId(), $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $payload = trim((string) $request->request->get('frise_payload', ''));
+        $selectedIds = [];
+
+        if ($payload !== '') {
+            $decoded = json_decode($payload, true);
+            if (is_array($decoded)) {
+                $selectedIds = array_values(array_filter(array_unique(array_map('intval', $decoded)), static fn(int $id): bool => $id > 0));
+            }
+        }
+
+        if ($selectedIds === []) {
+            $selectedIds = array_map('intval', (array) $request->request->all('frise_vignettes'));
+            $selectedIds = array_values(array_filter(array_unique($selectedIds), static fn(int $id): bool => $id > 0));
+        }
+
+        if ($selectedIds === []) {
+            $enigme->setFriseItems([]);
+            $entityManager->flush();
+            $this->addFlash('success', 'Configuration de la frise réinitialisée.');
+
+            return $this->redirectToRoute('app_enigme_show', ['id' => $enigme->getId()]);
+        }
+
+        $vignettes = $vignetteRepository->findBy(['id' => $selectedIds]);
+        $validIds = array_map(static fn($v): int => (int) $v->getId(), $vignettes);
+
+        $items = [];
+        foreach ($selectedIds as $index => $vignetteId) {
+            if (!in_array($vignetteId, $validIds, true)) {
+                continue;
+            }
+
+            $items[] = [
+                'vignetteId' => $vignetteId,
+                'position' => $index + 1,
+            ];
+        }
+
+        $enigme->setFriseItems($items);
+        $entityManager->flush();
+        $this->addFlash('success', 'Configuration de la frise enregistrée.');
+
+        return $this->redirectToRoute('app_enigme_show', ['id' => $enigme->getId()]);
     }
 
     #[Route('/{id}/frise/toggle', name: 'app_enigme_frise_toggle', methods: ['POST'])]

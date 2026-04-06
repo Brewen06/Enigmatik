@@ -8,6 +8,7 @@ use App\Entity\Vignette;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -66,6 +67,15 @@ class EnigmeType extends AbstractType
             ->add('type', EntityType::class, [
                 'class' => Type::class,
                 'choice_label' => 'libelle',
+                'choice_attr' => static function (?Type $type): array {
+                    if ($type === null) {
+                        return [];
+                    }
+
+                    return [
+                        'data-image-usage' => $type->getImageUsage(),
+                    ];
+                },
                 'label' => 'Type d\'énigme',
                 'placeholder' => 'Choisir un type d\'énigme',
                 'required' => false,
@@ -123,6 +133,31 @@ class EnigmeType extends AbstractType
                     'placeholder' => "Exemple (unique): HTTPS\n\nExemple (multiple):\nréponse 1\nréponse 2"
                 ],
                 'empty_data' => ''
+            ])
+            ->add('frisePayload', HiddenType::class, [
+                'mapped' => false,
+                'required' => false,
+                'empty_data' => '',
+            ])
+            ->add('yearStart', null, [
+                'label' => 'Année de début',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => '1000',
+                    'max' => '2100',
+                    'type' => 'number'
+                ]
+            ])
+            ->add('yearEnd', null, [
+                'label' => 'Année de fin',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => '1000',
+                    'max' => '2100',
+                    'type' => 'number'
+                ]
             ]);
 
         $builder->get('choices')
@@ -148,8 +183,51 @@ class EnigmeType extends AbstractType
             $reponseType = (string) ($form->get('reponseType')->getData() ?? 'libre');
 
             $normalizedSolutions = $this->normalizeLines((string) ($enigme->getSolution() ?? ''));
+            $type = $enigme->getType();
+            $isFriseType = $type !== null && mb_strtolower((string) $type->getLibelle()) === 'frise';
+
+            if ($isFriseType) {
+                $friseOrder = $this->normalizeFrisePayload((string) ($form->get('frisePayload')->getData() ?? ''));
+
+                if (count($friseOrder) < 2) {
+                    $form->get('type')->addError(new FormError('Ajoutez au moins 2 images dans la frise.'));
+                    return;
+                }
+
+                $indice = trim((string) ($enigme->getIndice() ?? ''));
+                if ($indice === '') {
+                    $form->get('indice')->addError(new FormError('Veuillez renseigner l\'indice du code final pour la frise.'));
+                    return;
+                }
+
+                $friseItems = [];
+                foreach ($friseOrder as $index => $vignetteId) {
+                    $friseItems[] = [
+                        'vignetteId' => $vignetteId,
+                        'position' => $index + 1,
+                    ];
+                }
+
+                $enigme->setFriseItems($friseItems);
+                $enigme->setChoices([]);
+                if ($normalizedSolutions === []) {
+                    $enigme->setSolution('frise');
+                }
+                return;
+            }
+
+            $enigme->setFriseItems([]);
+
             if ($normalizedSolutions === []) {
                 $form->get('solution')->addError(new FormError('Veuillez renseigner au moins une solution.'));
+            }
+
+            if ($type !== null && $type->requiresImage()) {
+                $hasMedia = (string) ($enigme->getLien() ?? '') !== '' || $enigme->getVignette() !== null;
+
+                if (!$hasMedia) {
+                    $form->get('lien')->addError(new FormError('Ce type d\'énigme nécessite un support image (lien ou vignette).'));
+                }
             }
 
             if ($reponseType === 'libre') {
@@ -215,6 +293,19 @@ class EnigmeType extends AbstractType
         }, $values);
 
         return array_values(array_unique(array_filter($normalized, fn(string $line): bool => $line !== '')));
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function normalizeFrisePayload(string $payload): array
+    {
+        $decoded = json_decode($payload, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_unique(array_map('intval', $decoded)), static fn(int $id): bool => $id > 0));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -17,6 +17,7 @@
                     <tr>
                         <th>Id</th>
                         <th>Libellé</th>
+                        <th>Usage image</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -25,6 +26,7 @@
                     <tr>
                         <td>{{ type.id }}</td>
                         <td>{{ type.libelle }}</td>
+                        <td>{{ type.imageUsageLabel }}</td>
                         <td class="text-end">
                             <div class="btn-group" role="group">
                                 <a href="{{ path('app_type_show', {'id': type.id}) }}" class="btn btn-info btn-sm text-white" title="Voir">
@@ -38,7 +40,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="3" class="text-center py-4">Aucun type trouvé</td>
+                        <td colspan="4" class="text-center py-4">Aucun type trouvé</td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -17,26 +17,31 @@ class TypeFixtures extends Fixture
     {
         $type1 = new Type();
         $type1->setLibelle('QUIZ');
+        $type1->setImageUsage(Type::IMAGE_USAGE_NONE);
         $manager->persist($type1);
         $this->addReference(self::TYPE_QUIZ, $type1);
 
         $type2 = new Type();
         $type2->setLibelle('Réponse ouverte');
+        $type2->setImageUsage(Type::IMAGE_USAGE_NONE);
         $manager->persist($type2);
         $this->addReference(self::TYPE_REPONSE_OUVERTE, $type2);
 
         $type3 = new Type();
         $type3->setLibelle('QCM');
+        $type3->setImageUsage(Type::IMAGE_USAGE_NONE);
         $manager->persist($type3);
         $this->addReference(self::TYPE_QCM, $type3);
 
         $type4 = new Type();
         $type4->setLibelle('Vrai/Faux');
+        $type4->setImageUsage(Type::IMAGE_USAGE_NONE);
         $manager->persist($type4);
         $this->addReference(self::TYPE_VRAI_FAUX, $type4);
 
         $type5 = new Type();
         $type5->setLibelle('frise');
+        $type5->setImageUsage(Type::IMAGE_USAGE);
         $manager->persist($type5);
         $this->addReference('type_frise', $type5);
 

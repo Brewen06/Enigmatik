@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Frise chronologique{% endblock %}
+
+{% block body %}
+<div class="container mt-5 pt-4 frise-page-shell">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+            <h1 class="h3 mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>Frise chronologique</h1>
+            <span class="badge bg-light text-primary fs-6">#{{ enigme.id }}</span>
+        </div>
+        <div class="card-body p-4">
+            <h2 class="h5 text-primary mb-3">{{ enigme.titre }}</h2>
+            {% include 'enigme/frise.html.twig' with {
+                enigme: enigme,
+                friseItems: friseItems|default([]),
+                availableVignettes: availableVignettes|default([]),
+                canManageFrise: canManageFrise|default(false)
+            } only %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .frise-page-shell {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+{% endblock %}

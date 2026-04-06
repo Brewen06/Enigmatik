@@ -1,10 +1,884 @@
-{% extends 'base.html.twig' %}
+ {% set initialLibrary = [] %}
+{% for vignette in availableVignettes|default([]) %}
+	{% set initialLibrary = initialLibrary|merge([{
+		id: 'v-' ~ vignette.id,
+		label: vignette.information,
+		src: asset(vignette.image|replace({'public/': ''})),
+		persisted: true
+	}]) %}
+{% endfor %}
 
-{% block title %}Frise Chronologique{% endblock %}
+{# For teams viewing the puzzle, also add vignettes from friseItems so they see the images #}
+{% for item in friseItems|default([]) %}
+	{% set imageId = 'v-' ~ item.vignetteId %}
+	{% set alreadyExists = false %}
+	{% for lib in initialLibrary %}
+		{% if lib.id == imageId %}
+			{% set alreadyExists = true %}
+		{% endif %}
+	{% endfor %}
+	{% if not alreadyExists %}
+		{% set initialLibrary = initialLibrary|merge([{
+			id: imageId,
+			label: item.information,
+			src: asset(item.image|replace({'public/': ''})),
+			persisted: true
+		}]) %}
+	{% endif %}
+{% endfor %}
 
-{% block body %}
+{% set initialPlaced = [] %}
+{% for item in friseItems|default([]) %}
+	{% set initialPlaced = initialPlaced|merge(['v-' ~ item.vignetteId]) %}
+{% endfor %}
 
-<script src="vis/dist/vis.js"></script>
-<link href="vis/dist/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+{% set yearStart = enigme.yearStart|default(1960) %}
+{% set yearEnd = enigme.yearEnd|default(2025) %}
+{% set yearRange = yearEnd - yearStart %}
 
-{% endblock %}
+<section
+	class="frise-editor{% if not (is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')) %} frise-editor--readonly{% endif %}"
+	data-frise-editor
+	data-can-manage-frise="{{ (is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')) ? '1' : '0' }}"
+	data-initial-library="{{ initialLibrary|json_encode|e('html_attr') }}"
+	data-initial-placed="{{ initialPlaced|json_encode|e('html_attr') }}"
+	data-year-start="{{ yearStart }}"
+	data-year-end="{{ yearEnd }}"
+	data-upload-url="{{ path('app_vignette_quick_upload') }}"
+	data-delete-url="{{ path('app_vignette_quick_delete') }}"
+	data-check-url="{{ path('app_enigme_check', {'id': enigme.id}) }}"
+>
+	<div class="frise-editor__inner">
+		<div class="frise-editor__header">
+			<h3 class="frise-editor__title">{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}Configuration de la frise{% else %}Chronologie{% endif %}</h3>
+			{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+				<p class="frise-editor__subtitle">Configurez la plage de dates, importez des images, puis ordonnez-les sur la frise.</p>
+			{% else %}
+				<p class="frise-editor__subtitle">Replacez les images dans le bon ordre chronologique.</p>
+			{% endif %}
+		</div>
+
+		{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+		<div class="frise-editor__config">
+			<div class="frise-editor__date-range">
+				<label for="year-start">Année de début :</label>
+				<input type="number" id="year-start" data-year-start-input value="{{ yearStart }}" min="1000" max="2100">
+			</div>
+			<div class="frise-editor__date-range">
+				<label for="year-end">Année de fin :</label>
+				<input type="number" id="year-end" data-year-end-input value="{{ yearEnd }}" min="1000" max="2100">
+			</div>
+		</div>
+
+		<div class="frise-editor__toolbar">
+			<label class="btn btn-primary btn-sm mb-0">
+				<i class="bi bi-cloud-upload me-1"></i>Importer des images
+				<input type="file" accept="image/*" multiple hidden data-frise-upload>
+			</label>
+			<button type="button" class="btn btn-outline-secondary btn-sm" data-frise-reset>
+				<i class="bi bi-arrow-counterclockwise me-1"></i>Réinitialiser
+			</button>
+			<input type="hidden" data-frise-upload-token value="{{ csrf_token('vignette_quick_upload') }}">
+			<input type="hidden" data-frise-delete-token value="{{ csrf_token('vignette_quick_delete') }}">
+		</div>
+		{% endif %}
+
+		<div class="frise-editor__workspace">
+			<aside class="frise-editor__gallery" data-frise-bank></aside>
+
+			<div class="frise-editor__board">
+				<div class="frise-editor__axis" data-frise-axis>
+					<div class="frise-editor__timeline"></div>
+
+					<div class="frise-editor__ruler" data-frise-ruler></div>
+
+					<div class="frise-editor__canvas" data-frise-canvas></div>
+				</div>
+			</div>
+		</div>
+
+		<p class="frise-editor__hint">
+			<i class="bi bi-info-circle me-2"></i>
+			{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+				Glissez une carte depuis la galerie sur la frise, puis déplacez-la horizontalement pour la placer à la bonne date.
+			{% else %}
+				Glissez les images pour les réorganiser, puis cliquez sur Vérifier.
+			{% endif %}
+		</p>
+		
+		{% if not (is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')) %}
+		<div class="d-grid mt-3">
+			<button type="button" class="btn btn-primary btn-lg" data-frise-check-submit>
+				<i class="bi bi-check-circle me-2"></i>Vérifier
+			</button>
+		</div>
+		<div class="mt-3" data-frise-check-result></div>
+		<div class="mt-3 d-none" data-frise-check-next>
+			<a href="{{ path('app_jeu_index') }}" class="btn btn-success">Retour au jeu</a>
+		</div>
+		{% endif %}
+	</div>
+</section>
+
+<script>
+function initFriseEditor() {
+	document.querySelectorAll('[data-frise-editor]').forEach((root) => {
+		const canManageFrise = root.dataset.canManageFrise === '1' && Boolean(root.querySelector('[data-frise-upload]'));
+
+		if (root.dataset.boundFriseEditor === '1') {
+			if (!canManageFrise) {
+				root.querySelectorAll('[data-action="delete"]').forEach((node) => node.remove());
+			}
+			return;
+		}
+
+		const uploadInput = root.querySelector('[data-frise-upload]');
+		const resetButton = root.querySelector('[data-frise-reset]');
+		const bankContainer = root.querySelector('[data-frise-bank]');
+		const axis = root.querySelector('[data-frise-axis]');
+		const rulerContainer = root.querySelector('[data-frise-ruler]');
+		const canvas = root.querySelector('[data-frise-canvas]');
+		const yearStartInput = root.querySelector('[data-year-start-input]');
+		const yearEndInput = root.querySelector('[data-year-end-input]');
+		const uploadTokenInput = root.querySelector('[data-frise-upload-token]');
+		const deleteTokenInput = root.querySelector('[data-frise-delete-token]');
+		const checkSubmitButton = root.querySelector('[data-frise-check-submit]');
+		const checkResult = root.querySelector('[data-frise-check-result]');
+		const checkNext = root.querySelector('[data-frise-check-next]');
+		const uploadUrl = root.dataset.uploadUrl || '';
+		const deleteUrl = root.dataset.deleteUrl || '';
+		const checkUrl = root.dataset.checkUrl || '';
+
+		if (!bankContainer || !axis || !rulerContainer || !canvas) return;
+
+		const parseJsonAttr = (value, fallback) => {
+			try {
+				const parsed = JSON.parse(value || '');
+				return Array.isArray(parsed) ? parsed : fallback;
+			} catch (error) {
+				return fallback;
+			}
+		};
+
+		let state = {
+			yearStart: parseInt(root.dataset.yearStart) || 1960,
+			yearEnd: parseInt(root.dataset.yearEnd) || 2025,
+			library: parseJsonAttr(root.dataset.initialLibrary, []).map((item) => ({
+				id: String(item.id || ''),
+				label: String(item.label || ''),
+				src: String(item.src || ''),
+				persisted: Boolean(item.persisted),
+				isObjectUrl: false,
+			})).filter((item) => item.id && item.src),
+			placed: [],
+		};
+
+		const initialPlacedIds = parseJsonAttr(root.dataset.initialPlaced, []).map((id) => String(id));
+		initialPlacedIds.forEach((id, index) => {
+			if (state.library.some((img) => img.id === id)) {
+				const x = initialPlacedIds.length > 1
+					? 8 + (index * 84) / (initialPlacedIds.length - 1)
+					: 50;
+				state.placed.push({ id, x });
+			}
+		});
+
+		let draggingMarkerId = null;
+		const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+		const findImage = (id) => state.library.find((item) => item.id === id);
+		const isPlaced = (id) => state.placed.some((item) => item.id === id);
+
+		const percentFromPointer = (clientX) => {
+			const rect = axis.getBoundingClientRect();
+			return rect.width <= 0 ? 50 : clamp(((clientX - rect.left) / rect.width) * 100, 0, 100);
+		};
+
+		const removeImage = (id) => {
+			if (!canManageFrise) return;
+			const image = findImage(id);
+			if (!image) return;
+			if (image.isObjectUrl) URL.revokeObjectURL(image.src);
+			state.library = state.library.filter((item) => item.id !== id);
+			state.placed = state.placed.filter((item) => item.id !== id);
+			render();
+		};
+
+		const removePersistedImage = async (id) => {
+			if (!canManageFrise) return;
+			const token = deleteTokenInput?.value || '';
+			if (!deleteUrl || !token) {
+				removeImage(id);
+				return;
+			}
+
+			const formData = new FormData();
+			formData.append('_token', token);
+			formData.append('id', id);
+
+			const response = await fetch(deleteUrl, {
+				method: 'POST',
+				body: formData,
+				headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			});
+
+			if (!response.ok) {
+				removeImage(id);
+				return;
+			}
+
+			const data = await response.json();
+			if (data.success) {
+				removeImage(id);
+			}
+		};
+
+		const placeOnTimeline = (id, percent) => {
+			const image = findImage(id);
+			if (!image) return;
+			const nextX = clamp(percent, 0, 100);
+			const existing = state.placed.find((item) => item.id === id);
+			if (existing) {
+				existing.x = nextX;
+			} else {
+				state.placed.push({ id, x: nextX });
+			}
+			render();
+		};
+
+		const removeFromTimeline = (id) => {
+			state.placed = state.placed.filter((item) => item.id !== id);
+			render();
+		};
+
+		const buildCard = (image) => {
+			const card = document.createElement('article');
+			card.className = 'frise-editor__card';
+			card.draggable = true;
+			card.dataset.imageId = image.id;
+
+			card.addEventListener('dragstart', (event) => {
+				event.dataTransfer?.setData('text/plain', image.id);
+				event.dataTransfer.effectAllowed = 'copy';
+			});
+
+			const placedStatus = isPlaced(image.id);
+			card.innerHTML = `
+				<img src="${image.src}" alt="${image.label}">
+				<p title="${image.label}">${image.label}</p>
+				<div class="frise-editor__card-actions">
+					<button type="button" class="btn btn-sm btn-outline-success" data-action="place" ${placedStatus ? 'disabled' : ''}>
+						<i class="bi bi-check-circle me-1"></i>Placer
+					</button>
+					${canManageFrise ? `
+						<button type="button" class="btn btn-sm btn-outline-danger" data-action="delete">
+							<i class="bi bi-trash me-1"></i>
+						</button>
+					` : ''}
+				</div>
+			`;
+
+			card.querySelector('[data-action="place"]')?.addEventListener('click', () => {
+				placeOnTimeline(image.id, 50);
+			});
+
+			if (canManageFrise) {
+				card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
+					removePersistedImage(image.id);
+				});
+			}
+
+			return card;
+		};
+
+		const buildMarker = (placedItem) => {
+			const image = findImage(placedItem.id);
+			if (!image) return null;
+
+			const marker = document.createElement('article');
+			marker.className = 'frise-editor__marker';
+			marker.dataset.imageId = placedItem.id;
+			marker.style.left = `${placedItem.x}%`;
+
+			marker.innerHTML = `
+				<button type="button" class="frise-editor__marker-remove" title="Retirer">×</button>
+				<img src="${image.src}" alt="${image.label}">
+				<span>${image.label}</span>
+			`;
+
+			marker.addEventListener('pointerdown', (event) => {
+				draggingMarkerId = placedItem.id;
+				marker.setPointerCapture(event.pointerId);
+			});
+
+			const removeButton = marker.querySelector('.frise-editor__marker-remove');
+			removeButton?.addEventListener('pointerdown', (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+			});
+			removeButton?.addEventListener('click', (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				removeFromTimeline(placedItem.id);
+			});
+
+			return marker;
+		};
+
+		const renderRuler = () => {
+			rulerContainer.innerHTML = '';
+			const yearRange = Math.max(1, state.yearEnd - state.yearStart);
+			const step = yearRange <= 10 ? 1 : yearRange <= 50 ? 5 : 10;
+
+			for (let year = state.yearStart; year <= state.yearEnd; year += step) {
+				const percent = ((year - state.yearStart) / yearRange) * 100;
+				const tick = document.createElement('div');
+				tick.className = 'frise-editor__tick';
+				tick.style.left = `${percent}%`;
+
+				const label = document.createElement('span');
+				label.className = 'frise-editor__year-label';
+				label.textContent = year;
+				label.style.left = `${percent}%`;
+
+				rulerContainer.appendChild(tick);
+				rulerContainer.appendChild(label);
+			}
+		};
+
+		const render = () => {
+			bankContainer.innerHTML = '';
+			canvas.innerHTML = '';
+
+			if (state.library.length === 0) {
+				bankContainer.innerHTML = '<p class="text-muted fst-italic small">Aucune image importée.</p>';
+			} else {
+				state.library.forEach((image) => bankContainer.appendChild(buildCard(image)));
+			}
+
+			if (state.placed.length === 0) {
+				const empty = document.createElement('p');
+				empty.className = 'frise-editor__canvas-empty';
+				empty.textContent = 'Glissez une image depuis la galerie.';
+				canvas.appendChild(empty);
+			} else {
+				state.placed.sort((a, b) => a.x - b.x).forEach((item) => {
+					const marker = buildMarker(item);
+					if (marker) canvas.appendChild(marker);
+				});
+			}
+
+			renderRuler();
+		};
+
+		if (uploadInput) {
+			uploadInput.addEventListener('change', (event) => {
+				const files = Array.from(event.target.files || []);
+				files.forEach(async (file, index) => {
+					if (!file.type.startsWith('image/') || !uploadUrl) return;
+
+					const formData = new FormData();
+					formData.append('_token', uploadTokenInput?.value || '');
+					formData.append('file', file);
+					formData.append('information', file.name.replace(/\.[^.]+$/, ''));
+
+					try {
+						const response = await fetch(uploadUrl, {
+							method: 'POST',
+							body: formData,
+							headers: { 'X-Requested-With': 'XMLHttpRequest' },
+						});
+
+						const data = await response.json();
+						if (!response.ok || !data.success || !data.vignette) {
+							return;
+						}
+
+						state.library.push({
+							id: `v-${data.vignette.id}`,
+							label: data.vignette.information || file.name,
+							src: `/${String(data.vignette.image || '').replace(/^public\//, '')}`,
+							persisted: true,
+							isObjectUrl: false,
+						});
+						render();
+					} catch (error) {
+						console.warn('Upload de vignette impossible.', error);
+					}
+				});
+				uploadInput.value = '';
+			});
+		}
+
+		if (resetButton) {
+			resetButton.addEventListener('click', () => {
+				state.placed = [];
+				render();
+			});
+		}
+
+		if (yearStartInput) {
+			yearStartInput.addEventListener('change', (event) => {
+				const newStart = parseInt(event.target.value) || state.yearStart;
+				if (newStart < state.yearEnd) {
+					state.yearStart = newStart;
+					render();
+				} else {
+					event.target.value = state.yearStart;
+				}
+			});
+		}
+
+		if (yearEndInput) {
+			yearEndInput.addEventListener('change', (event) => {
+				const newEnd = parseInt(event.target.value) || state.yearEnd;
+				if (newEnd > state.yearStart) {
+					state.yearEnd = newEnd;
+					render();
+				} else {
+					event.target.value = state.yearEnd;
+				}
+			});
+		}
+
+		axis.addEventListener('dragover', (event) => {
+			event.preventDefault();
+			if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+		});
+
+		axis.addEventListener('drop', (event) => {
+			event.preventDefault();
+			const imageId = event.dataTransfer?.getData('text/plain') || '';
+			if (imageId) placeOnTimeline(imageId, percentFromPointer(event.clientX));
+		});
+
+		axis.addEventListener('pointermove', (event) => {
+			if (!draggingMarkerId) return;
+			const marker = state.placed.find((item) => item.id === draggingMarkerId);
+			if (marker) {
+				marker.x = percentFromPointer(event.clientX);
+				render();
+			}
+		});
+
+		axis.addEventListener('pointerup', () => { draggingMarkerId = null; });
+		axis.addEventListener('pointercancel', () => { draggingMarkerId = null; });
+
+		if (checkSubmitButton && checkUrl) {
+			checkSubmitButton.addEventListener('click', async () => {
+				const order = state.placed
+					.sort((a, b) => a.x - b.x)
+					.map((item) => {
+						const match = item.id.match(/^v-(\d+)$/);
+						return match ? parseInt(match[1]) : 0;
+					})
+					.filter((id) => id > 0);
+
+				if (order.length < 2) {
+					if (checkResult) {
+						checkResult.innerHTML = '<div class="alert alert-warning">La frise doit contenir au moins 2 images.</div>';
+					}
+					return;
+				}
+
+				try {
+					const response = await fetch(checkUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-Requested-With': 'XMLHttpRequest'
+						},
+						body: JSON.stringify({ answer: order })
+					});
+
+					const data = await response.json();
+					if (checkResult) {
+						if (data.success) {
+							let message = '<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>Bravo ! Ordre chronologique correct.</div>';
+							if (data.indice) {
+								message += `<div class="alert alert-info mt-2"><strong>Indice débloqué :</strong> <span class="badge bg-warning text-dark">${data.indice}</span></div>`;
+							}
+							checkResult.innerHTML = message;
+							if (checkNext) {
+								checkNext.classList.remove('d-none');
+							}
+						} else {
+							checkResult.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle me-2"></i>L\'ordre chronologique est incorrect. Réessayez.</div>';
+						}
+					}
+				} catch (error) {
+					console.error('Erreur lors de la vérification', error);
+					if (checkResult) {
+						checkResult.innerHTML = '<div class="alert alert-danger">Une erreur s\'est produite.</div>';
+					}
+				}
+			});
+		}
+
+		render();
+		root.dataset.boundFriseEditor = '1';
+	});
+}
+
+document.addEventListener('DOMContentLoaded', initFriseEditor);
+document.addEventListener('turbo:load', initFriseEditor);
+</script>
+<style>
+	.frise-editor {
+		border-radius: 1.25rem;
+		background: linear-gradient(135deg, #f8ecdb 0%, #f5e8d0 100%);
+		padding: 0;
+		box-shadow: 0 6px 20px rgba(77, 92, 120, 0.12);
+	}
+
+	.frise-editor--readonly .frise-editor__card [data-action="delete"] {
+		display: none !important;
+		pointer-events: none;
+	}
+
+	.frise-editor__inner {
+		padding: 2rem;
+	}
+
+	.frise-editor__header {
+		margin-bottom: 1.5rem;
+	}
+
+	.frise-editor__title {
+		margin: 0 0 0.5rem;
+		color: #1f2a44;
+		font-size: 1.5rem;
+		font-weight: 700;
+	}
+
+	.frise-editor__subtitle {
+		margin: 0;
+		color: #5b657c;
+		font-size: 0.95rem;
+	}
+
+	.frise-editor__config {
+		display: flex;
+		gap: 1.2rem;
+		margin-bottom: 1.5rem;
+		align-items: flex-end;
+	}
+
+	.frise-editor__date-range {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		flex: 0 0 auto;
+	}
+
+	.frise-editor__date-range label {
+		font-weight: 600;
+		color: #2e3f5f;
+		font-size: 0.88rem;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.frise-editor__date-range input {
+		width: 100px;
+		padding: 0.5rem 0.7rem;
+		border: 1px solid #c8d8e7;
+		border-radius: 0.6rem;
+		font-size: 0.95rem;
+		font-weight: 500;
+		background: #fff;
+		color: #1f2a44;
+	}
+
+	.frise-editor__date-range input:focus {
+		outline: none;
+		border-color: #2459e0;
+		box-shadow: 0 0 0 3px rgba(36, 89, 224, 0.1);
+	}
+
+	.frise-editor__toolbar {
+		display: flex;
+		gap: 0.8rem;
+		margin-bottom: 1.8rem;
+		flex-wrap: wrap;
+	}
+
+	.frise-editor__toolbar .btn {
+		font-weight: 600;
+		border-radius: 0.7rem;
+		padding: 0.6rem 1.1rem;
+		font-size: 0.92rem;
+		transition: all 150ms ease;
+	}
+
+	.frise-editor__workspace {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.frise-editor__gallery {
+		border: 2px dashed #c8b88f;
+		border-radius: 1rem;
+		padding: 1rem;
+		background: #fff7df;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 0.8rem;
+		max-height: 320px;
+		overflow-y: auto;
+	}
+
+	.frise-editor__gallery::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.frise-editor__gallery::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.frise-editor__gallery::-webkit-scrollbar-thumb {
+		background: #c8b88f;
+		border-radius: 3px;
+	}
+
+	.frise-editor__card {
+		border: 1px solid #d8cbab;
+		border-radius: 0.85rem;
+		background: #fff;
+		padding: 0.6rem;
+		display: grid;
+		grid-template-rows: auto auto auto;
+		gap: 0.5rem;
+		cursor: grab;
+		box-shadow: 0 4px 12px rgba(53, 56, 68, 0.08);
+		transition: box-shadow 200ms ease;
+		min-width: 0;
+	}
+
+	.frise-editor__card:hover {
+		box-shadow: 0 6px 16px rgba(53, 56, 68, 0.15);
+	}
+
+	.frise-editor__card img {
+		width: 100%;
+		height: 110px;
+		object-fit: cover;
+		border-radius: 0.6rem;
+		border: 1px solid #e8dfca;
+	}
+
+	.frise-editor__card p {
+		margin: 0;
+		font-size: 0.8rem;
+		line-height: 1.3;
+		color: #2e3f5f;
+		white-space: normal;
+		word-break: break-word;
+	}
+
+	.frise-editor__card-actions {
+		display: flex;
+		gap: 0.3rem;
+	}
+
+	.frise-editor__card-actions .btn {
+		flex: 1;
+		padding: 0.35rem 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.frise-editor__board {
+		border: 2px solid #d6c79f;
+		border-radius: 1rem;
+		padding: 2rem;
+		background: linear-gradient(180deg, #fbf2d6 0%, #fbeee0 100%);
+		overflow-x: auto;
+		min-height: 420px;
+	}
+
+	.frise-editor__axis {
+		position: relative;
+		min-height: 380px;
+		min-width: 900px;
+	}
+
+	.frise-editor__timeline {
+		position: absolute;
+		top: 160px;
+		left: 0;
+		right: 0;
+		height: 10px;
+		border-radius: 999px;
+		background: linear-gradient(90deg, #556b82 0%, #556b82 100%);
+		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(85, 107, 130, 0.25);
+	}
+
+	.frise-editor__ruler {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+
+	.frise-editor__tick {
+		position: absolute;
+		top: 148px;
+		width: 2px;
+		height: 24px;
+		background: #a8b5c8;
+		transform: translateX(-50%);
+	}
+
+	.frise-editor__year-label {
+		position: absolute;
+		top: 182px;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #3d4c67;
+		white-space: nowrap;
+		transform: translateX(-50%);
+		pointer-events: none;
+	}
+
+	.frise-editor__canvas {
+		position: absolute;
+		inset: 0;
+	}
+
+	.frise-editor__marker {
+		position: absolute;
+		top: 60px;
+		transform: translateX(-50%);
+		width: 160px;
+		padding: 0.5rem;
+		border: 1px solid #c8d3e7;
+		border-radius: 0.75rem;
+		background: #fff;
+		box-shadow: 0 10px 24px rgba(33, 50, 84, 0.16);
+		cursor: grab;
+		touch-action: none;
+		display: grid;
+		grid-template-rows: auto 1fr auto;
+		gap: 0.3rem;
+		transition: box-shadow 200ms ease;
+	}
+
+	.frise-editor__marker:hover {
+		box-shadow: 0 12px 32px rgba(33, 50, 84, 0.22);
+	}
+
+	.frise-editor__marker img {
+		width: 100%;
+		height: 90px;
+		object-fit: cover;
+		border-radius: 0.5rem;
+	}
+
+	.frise-editor__marker span {
+		font-size: 0.75rem;
+		color: #3d4c67;
+		font-weight: 500;
+		white-space: normal;
+		word-break: break-word;
+		line-height: 1.2;
+	}
+
+	.frise-editor__marker-remove {
+		position: absolute;
+		top: -2px;
+		right: -2px;
+		width: 1.5rem;
+		height: 1.5rem;
+		border: 0;
+		border-radius: 999px;
+		background: #d73446;
+		color: #fff;
+		font-weight: 700;
+		font-size: 1.1rem;
+		line-height: 1;
+		display: grid;
+		place-items: center;
+		cursor: pointer;
+		box-shadow: 0 4px 12px rgba(215, 52, 70, 0.35);
+		transition: all 150ms ease;
+	}
+
+	.frise-editor__marker-remove:hover {
+		background: #c02535;
+		box-shadow: 0 6px 16px rgba(215, 52, 70, 0.45);
+	}
+
+	.frise-editor__canvas-empty {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		color: #8a9aad;
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 500;
+		white-space: nowrap;
+	}
+
+	.frise-editor__hint {
+		padding: 1rem;
+		border-radius: 0.8rem;
+		background: rgba(255, 255, 255, 0.5);
+		color: #4d5c78;
+		font-size: 0.9rem;
+		margin-bottom: 0;
+		border: 1px solid rgba(212, 200, 175, 0.3);
+	}
+
+	@media (max-width: 1200px) {
+		.frise-editor__workspace {
+			grid-template-columns: 1fr;
+		}
+
+		.frise-editor__axis {
+			min-width: 100%;
+			min-height: 350px;
+		}
+
+		.frise-editor__gallery {
+			max-height: 320px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.frise-editor__inner {
+			padding: 1.2rem;
+		}
+
+		.frise-editor__title {
+			font-size: 1.2rem;
+		}
+
+		.frise-editor__config {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.frise-editor__date-range input {
+			width: 100%;
+		}
+
+		.frise-editor__toolbar {
+			flex-direction: column;
+		}
+
+		.frise-editor__toolbar .btn {
+			width: 100%;
+		}
+
+		.frise-editor__axis {
+			min-height: 300px;
+		}
+
+		.frise-editor__marker {
+			width: 140px;
+		}
+	}
+</style>
+
