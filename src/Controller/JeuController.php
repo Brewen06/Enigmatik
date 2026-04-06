@@ -40,6 +40,11 @@ final class JeuController extends AbstractController
         $enigmes = $canManageEnigmes
             ? $enigmeRepository->findBy([], ['ordre' => 'ASC'])
             : $enigmeRepository->findBy(['active' => true], ['ordre' => 'ASC']);
+        $resolvedEnigmeIds = $equipe?->getEnigmesResolues() ?? [];
+        $unlockedEnigmeCount = $canManageEnigmes
+            ? count($enigmes)
+            : $this->computeUnlockedEnigmeCount($equipe, $enigmes, $resolvedEnigmeIds);
+        $recoveredHints = $this->buildRecoveredHints($equipe, $enigmeRepository);
 
         $timerSeconds = $this->extractTimerSeconds($jeu);
         $timerRuntime = $this->computeTimerRuntime($equipe, $timerSeconds);
@@ -51,6 +56,9 @@ final class JeuController extends AbstractController
             'timerSeconds' => $timerRuntime['remainingSeconds'],
             'timerLocked' => $timerRuntime['locked'],
             'canManageEnigmes' => $canManageEnigmes,
+            'recoveredHints' => $recoveredHints,
+            'resolvedEnigmeIds' => $resolvedEnigmeIds,
+            'unlockedEnigmeCount' => $unlockedEnigmeCount,
         ]);
     }
 
@@ -122,6 +130,72 @@ final class JeuController extends AbstractController
     {
         return $this->render('jeu/victoire.html.twig');
     }
+
+    /**
+     * @return list<array{ordre: int, titre: string, indice: string}>
+     */
+    private function buildRecoveredHints(?Equipe $equipe, EnigmeRepository $enigmeRepository): array
+    {
+        if (!$equipe) {
+            return [];
+        }
+
+        $resolvedIds = $equipe->getEnigmesResolues();
+
+        if ($resolvedIds === []) {
+            return [];
+        }
+
+        $resolvedEnigmes = $enigmeRepository->findBy(['id' => $resolvedIds], ['ordre' => 'ASC']);
+        $hints = [];
+
+        foreach ($resolvedEnigmes as $resolvedEnigme) {
+            $indice = trim((string) ($resolvedEnigme->getIndice() ?? ''));
+
+            if ($indice === '') {
+                continue;
+            }
+
+            $hints[] = [
+                'ordre' => (int) ($resolvedEnigme->getOrdre() ?? 0),
+                'titre' => (string) ($resolvedEnigme->getTitre() ?? ''),
+                'indice' => $indice,
+            ];
+        }
+
+        return $hints;
+    }
+
+    /**
+     * @param list<\App\Entity\Enigme> $enigmes
+     * @param list<int> $resolvedEnigmeIds
+     */
+    private function computeUnlockedEnigmeCount(?Equipe $equipe, array $enigmes, array $resolvedEnigmeIds): int
+    {
+        $totalEnigmes = count($enigmes);
+
+        if ($totalEnigmes === 0) {
+            return 0;
+        }
+
+        if (!$equipe) {
+            return 1;
+        }
+
+        $resolvedSet = array_fill_keys($resolvedEnigmeIds, true);
+        $resolvedActiveCount = 0;
+
+        foreach ($enigmes as $enigme) {
+            $enigmeId = (int) ($enigme->getId() ?? 0);
+
+            if ($enigmeId > 0 && isset($resolvedSet[$enigmeId])) {
+                $resolvedActiveCount++;
+            }
+        }
+
+        return min($totalEnigmes, $resolvedActiveCount + 1);
+    }
+
     private function extractTimerSeconds(?Jeu $jeu): int
     {
         if (!$jeu) {

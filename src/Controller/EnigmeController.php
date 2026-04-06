@@ -25,13 +25,16 @@ final class EnigmeController extends AbstractController
     }
 
     #[Route('/creer', name: 'app_enigme_creer', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, EnigmeRepository $enigmeRepository): Response
     {
         $enigme = new Enigme();
         $form = $this->createForm(EnigmeType::class, $enigme);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $requestedOrdre = max(1, (int) ($enigme->getOrdre() ?? 1));
+            $this->insertEnigmeAtOrdre($enigme, $requestedOrdre, $enigmeRepository);
+
             $entityManager->persist($enigme);
             $entityManager->flush();
 
@@ -42,6 +45,21 @@ final class EnigmeController extends AbstractController
             'enigme' => $enigme,
             'form' => $form,
         ]);
+    }
+
+    private function insertEnigmeAtOrdre(Enigme $newEnigme, int $requestedOrdre, EnigmeRepository $enigmeRepository): void
+    {
+        $newEnigme->setOrdre($requestedOrdre);
+
+        $existingEnigmes = $enigmeRepository->findBy([], ['ordre' => 'DESC']);
+
+        foreach ($existingEnigmes as $existingEnigme) {
+            $existingOrdre = (int) ($existingEnigme->getOrdre() ?? 0);
+
+            if ($existingOrdre >= $requestedOrdre) {
+                $existingEnigme->setOrdre($existingOrdre + 1);
+            }
+        }
     }
 
     #[Route('/{id}', name: 'app_enigme_show', methods: ['GET'])]

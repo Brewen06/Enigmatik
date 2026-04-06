@@ -155,6 +155,10 @@ export default class extends Controller {
             return;
         }
 
+        if (event.currentTarget.dataset.boardLockedParam === '1') {
+            return;
+        }
+
         const params = event.currentTarget.dataset;
         this.enigmaTitleTarget.textContent = 'Énigme ' + params.boardIndexParam + ' : ' + params.boardTitleParam;
         this.enigmaDescTarget.textContent = params.boardDescParam;

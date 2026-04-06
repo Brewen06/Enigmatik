@@ -3,24 +3,50 @@
 {% block title %}Enigmatik - Jeu{% endblock %}
 
 {% block body %}
-    <div class="tw-text-center tw-mb-10">
-        <h1 class="tw-text-4xl tw-font-bold tw-mb-2">Bienvenue <span class="tw-text-blue-600">{% if equipe %}{{ equipe.nom }}{% endif %}</span> !</h1>
-        <p class="tw-text-lg tw-text-gray-600">Prêt à relever le défi ? Résolvez les énigmes pour obtenir les indices du code final.</p>
-    </div>
+    <section class="welcome-note tw-mb-10 tw-relative">
+        <div class="welcome-note__tape welcome-note__tape--left" aria-hidden="true"></div>
+        <div class="welcome-note__tape welcome-note__tape--right" aria-hidden="true"></div>
+        <div class="welcome-note__body tw-text-center tw-px-4 tw-py-7">
+            <h1 class="welcome-note__title tw-mb-2">Bienvenue <span class="welcome-note__team">{% if equipe %}{{ equipe.nom }}{% endif %}</span></h1>
+            <p class="welcome-note__subtitle tw-mb-0">Explorez le mur d'énigmes, débloquez les indices et assemblez le code final.</p>
+        </div>
+    </section>
 
     {% if equipe %}
-        <div class="tw-max-w-md tw-mx-auto tw-bg-white tw-rounded-xl tw-shadow tw-p-4 tw-mb-8 tw-flex tw-items-center tw-gap-4">
+        <div class="team-note tw-max-w-xl tw-mx-auto tw-p-4 tw-mb-8 tw-flex tw-items-center tw-gap-4 tw-relative">
+            <div class="team-note__pin" aria-hidden="true"></div>
             {% if equipe.avatar %}
-                <img src="{{ asset(equipe.avatar.image) }}" alt="{{ equipe.avatar.nom }}" class="tw-w-16 tw-h-16 tw-rounded-full tw-object-cover tw-border tw-border-gray-200">
+                <img src="{{ asset(equipe.avatar.image) }}" alt="{{ equipe.avatar.nom }}" class="team-note__avatar tw-w-16 tw-h-16 tw-rounded-full tw-object-cover">
             {% endif %}
             <div>
-                <p class="tw-text-xs tw-uppercase tw-text-gray-500 tw-mb-1">Données de l'équipe</p>
-                <p class="tw-font-semibold tw-text-gray-900 tw-mb-0">{{ equipe.nom }}</p>
+                <p class="team-note__label tw-mb-1">Données de l'équipe</p>
+                <p class="team-note__name tw-mb-0">{{ equipe.nom }}</p>
                 {% if equipe.avatar %}
-                    <p class="tw-text-sm tw-text-gray-600 tw-mb-0">Avatar : {{ equipe.avatar.nom }}</p>
+                    <p class="team-note__meta tw-mb-0">Avatar : {{ equipe.avatar.nom }}</p>
                 {% endif %}
             </div>
         </div>
+
+        <section class="clue-note tw-max-w-3xl tw-mx-auto tw-mb-8">
+            <div class="clue-note__pin" aria-hidden="true"></div>
+            <div class="tw-flex tw-items-center tw-justify-between tw-gap-3 tw-mb-3">
+                <h2 class="clue-note__title tw-mb-0">Indices récupérés</h2>
+                <span class="clue-note__counter">{{ recoveredHints|length }} trouvé(s)</span>
+            </div>
+
+            {% if recoveredHints is not empty %}
+                <ul class="tw-list-none tw-p-0 tw-m-0 clue-note__list">
+                    {% for hint in recoveredHints %}
+                        <li class="clue-note__item">
+                            <p class="clue-note__meta tw-mb-1">Énigme {{ hint.ordre }}{% if hint.titre %} - {{ hint.titre }}{% endif %}</p>
+                            <p class="clue-note__value tw-mb-0">{{ hint.indice }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="tw-mb-0 clue-note__empty">Aucun indice récupéré pour le moment. Résolvez une énigme pour débloquer votre premier indice.</p>
+            {% endif %}
+        </section>
     {% endif %}
 
     <div class="tw-container tw-relative tw-mx-auto tw-px-4" 
@@ -31,21 +57,26 @@
             data-board-timer-seconds-value="{{ timerSeconds }}"
             data-board-timer-locked-value="{{ timerLocked ? 'true' : 'false' }}">
         <div data-board-target="modal" class="tw-hidden tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-p-4 tw-bg-black tw-bg-opacity-75 tw-backdrop-blur-sm tw-overflow-y-auto">
-            <div class="tw-bg-white tw-rounded-xl tw-p-8 tw-max-w-2xl tw-w-full tw-my-4 tw-relative tw-shadow-2xl tw-border-4 tw-border-green-500">
-                <button data-action="click->board#closeModal" class="tw-absolute tw-top-4 tw-right-4 tw-text-gray-400 hover:tw-text-gray-800 tw-transition-colors">
+            <div class="intro-brief tw-max-w-2xl tw-w-full tw-my-4 tw-relative">
+                <div class="intro-brief__tape intro-brief__tape--left" aria-hidden="true"></div>
+                <div class="intro-brief__tape intro-brief__tape--right" aria-hidden="true"></div>
+                <button data-action="click->board#closeModal" class="intro-brief__close" aria-label="Fermer le message de bienvenue">
                     <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-8 tw-w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
                 {% if jeu and jeu.messageDeBienvenue %}
-                    <h2 class="tw-text-3xl tw-font-bold tw-text-green-700 tw-mb-6">Débriefing de mission</h2>
-                    <p class="tw-text-lg tw-text-gray-800 tw-whitespace-pre-line tw-mb-6">{{ jeu.messageDeBienvenue }}</p>
-                    <button data-action="click->board#closeModal" class="tw-mt-8 tw-px-8 tw-py-3 tw-bg-green-600 hover:tw-bg-green-700 tw-text-white tw-font-bold tw-rounded-full tw-shadow-lg tw-transition-transform hover:tw-scale-105">
+                    <h2 class="intro-brief__title">Débriefing de mission</h2>
+                    <p class="intro-brief__lead">Lisez les consignes avant d'ouvrir le mur.</p>
+                    <p class="intro-brief__content tw-whitespace-pre-line">{{ jeu.messageDeBienvenue }}</p>
+                    <button data-action="click->board#closeModal" class="intro-brief__cta tw-mt-6">
                         Accéder au jeu
                     </button>
                 {% else %}
-                    <h2 class="tw-text-2xl tw-font-bold tw-text-green-700 tw-mb-6">Bienvenue à votre mission !</h2>
-                    <button data-action="click->board#closeModal" class="tw-mt-8 tw-px-8 tw-py-3 tw-bg-green-600 hover:tw-bg-green-700 tw-text-white tw-font-bold tw-rounded-full tw-shadow-lg tw-transition-transform hover:tw-scale-105">
+                    <h2 class="intro-brief__title">Bienvenue à votre mission !</h2>
+                    <p class="intro-brief__lead">Votre dossier est prêt.</p>
+                    <p class="intro-brief__content">Résolvez les énigmes dans l'ordre, récupérez les indices et déverrouillez le code final.</p>
+                    <button data-action="click->board#closeModal" class="intro-brief__cta tw-mt-6">
                         Accéder au jeu
                     </button>
                 {% endif %}
@@ -85,18 +116,28 @@
 
 
         {% if timerSeconds > 0 %}
-    <div class="tw-mb-6 tw-flex tw-justify-center">
-        <div class="tw-inline-flex tw-items-center tw-gap-3 tw-rounded-lg tw-border tw-border-amber-300 tw-bg-amber-50 tw-px-4 tw-py-2 tw-shadow-sm">
-            <i class="bi bi-stopwatch-fill tw-text-xl tw-text-amber-900" aria-hidden="true"></i>
-            <span class="tw-font-semibold tw-text-amber-900">Temps restant</span>
-            <span data-board-target="timer" class="tw-text-2xl tw-font-bold tw-tabular-nums tw-text-amber-900">00:00</span>
+            <div class="timer-note-wrap tw-mb-6 tw-flex tw-justify-center">
+                <div class="timer-note tw-inline-flex tw-items-center tw-gap-3 tw-px-4 tw-py-2 tw-relative">
+                    <div class="timer-note__pin" aria-hidden="true"></div>
+                    <i class="bi bi-stopwatch-fill timer-note__icon" aria-hidden="true"></i>
+                    <span class="timer-note__label">Temps restant</span>
+                    <span data-board-target="timer" class="timer-note__value tw-tabular-nums">00:00</span>
+                </div>
+            </div>
+        {% endif %}
+        <section class="enigma-wall tw-rounded-2xl tw-p-4 md:tw-p-6 tw-shadow-2xl">
+        <div class="tw-flex tw-items-center tw-justify-between tw-gap-4 tw-mb-5 tw-px-1">
+            <h2 class="tw-text-xl tw-font-bold tw-uppercase tw-tracking-wide tw-text-amber-100 tw-mb-0">Mur d'énigmes</h2>
+            <span class="tw-text-xs tw-font-semibold tw-uppercase tw-text-amber-200 tw-bg-black/20 tw-px-3 tw-py-1 tw-rounded-full">{{ enigmes|length }} dossiers</span>
         </div>
-    </div>
-{% endif %}
-        <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-8 tw-justify-items-center">
+
+        <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6 tw-justify-items-stretch">
             {% for enigme in enigmes %}
-                <div class="tw-w-64 tw-flex tw-flex-col tw-gap-3">
-                    <div class="tw-h-96 tw-cursor-pointer tw-transition-transform hover:tw-scale-105 {% if not enigme.active %}tw-opacity-70{% endif %}"
+                {% set isUnlocked = canManageEnigmes or loop.index <= unlockedEnigmeCount %}
+                {% if isUnlocked %}
+                {% set isSolved = enigme.id in resolvedEnigmeIds %}
+                <div class="tw-flex tw-flex-col tw-gap-3">
+                    <article class="enigma-file tw-cursor-pointer tw-transition-transform hover:tw-scale-[1.02] {% if not enigme.active %}tw-opacity-75{% endif %}"
                          data-action="click->board#openEnigma"
                          data-board-title-param="{{ enigme.titre }}"
                          data-board-desc-param="{{ enigme.consigne|slice(0, 150) }}..."
@@ -104,13 +145,25 @@
                          data-board-vignette-param="{% if enigme.vignette %}{{ enigme.vignette.information }}{% endif %}"
                          data-board-url-param="{{ path('app_enigme_show', {'id': enigme.id}) }}"
                          data-board-index-param="{{ loop.index }}">
-                    <div class="tw-w-full tw-h-full tw-rounded-xl tw-overflow-hidden tw-border-4 {% if enigme.active %}tw-border-blue-500{% else %}tw-border-gray-400{% endif %} tw-bg-white tw-flex tw-flex-col tw-items-center tw-justify-center tw-p-4 tw-shadow-xl">
-                        <h3 class="tw-text-xl tw-font-bold tw-text-blue-600 tw-text-center">Énigme {{ loop.index }}</h3>
-                        <p class="tw-mt-2 tw-text-sm tw-text-gray-500 tw-text-center">{{ enigme.titre }}</p>
-                        <span class="tw-mt-2 tw-inline-block tw-bg-blue-100 tw-text-blue-800 tw-text-xs tw-px-2 tw-py-1 tw-rounded-full">{{ enigme.type.libelle }}</span>
-                    <br>
+                    <div class="enigma-file__tape enigma-file__tape--left" aria-hidden="true"></div>
+                    <div class="enigma-file__tape enigma-file__tape--right" aria-hidden="true"></div>
+                    <div class="enigma-file__body {% if enigme.active %}enigma-file__body--active{% else %}enigma-file__body--inactive{% endif %} {% if isSolved %}enigma-file__body--solved{% endif %}">
+                        <p class="enigma-file__tag tw-mb-2">Dossier #{{ enigme.ordre }}</p>
+                        <h3 class="enigma-file__title">{{ enigme.titre }}</h3>
+                        <p class="enigma-file__excerpt">{{ enigme.consigne|slice(0, 95) }}{% if enigme.consigne|length > 95 %}...{% endif %}</p>
+                        <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-mt-auto">
+                            <span class="enigma-file__type">{{ enigme.type.libelle }}</span>
+                            <span class="enigma-file__state {% if isSolved %}enigma-file__state--solved{% elseif enigme.active %}enigma-file__state--on{% else %}enigma-file__state--off{% endif %}">
+                                {% if isSolved %}
+                                    Résolue
+                                {% else %}
+                                    {{ enigme.active ? 'Active' : 'Inactive' }}
+                                {% endif %}
+                            </span>
+                        </div>
+
                         {% if canManageEnigmes %}
-                        <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="tw-flex tw-justify-center" onclick="event.stopPropagation();">
+                        <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="tw-flex tw-justify-center tw-mt-3" onclick="event.stopPropagation();">
                             <input type="hidden" name="_token" value="{{ csrf_token('toggle_active' ~ enigme.id) }}">
                             <button
                                 type="submit"
@@ -124,42 +177,686 @@
                         </form>
                         {% endif %}
                     </div>
+                </article>
                 </div>
-
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
+        </section>
 
-        <div class="tw-mt-12 tw-max-w-2xl tw-mx-auto">
-            <div class="tw-bg-gray-900 tw-rounded-xl tw-overflow-hidden tw-border-4 tw-border-yellow-500 tw-shadow-2xl">
-                <div class="tw-bg-yellow-500 tw-py-3 tw-px-6 tw-flex tw-justify-between tw-items-center">
-                    <h3 class="tw-text-xl tw-font-bold tw-text-gray-900 tw-uppercase tw-tracking-wider"><i class="tw-text-2xl tw-mr-2">🔐</i> Verrou Final</h3>
-                    <span class="tw-text-gray-900 tw-font-semibold tw-text-sm">Trouvez pour gagner</span>
+        <section class="final-lock tw-mt-12 tw-max-w-3xl tw-mx-auto">
+
+            <div class="final-lock__panel">
+                <div class="final-lock__header tw-flex tw-justify-between tw-items-center tw-gap-3">
+                    <h3 class="final-lock__title tw-mb-0"><i class="tw-text-xl tw-mr-2">🔐</i> Verrou final</h3>
+                    <span class="final-lock__subtitle">Assemblez vos indices</span>
                 </div>
-                <div class="tw-p-8 tw-flex tw-flex-col md:tw-flex-row tw-items-center tw-gap-4">
+
+                <div class="tw-p-6 md:tw-p-8 tw-flex tw-flex-col md:tw-flex-row tw-items-center tw-gap-4">
                     <div class="tw-flex-1 tw-w-full">
-                        <label for="finalCode" class="tw-block tw-text-yellow-400 tw-text-sm tw-font-bold tw-mb-2">Saisir le Code final</label>
+                        <label for="finalCode" class="final-lock__label">Saisir le code final</label>
                         <input type="text" 
                                 id="finalCode"
                                 data-board-target="finalCodeInput"
-                                class="tw-w-full tw-px-4 tw-py-3 tw-bg-gray-800 tw-border-2 tw-border-gray-600 tw-rounded tw-text-white tw-text-center tw-text-xl tw-tracking-[0.2em] tw-uppercase tw-placeholder-gray-500 focus:tw-outline-none focus:tw-border-yellow-400 focus:tw-ring-1 focus:tw-ring-yellow-400 transition-colors"
+                                class="final-lock__input tw-w-full tw-px-4 tw-py-3 tw-text-center tw-text-xl tw-tracking-[0.2em] tw-uppercase"
                                 placeholder="VOTRE CODE"
                                 maxlength="20">
                     </div>
                     <div class="tw-w-full md:tw-w-auto tw-flex tw-flex-col">
                         <button type="button"
                                 data-action="click->board#checkFinalCode"
-                                class="tw-w-full tw-mt-6 md:tw-mt-6 tw-px-8 tw-py-3 tw-bg-yellow-500 hover:tw-bg-yellow-400 tw-text-gray-900 tw-font-bold tw-text-lg tw-rounded tw-transition-colors tw-shadow-lg transform active:tw-scale-95">
+                                class="final-lock__button tw-w-full tw-mt-6 md:tw-mt-6 tw-px-8 tw-py-3 tw-font-bold tw-text-lg tw-rounded tw-transition-colors tw-shadow-lg transform active:tw-scale-95">
                             DÉVERROUILLER
                         </button>
                     </div>
                 </div>
-                <div data-board-target="finalMessage" class="tw-text-center tw-pb-6 tw-min-h-[40px] tw-text-lg"></div>
+
+                <div data-board-target="finalMessage" class="final-lock__message tw-text-center tw-pb-6 tw-min-h-[40px] tw-text-lg"></div>
             </div>
-        </div>
+        </section>
     </div>
 
     <style>
+        .welcome-note {
+            max-width: 72rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .welcome-note__body {
+            background:
+                linear-gradient(to bottom, rgba(72, 130, 215, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(214, 84, 84, 0.18) 0, rgba(214, 84, 84, 0.18) 1px, transparent 1px),
+                #fffef2;
+            background-size: 100% 2rem, 2.5rem 100%, auto;
+            background-position: 0 2.9rem, 2.4rem 0, 0 0;
+            border: 1px solid #e2d7b8;
+            border-radius: 0.55rem;
+            box-shadow: 0 18px 30px rgba(31, 23, 11, 0.2);
+            transform: rotate(-0.45deg);
+        }
+
+        .welcome-note__tape {
+            position: absolute;
+            top: -0.5rem;
+            width: 5rem;
+            height: 1.1rem;
+            background: rgba(234, 225, 192, 0.62);
+            border: 1px solid rgba(148, 128, 70, 0.26);
+            z-index: 2;
+            transform: rotate(-10deg);
+            backdrop-filter: blur(1px);
+        }
+
+        .welcome-note__tape--left {
+            left: 2rem;
+        }
+
+        .welcome-note__tape--right {
+            right: 2rem;
+            transform: rotate(11deg);
+        }
+
+        .welcome-note__kicker {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.11em;
+            color: #746749;
+        }
+
+        .welcome-note__title {
+            font-size: clamp(1.95rem, 1.45rem + 1.25vw, 3rem);
+            font-weight: 800;
+            color: #3a3528;
+            line-height: 1.1;
+        }
+
+        .welcome-note__team {
+            color: #2b65d9;
+        }
+
+        .welcome-note__subtitle {
+            font-size: clamp(1rem, 0.9rem + 0.45vw, 1.7rem);
+            color: #51493c;
+        }
+
+        .team-note {
+            background: linear-gradient(180deg, #fffdf6 0%, #f4ecd9 100%);
+            border: 1px solid #dccda9;
+            border-radius: 0.8rem;
+            box-shadow: 0 14px 24px rgba(31, 22, 10, 0.2);
+            transform: rotate(-0.35deg);
+        }
+
+        .team-note__pin {
+            position: absolute;
+            top: -0.42rem;
+            right: 1.1rem;
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 999px;
+            background: radial-gradient(circle at 35% 30%, #ffffff 0%, #ccd4df 40%, #7f8ca1 100%);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
+        }
+
+        .team-note__avatar {
+            border: 3px solid #f8f1de;
+            box-shadow: 0 5px 10px rgba(31, 23, 11, 0.2);
+            background: #fff;
+        }
+
+        .team-note__label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #70644a;
+        }
+
+        .team-note__name {
+            font-size: 1.85rem;
+            line-height: 1;
+            font-weight: 800;
+            color: #2e2a21;
+        }
+
+        .team-note__meta {
+            font-size: 0.95rem;
+            color: #5f584b;
+        }
+
+        .timer-note {
+            background:
+                linear-gradient(to bottom, rgba(68, 121, 204, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(210, 87, 77, 0.17) 0, rgba(210, 87, 77, 0.17) 1px, transparent 1px),
+                #fffef2;
+            background-size: 100% 1.7rem, 1.75rem 100%, auto;
+            background-position: 0 2rem, 1.1rem 0, 0 0;
+            border: 1px solid #e0d5b7;
+            border-radius: 0.35rem;
+            box-shadow: 0 12px 22px rgba(31, 23, 11, 0.2);
+            transform: rotate(0.5deg);
+        }
+
+        .timer-note__pin {
+            position: absolute;
+            top: -0.38rem;
+            left: 1rem;
+            width: 0.85rem;
+            height: 0.85rem;
+            border-radius: 999px;
+            background: radial-gradient(circle at 35% 30%, #ffffff 0%, #ccd4df 40%, #7f8ca1 100%);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
+        }
+
+        .timer-note__icon {
+            font-size: 1.15rem;
+            color: #6f5827;
+        }
+
+        .timer-note__label {
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: #6d6047;
+        }
+
+        .timer-note__value {
+            font-size: 1.42rem;
+            font-weight: 900;
+            letter-spacing: 0.07em;
+            color: #2f2a1f;
+            min-width: 5.2rem;
+            text-align: center;
+        }
+
+        .clue-note {
+            position: relative;
+            background:
+                linear-gradient(to bottom, rgba(72, 130, 215, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(214, 84, 84, 0.18) 0, rgba(214, 84, 84, 0.18) 1px, transparent 1px),
+                #fffef2;
+            background-size: 100% 1.9rem, 2.2rem 100%, auto;
+            background-position: 0 2.8rem, 2rem 0, 0 0;
+            border: 1px solid #e7ddbb;
+            border-radius: 0.4rem;
+            box-shadow: 0 18px 28px rgba(35, 28, 17, 0.2);
+            padding: 1.2rem 1.1rem 1rem 3rem;
+            transform: rotate(-0.6deg);
+        }
+
+        .clue-note__pin {
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 999px;
+            top: -0.45rem;
+            left: 1.35rem;
+            background: radial-gradient(circle at 35% 30%, #ffffff 0%, #c9ced8 35%, #7a8498 100%);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.28);
+        }
+
+        .clue-note__title {
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #2f3d4b;
+        }
+
+        .clue-note__counter {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #5c6370;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #dbd5bd;
+            border-radius: 999px;
+            padding: 0.2rem 0.6rem;
+        }
+
+        .clue-note__list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .clue-note__item {
+            border-bottom: 1px dashed rgba(58, 79, 115, 0.26);
+            padding-bottom: 0.35rem;
+        }
+
+        .clue-note__item:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .clue-note__meta {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #5a6270;
+        }
+
+        .clue-note__value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: #1b3354;
+        }
+
+        .clue-note__empty {
+            color: #5b6472;
+            font-style: italic;
+        }
+
+        .enigma-wall {
+            background:
+                linear-gradient(145deg, rgba(124, 70, 42, 0.72), rgba(102, 57, 35, 0.88)),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 2px, transparent 2px 18px),
+                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 24px);
+            border: 1px solid rgba(70, 34, 18, 0.55);
+        }
+
+        .enigma-file {
+            position: relative;
+            min-height: 18rem;
+        }
+
+        .enigma-file__tape {
+            position: absolute;
+            width: 4.2rem;
+            height: 1.05rem;
+            top: -0.35rem;
+            background: rgba(237, 228, 189, 0.56);
+            border: 1px solid rgba(148, 128, 70, 0.28);
+            z-index: 2;
+            transform: rotate(-8deg);
+            backdrop-filter: blur(1px);
+        }
+
+        .enigma-file__tape--left {
+            left: 1rem;
+        }
+
+        .enigma-file__tape--right {
+            right: 1rem;
+            transform: rotate(9deg);
+        }
+
+        .enigma-file__body {
+            position: relative;
+            z-index: 1;
+            min-height: 18rem;
+            border-radius: 0.8rem;
+            border: 1px solid #d8d0b5;
+            background: linear-gradient(180deg, #fffef8, #f8f3e7);
+            padding: 1rem;
+            box-shadow: 0 10px 22px rgba(30, 19, 11, 0.28);
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .enigma-file__body--active {
+            outline: 3px solid rgba(53, 124, 231, 0.5);
+        }
+
+        .enigma-file__body--inactive {
+            filter: grayscale(0.15);
+            outline: 3px solid rgba(107, 114, 128, 0.45);
+        }
+
+        .enigma-file__tag {
+            display: inline-block;
+            align-self: flex-start;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: #193054;
+            background: #cfe2ff;
+            border-radius: 999px;
+            padding: 0.2rem 0.55rem;
+        }
+
+        .enigma-file__title {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: #2c2a24;
+            margin: 0;
+        }
+
+        .enigma-file__excerpt {
+            font-size: 0.92rem;
+            color: #5d5648;
+            margin: 0.2rem 0 0;
+            line-height: 1.4;
+        }
+
+        .enigma-file__type {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            background: #efe4c8;
+            color: #66542b;
+            border-radius: 999px;
+            padding: 0.2rem 0.55rem;
+            font-weight: 700;
+        }
+
+        .enigma-file__state {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 999px;
+            padding: 0.2rem 0.5rem;
+            font-weight: 800;
+            border: 1px solid transparent;
+        }
+
+        .enigma-file__state--on {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+
+        .enigma-file__state--off {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .enigma-file__body--solved {
+            outline: 3px solid rgba(22, 163, 74, 0.48);
+            background: linear-gradient(180deg, #f7fced, #eef7df);
+        }
+
+        .enigma-file__state--solved {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+
+        .intro-brief {
+            background:
+                linear-gradient(to bottom, rgba(72, 130, 215, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(214, 84, 84, 0.14) 0, rgba(214, 84, 84, 0.14) 1px, transparent 1px),
+                linear-gradient(180deg, #fffef7 0%, #f6f0df 100%);
+            background-size: 100% 2rem, 2.2rem 100%, auto;
+            background-position: 0 3.1rem, 2.1rem 0, 0 0;
+            border: 1px solid #d4c8a8;
+            border-radius: 0.9rem;
+            box-shadow: 0 20px 34px rgba(24, 17, 10, 0.32);
+            padding: 2rem 2rem 1.6rem;
+        }
+
+        .intro-brief__close {
+            position: absolute;
+            top: 0.95rem;
+            right: 0.95rem;
+            width: 3.1rem;
+            height: 3.1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #3d3b36;
+            background: rgba(255, 255, 255, 0.52);
+            color: #5c5951;
+            transition: transform 120ms ease, background-color 120ms ease;
+        }
+
+        .intro-brief__close:hover {
+            transform: rotate(-3deg);
+            background: #fff;
+            color: #2e2c27;
+        }
+
+        .intro-brief__stamp {
+            position: absolute;
+            right: 6rem;
+            top: 1.2rem;
+            border: 2px dashed rgba(142, 39, 39, 0.45);
+            color: #8f3131;
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 999px;
+            padding: 0.25rem 0.5rem;
+            transform: rotate(10deg);
+        }
+
+        .intro-brief__tape {
+            position: absolute;
+            top: -0.45rem;
+            width: 4.5rem;
+            height: 1rem;
+            background: rgba(236, 228, 196, 0.62);
+            border: 1px solid rgba(137, 120, 70, 0.35);
+            transform: rotate(-8deg);
+        }
+
+        .intro-brief__tape--left {
+            left: 1.2rem;
+        }
+
+        .intro-brief__tape--right {
+            right: 1.2rem;
+            transform: rotate(9deg);
+        }
+
+        .intro-brief__title {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #2f3d24;
+            margin-bottom: 0.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            max-width: calc(100% - 7.5rem);
+        }
+
+        .intro-brief__lead {
+            color: #7b6840;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .intro-brief__content {
+            color: #4b4e3f;
+            font-size: 1.02rem;
+            line-height: 1.7;
+            margin-bottom: 0.4rem;
+        }
+
+        .intro-brief__cta {
+            border: 0;
+            border-radius: 999px;
+            padding: 0.7rem 1.4rem;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            background: linear-gradient(135deg, #2f6f4a, #1f5b3a);
+            box-shadow: 0 10px 18px rgba(21, 72, 45, 0.32);
+        }
+
+        .intro-brief__cta:hover {
+            filter: brightness(1.05);
+        }
+
+        .final-lock {
+            position: relative;
+        }
+
+        .final-lock__sticker {
+            position: absolute;
+            top: -0.85rem;
+            right: 1rem;
+            background: #dc2626;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 0.2rem;
+            padding: 0.2rem 0.5rem;
+            transform: rotate(7deg);
+            box-shadow: 0 5px 10px rgba(20, 12, 8, 0.35);
+            z-index: 2;
+        }
+
+        .final-lock__panel {
+            background: linear-gradient(180deg, #fffdf5 0%, #f5ecd7 100%);
+            border: 1px solid #d9caa8;
+            border-radius: 1rem;
+            box-shadow: 0 18px 30px rgba(25, 18, 10, 0.24);
+            overflow: hidden;
+        }
+
+        .final-lock__header {
+            background: linear-gradient(180deg, #5f4829 0%, #4b371f 100%);
+            border-bottom: 1px solid rgba(255, 233, 186, 0.28);
+            padding: 0.85rem 1.2rem;
+        }
+
+        .final-lock__title {
+            color: #fef3c7;
+            font-size: 1.05rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .final-lock__subtitle {
+            color: #fce7b2;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border: 1px solid rgba(253, 230, 138, 0.45);
+            border-radius: 999px;
+            padding: 0.18rem 0.6rem;
+        }
+
+        .final-lock__label {
+            display: block;
+            margin-bottom: 0.45rem;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 800;
+            color: #5f5030;
+        }
+
+        .final-lock__input {
+            background: #fff;
+            border: 2px solid #d5c39b;
+            border-radius: 0.6rem;
+            color: #433116;
+        }
+
+        .final-lock__input:focus {
+            outline: none;
+            border-color: #9b7f4b;
+            box-shadow: 0 0 0 3px rgba(182, 145, 78, 0.22);
+        }
+
+        .final-lock__button {
+            border: 0;
+            color: #fff;
+            background: linear-gradient(135deg, #7c5a2f, #624520);
+            letter-spacing: 0.04em;
+        }
+
+        .final-lock__button:hover {
+            filter: brightness(1.05);
+        }
+
+        .final-lock__message {
+            color: #4b4335;
+            font-weight: 700;
+        }
+
+        .final-lock__message .tw-text-yellow-400 {
+            color: #9f6b19 !important;
+        }
+
+        .final-lock__message .tw-text-green-400 {
+            color: #166534 !important;
+        }
+
+        .final-lock__message .tw-text-red-400 {
+            color: #991b1b !important;
+        }
+
+        @media (max-width: 768px) {
+            .welcome-note__body {
+                transform: none;
+                background-position: 0 2.9rem, 1.2rem 0, 0 0;
+            }
+
+            .welcome-note__tape--left {
+                left: 0.7rem;
+            }
+
+            .welcome-note__tape--right {
+                right: 0.7rem;
+            }
+
+            .welcome-note__subtitle {
+                font-size: 1.05rem;
+            }
+
+            .team-note {
+                transform: none;
+            }
+
+            .team-note__name {
+                font-size: 1.45rem;
+            }
+
+            .timer-note {
+                transform: none;
+            }
+
+            .clue-note {
+                padding-left: 1.1rem;
+                transform: none;
+                background-position: 0 2.8rem, 1rem 0, 0 0;
+            }
+
+            .clue-note__pin {
+                left: auto;
+                right: 1rem;
+            }
+
+            .intro-brief {
+                padding: 1.3rem 1rem;
+                background-position: 0 3rem, 1rem 0, 0 0;
+            }
+
+            .intro-brief__title {
+                font-size: 1.4rem;
+                max-width: 100%;
+                margin-top: 2.3rem;
+            }
+
+            .intro-brief__close {
+                width: 2.7rem;
+                height: 2.7rem;
+            }
+
+            .intro-brief__stamp {
+                right: 0.9rem;
+                top: 4.3rem;
+            }
+        }
+
         .tw-perspective-1000 {
             perspective: 1000px;
         }
