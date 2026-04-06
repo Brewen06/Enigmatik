@@ -33,7 +33,7 @@
                     </div>
 
                     <p class="mb-3 text-muted small">
-                        Glissez les images de la banque vers la frise, puis ordonnez-les de gauche à droite (plus ancien vers plus récent).
+                        Glissez les images depuis la banque vers la frise pour fixer leur année, puis ajustez leur position horizontale.
                     </p>
 
                     {{ form_widget(form.frisePayload) }}
@@ -45,7 +45,6 @@
                                     <img src="{{ asset(vignette.image|replace({'public/': ''})) }}" alt="{{ vignette.information }}">
                                     <p>{{ vignette.information|slice(0, 70) }}</p>
                                     <div class="frise-form-card__actions">
-                                        <button type="button" class="btn btn-sm btn-outline-success" data-action="place"><i class="bi bi-check-circle me-1"></i>Placer</button>
                                         <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete"><i class="bi bi-trash"></i></button>
                                     </div>
                                 </article>
@@ -55,13 +54,12 @@
                         </div>
 
                         <div class="frise-form-board mt-3">
-                            <h4 class="h6 mb-2">Frise configurée</h4>
-                            <div class="d-flex justify-content-between small text-muted mb-1">
-                                <span>Plus ancien</span>
-                                <span>Plus récent</span>
+                            
+                            <div class="frise-form-axis frise-form-axis--board mt-3" data-frise-form-axis>
+                                <div class="frise-form-line"></div>
+                                <div class="frise-form-ruler" data-frise-form-ruler></div>
+                                <div class="frise-form-canvas" data-frise-form-canvas></div>
                             </div>
-                            <div class="frise-form-line"></div>
-                            <div class="frise-form-dropzone frise-form-dropzone--track mt-2" data-frise-form-track></div>
                         </div>
                     </div>
                 </div>
@@ -218,6 +216,8 @@ function initFriseConfiguratorInForm() {
     const editor = document.querySelector('[data-frise-form-editor]');
     const payloadInput = document.getElementById('{{ form.frisePayload.vars.id }}');
     const resetButton = document.getElementById('btn-reset-frise-form');
+    const yearStartInput = document.getElementById('{{ form.yearStart.vars.id }}');
+    const yearEndInput = document.getElementById('{{ form.yearEnd.vars.id }}');
     const uploadInput = document.querySelector('[data-frise-upload]');
     const uploadTokenInput = document.querySelector('[data-frise-upload-token]');
     const deleteTokenInput = document.querySelector('[data-frise-delete-token]');
@@ -229,16 +229,41 @@ function initFriseConfiguratorInForm() {
     }
 
     const bank = editor.querySelector('[data-frise-form-bank]');
-    const track = editor.querySelector('[data-frise-form-track]');
+    const axis = editor.querySelector('[data-frise-form-axis]');
+    const canvas = editor.querySelector('[data-frise-form-canvas]');
+    const ruler = editor.querySelector('[data-frise-form-axis] [data-frise-form-ruler]');
 
-    if (!bank || !track) {
+    if (!bank || !axis || !canvas) {
         return;
     }
 
     let draggedCard = null;
+    let draggingMarkerId = null;
+    const state = { placed: [] };
 
     function cardsIn(container) {
         return Array.from(container.querySelectorAll('.frise-form-card'));
+    }
+
+    function findCardById(vignetteId) {
+        return bank.querySelector(`.frise-form-card[data-vignette-id="${vignetteId}"]`);
+    }
+
+    function findPlaced(vignetteId) {
+        return state.placed.find((item) => item.id === vignetteId) || null;
+    }
+
+    function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+    }
+
+    function percentFromPointer(clientX) {
+        const rect = axis.getBoundingClientRect();
+        if (rect.width <= 0) {
+            return 50;
+        }
+
+        return clamp(((clientX - rect.left) / rect.width) * 100, 0, 100);
     }
 
     function createCard(vignette) {
@@ -253,7 +278,6 @@ function initFriseConfiguratorInForm() {
             <img src="/${String(vignette.image || '').replace(/^public\//, '')}" alt="${String(vignette.information || 'Vignette')}">
             <p>${String(vignette.information || 'Vignette')}</p>
             <div class="frise-form-card__actions">
-                <button type="button" class="btn btn-sm btn-outline-success" data-action="place"><i class="bi bi-check-circle me-1"></i>Placer</button>
                 <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete"><i class="bi bi-trash"></i></button>
             </div>
         `;
@@ -261,16 +285,169 @@ function initFriseConfiguratorInForm() {
         return card;
     }
 
-    function moveCardToTrack(card) {
-        track.appendChild(card);
+    function placeOnTimeline(vignetteId, x) {
+        const nextX = clamp(x, 0, 100);
+        const existing = findPlaced(vignetteId);
+
+        if (existing) {
+            existing.x = nextX;
+        } else {
+            state.placed.push({ id: vignetteId, x: nextX });
+        }
+
+        render();
+    }
+
+    function removeFromTimeline(vignetteId) {
+        state.placed = state.placed.filter((item) => item.id !== vignetteId);
+        render();
+    }
+
+    function buildMarker(placedItem) {
+        const card = findCardById(placedItem.id);
+        if (!card) {
+            return null;
+        }
+
+        const image = card.dataset.vignetteImage || '';
+        const label = card.dataset.vignetteLabel || 'Vignette';
+
+        const marker = document.createElement('article');
+        marker.className = 'frise-form-marker';
+        marker.dataset.vignetteId = placedItem.id;
+        marker.style.left = `${placedItem.x}%`;
+
+        marker.innerHTML = `
+            <button type="button" class="frise-form-marker-remove" title="Retirer">×</button>
+            <img src="/${String(image).replace(/^public\//, '')}" alt="${label}">
+            <span>${label}</span>
+        `;
+
+        marker.addEventListener('pointerdown', (event) => {
+            draggingMarkerId = placedItem.id;
+            marker.setPointerCapture(event.pointerId);
+        });
+
+        const removeButton = marker.querySelector('.frise-form-marker-remove');
+        removeButton?.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        });
+        removeButton?.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            removeFromTimeline(placedItem.id);
+        });
+
+        return marker;
+    }
+
+    function refreshPayload() {
+        const ids = state.placed
+            .slice()
+            .sort((a, b) => a.x - b.x)
+            .map((item) => Number(item.id || 0))
+            .filter((id) => id > 0);
+
+        payloadInput.value = JSON.stringify(ids);
+    }
+
+    function renderCanvas() {
+        canvas.innerHTML = '';
+
+        if (state.placed.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'frise-form-canvas-empty';
+            empty.textContent = 'Glissez une image sur la frise.';
+            canvas.appendChild(empty);
+            return;
+        }
+
+        state.placed
+            .slice()
+            .sort((a, b) => a.x - b.x)
+            .forEach((item, index) => {
+                const marker = buildMarker(item);
+                if (!marker) {
+                    return;
+                }
+
+                const badge = document.createElement('div');
+                badge.className = 'frise-form-step';
+                badge.textContent = String(index + 1);
+                marker.appendChild(badge);
+
+                canvas.appendChild(marker);
+            });
+    }
+
+    function render() {
         refreshPayload();
+        renderCanvas();
+    }
+
+    function getYearBounds() {
+        const parsedStart = parseInt(yearStartInput?.value || '', 10);
+        const parsedEnd = parseInt(yearEndInput?.value || '', 10);
+        const start = Number.isFinite(parsedStart) ? parsedStart : 1960;
+        const end = Number.isFinite(parsedEnd) ? parsedEnd : 2025;
+
+        if (end <= start) {
+            return { start, end: start + 1 };
+        }
+
+        return { start, end };
+    }
+
+    function renderRuler() {
+        if (!ruler) {
+            return;
+        }
+
+        ruler.innerHTML = '';
+        const { start, end } = getYearBounds();
+        const range = Math.max(1, end - start);
+        const step = range <= 10 ? 1 : range <= 50 ? 5 : 10;
+
+        for (let year = start; year <= end; year += step) {
+            const percent = ((year - start) / range) * 100;
+
+            const tick = document.createElement('span');
+            tick.className = 'frise-form-tick';
+            tick.style.left = `${percent}%`;
+
+            const label = document.createElement('span');
+            label.className = 'frise-form-year';
+            label.style.left = `${percent}%`;
+            label.textContent = String(year);
+
+            ruler.appendChild(tick);
+            ruler.appendChild(label);
+        }
+
+        if ((end - start) % step !== 0) {
+            const endTick = document.createElement('span');
+            endTick.className = 'frise-form-tick';
+            endTick.style.left = '100%';
+
+            const endLabel = document.createElement('span');
+            endLabel.className = 'frise-form-year';
+            endLabel.style.left = '100%';
+            endLabel.textContent = String(end);
+
+            ruler.appendChild(endTick);
+            ruler.appendChild(endLabel);
+        }
     }
 
     async function deleteCard(card) {
-        const vignetteId = Number(card.dataset.vignetteId || 0);
-        if (vignetteId <= 0 || !deleteUrl) {
+        const vignetteId = String(card.dataset.vignetteId || '');
+        const numericId = Number(vignetteId || 0);
+
+        if (numericId <= 0 || !deleteUrl) {
+            removeFromTimeline(vignetteId);
             card.remove();
-            refreshPayload();
+            render();
             return;
         }
 
@@ -282,7 +459,7 @@ function initFriseConfiguratorInForm() {
         try {
             const formData = new FormData();
             formData.append('_token', deleteTokenInput?.value || '');
-            formData.append('id', String(vignetteId));
+            formData.append('id', String(numericId));
 
             const response = await fetch(deleteUrl, {
                 method: 'POST',
@@ -294,38 +471,13 @@ function initFriseConfiguratorInForm() {
 
             const data = await response.json();
             if (response.ok && data.success) {
+                removeFromTimeline(vignetteId);
                 card.remove();
-                refreshPayload();
+                render();
             }
         } catch (error) {
             console.warn('Suppression impossible.', error);
         }
-    }
-
-    function refreshPayload() {
-        cardsIn(track).forEach((card, index) => {
-            let badge = card.querySelector('[data-role="position"]');
-            if (!badge) {
-                badge = document.createElement('div');
-                badge.className = 'frise-form-step';
-                badge.setAttribute('data-role', 'position');
-                card.prepend(badge);
-            }
-            badge.textContent = String(index + 1);
-        });
-
-        cardsIn(bank).forEach((card) => {
-            const badge = card.querySelector('[data-role="position"]');
-            if (badge) {
-                badge.remove();
-            }
-        });
-
-        const ids = cardsIn(track)
-            .map((card) => Number(card.dataset.vignetteId || 0))
-            .filter((id) => id > 0);
-
-        payloadInput.value = JSON.stringify(ids);
     }
 
     function bindCard(card) {
@@ -343,10 +495,6 @@ function initFriseConfiguratorInForm() {
             draggedCard = null;
         });
 
-        card.querySelector('[data-action="place"]')?.addEventListener('click', () => {
-            moveCardToTrack(card);
-        });
-
         card.querySelector('[data-action="delete"]')?.addEventListener('click', () => {
             deleteCard(card);
         });
@@ -354,7 +502,7 @@ function initFriseConfiguratorInForm() {
         card.dataset.dragBound = '1';
     }
 
-    function handleDragOver(container, event) {
+    function handleDragOverBank(container, event) {
         event.preventDefault();
         if (!draggedCard) {
             return;
@@ -371,30 +519,70 @@ function initFriseConfiguratorInForm() {
         container.insertBefore(draggedCard, before ? targetCard : targetCard.nextSibling);
     }
 
-    function handleDrop(container, event) {
+    function handleDropOnAxis(event) {
         event.preventDefault();
         if (!draggedCard) {
             return;
         }
 
-        if (draggedCard.parentElement !== container) {
-            container.appendChild(draggedCard);
+        const vignetteId = String(draggedCard.dataset.vignetteId || '');
+        if (vignetteId) {
+            placeOnTimeline(vignetteId, percentFromPointer(event.clientX));
         }
-
-        refreshPayload();
     }
 
-    [bank, track].forEach((container) => {
-        container.addEventListener('dragover', (event) => handleDragOver(container, event));
-        container.addEventListener('drop', (event) => handleDrop(container, event));
+    bank.addEventListener('dragover', (event) => handleDragOverBank(bank, event));
+    bank.addEventListener('drop', (event) => {
+        event.preventDefault();
+        draggedCard = null;
     });
+
+    axis.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = 'copy';
+        }
+    });
+    axis.addEventListener('drop', handleDropOnAxis);
+
+    axis.addEventListener('pointermove', (event) => {
+        if (!draggingMarkerId) {
+            return;
+        }
+
+        const marker = findPlaced(draggingMarkerId);
+        if (!marker) {
+            return;
+        }
+
+        marker.x = percentFromPointer(event.clientX);
+        render();
+    });
+    axis.addEventListener('pointerup', () => {
+        draggingMarkerId = null;
+    });
+    axis.addEventListener('pointercancel', () => {
+        draggingMarkerId = null;
+    });
+
+    if (yearStartInput && yearStartInput.dataset.boundFriseRuler !== '1') {
+        yearStartInput.addEventListener('input', renderRuler);
+        yearStartInput.addEventListener('change', renderRuler);
+        yearStartInput.dataset.boundFriseRuler = '1';
+    }
+
+    if (yearEndInput && yearEndInput.dataset.boundFriseRuler !== '1') {
+        yearEndInput.addEventListener('input', renderRuler);
+        yearEndInput.addEventListener('change', renderRuler);
+        yearEndInput.dataset.boundFriseRuler = '1';
+    }
 
     cardsIn(editor).forEach(bindCard);
 
     if (resetButton && resetButton.dataset.boundResetFriseForm !== '1') {
         resetButton.addEventListener('click', () => {
-            cardsIn(track).forEach((card) => bank.appendChild(card));
-            refreshPayload();
+            state.placed = [];
+            render();
         });
         resetButton.dataset.boundResetFriseForm = '1';
     }
@@ -434,7 +622,7 @@ function initFriseConfiguratorInForm() {
             }
 
             uploadInput.value = '';
-            refreshPayload();
+            render();
         });
         uploadInput.dataset.boundUploadFrise = '1';
     }
@@ -452,17 +640,24 @@ function initFriseConfiguratorInForm() {
                 .sort((a, b) => a.position - b.position);
 
             ordered.forEach((item) => {
-                const card = editor.querySelector(`.frise-form-card[data-vignette-id="${item.vignetteId}"]`);
-                if (card) {
-                    track.appendChild(card);
+                const card = findCardById(String(item.vignetteId));
+                if (!card) {
+                    return;
                 }
+
+                const x = ordered.length > 1
+                    ? 8 + ((item.position - 1) * 84) / (ordered.length - 1)
+                    : 50;
+
+                state.placed.push({ id: String(item.vignetteId), x });
             });
         }
     } catch (error) {
         console.warn('Impossible de lire les données initiales de la frise.', error);
     }
 
-    refreshPayload();
+    render();
+    renderRuler();
     editor.dataset.boundFriseFormEditor = '1';
 }
 
@@ -509,10 +704,133 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         min-height: 145px;
     }
 
+    .frise-form-axis--board {
+        position: relative;
+        min-height: 360px;
+        border: 1px dashed #b8c7df;
+        border-radius: 0.95rem;
+        background: #f8fbff;
+        padding: 1rem;
+    }
+
+    .frise-form-axis--board .frise-form-line {
+        position: absolute;
+        top: 88px;
+        left: 1rem;
+        right: 1rem;
+    }
+
+    .frise-form-axis--board .frise-form-ruler {
+        position: absolute;
+        top: 100px;
+        left: 1rem;
+        right: 1rem;
+        height: 30px;
+    }
+
+    .frise-form-canvas {
+        position: absolute;
+        inset: 0;
+    }
+
+    .frise-form-canvas-empty {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #8a9aad;
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .frise-form-marker {
+        position: absolute;
+        top: 140px;
+        transform: translateX(-50%);
+        width: 180px;
+        border: 1px solid #d8e4f6;
+        border-radius: 0.9rem;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(26, 43, 73, 0.08);
+        padding: 0.5rem;
+        cursor: grab;
+        user-select: none;
+        display: grid;
+        gap: 0.45rem;
+        touch-action: none;
+    }
+
+    .frise-form-marker img {
+        width: 100%;
+        height: 88px;
+        object-fit: cover;
+        border-radius: 0.65rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .frise-form-marker span {
+        font-size: 0.8rem;
+        margin: 0;
+        line-height: 1.2;
+        color: #334461;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .frise-form-marker-remove {
+        position: absolute;
+        top: -0.45rem;
+        right: -0.45rem;
+        width: 1.45rem;
+        height: 1.45rem;
+        border: 0;
+        border-radius: 999px;
+        background: #d73446;
+        color: #fff;
+        font-size: 1rem;
+        line-height: 1;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(215, 52, 70, 0.35);
+    }
+
     .frise-form-line {
         height: 3px;
         border-radius: 999px;
         background: linear-gradient(90deg, #1f74db 0%, #24a46c 100%);
+    }
+
+    .frise-form-axis {
+        position: relative;
+    }
+
+    .frise-form-ruler {
+        position: relative;
+        height: 28px;
+        margin-top: 0.45rem;
+        user-select: none;
+    }
+
+    .frise-form-tick {
+        position: absolute;
+        top: 0;
+        width: 2px;
+        height: 10px;
+        background: #a8b5c8;
+        transform: translateX(-50%);
+    }
+
+    .frise-form-year {
+        position: absolute;
+        top: 12px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #3d4c67;
+        white-space: nowrap;
+        transform: translateX(-50%);
     }
 
     .frise-form-card {

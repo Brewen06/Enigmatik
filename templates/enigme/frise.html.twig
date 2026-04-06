@@ -8,7 +8,6 @@
 	}]) %}
 {% endfor %}
 
-{# For teams viewing the puzzle, also add vignettes from friseItems so they see the images #}
 {% for item in friseItems|default([]) %}
 	{% set imageId = 'v-' ~ item.vignetteId %}
 	{% set alreadyExists = false %}
