@@ -97,13 +97,8 @@
         }
     },
     "require-dev": {
-<<<<<<< HEAD
-        "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "phpunit/phpunit": "^12.4",
-=======
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
-        "phpunit/phpunit": "^12.5.14",
->>>>>>> Connexion
+        "phpunit/phpunit": "^12.5.17",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",

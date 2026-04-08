@@ -1,17 +1,5 @@
 {% extends 'base.html.twig' %}
 
-<<<<<<< HEAD
-{% block title %}Edit Jeu{% endblock %}
-
-{% block body %}
-    <h1>Edit Jeu</h1>
-
-    {{ include('jeu/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_jeu_index') }}">back to list</a>
-
-    {{ include('jeu/_delete_form.html.twig') }}
-=======
 {% block title %}Configuration du jeu{% endblock %}
 
 {% block body %}
@@ -31,5 +19,4 @@
         {{ form_end(form) }}
     </div>
 </section>
->>>>>>> Connexion
 {% endblock %}
