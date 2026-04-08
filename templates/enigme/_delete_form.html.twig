@@ -1,4 +1,12 @@
-<form method="post" action="{{ path('app_enigme_delete', {'id': enigme.id}) }}" onsubmit="return confirm('Êtes-vous sûr de supprimer cette enigme ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ enigme.id) }}">
-    <button class="btn">Supprimer</button>
+<form
+    method="post"
+    action="{{ path('app_enigme_delete', { id: enigme.id }) }}"
+    onsubmit="return confirm('Êtes-vous sûr de supprimer cette enigme ?');"
+>
+    <input
+        type="hidden"
+        name="_token"
+        value="{{ csrf_token('delete' ~ enigme.id) }}"
+    />
+    <button class="btn btn-outline-danger">Supprimer</button>
 </form>

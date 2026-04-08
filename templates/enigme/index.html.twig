@@ -3,17 +3,24 @@
 {% block title %}Liste des énigmes{% endblock %}
 
 {% block body %}
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h1 class="h3 mb-0 text-white">Liste des énigmes</h1>
-        <a href="{{ path('app_enigme_creer') }}" class="btn btn-light btn-sm">
-            <i class="bi bi-plus-lg"></i> Créer une énigme
-        </a>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-light">
+<section class="enigme-page enigme-page--form enigme-page--list">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header d-flex justify-content-between align-items-center gap-2 flex-wrap">
+            <div>
+                <h1 class="enigme-page__title mb-1">Liste des énigmes</h1>
+                <p class="enigme-page__subtitle mb-0">Gérez l'ordre, le statut et les actions en un seul écran.</p>
+            </div>
+            <a href="{{ path('app_enigme_creer') }}" class="btn btn-primary enigme-list__create-btn">
+                <i class="bi bi-plus-lg me-1"></i> Créer une énigme
+            </a>
+        </div>
+
+        <div class="enigme-list__stats mb-3">
+        </div>
+
+        <div class="enigme-list__table-wrap table-responsive">
+            <table class="table align-middle enigme-list__table">
+                <thead>
                     <tr>
                         <th>Id</th>
                         <th>Statut</th>
@@ -28,59 +35,62 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for enigme in enigmes %}
-                    <tr>
-                        <td>{{ enigme.id }}</td>
-                        <td>
-                            {% if enigme.active %}
-                                <span class="badge bg-success">Active</span>
-                            {% else %}
-                                <span class="badge bg-danger">Désactivée</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ enigme.ordre }}</td>
-                        <td>{{ enigme.titre }}</td>
-                        <td>{{ enigme.type.libelle }}</td>
-                        <td>{{ enigme.consigne|slice(0, 100) }}</td>
-                        <td>{{ enigme.lien }}</td>
-                        <td>{{ enigme.indice }}</td>
-                        <td>
-                            {% if enigme.vignette %}
-                                <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" width="50" class="img-thumbnail">
-                            {% else %}
-                                <span class="text-muted">Aucune</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group" role="group">
-                                <a href="{{ path('app_enigme_show', {'id': enigme.id}) }}" class="btn btn-info btn-sm text-white" title="Voir">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}" class="btn btn-warning btn-sm text-white" title="Modifier">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="d-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle_active' ~ enigme.id) }}">
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm {{ enigme.active ? 'btn-outline-danger' : 'btn-outline-success' }}"
-                                        title="{{ enigme.active ? 'Désactiver' : 'Activer' }}"
-                                    >
-                                        <i class="bi {{ enigme.active ? 'bi-toggle-on' : 'bi-toggle-off' }}"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="9" class="text-center py-4">Aucune énigme trouvée</td>
-                    </tr>
-                {% endfor %}
+                    {% for enigme in enigmes %}
+                        <tr>
+                            <td>{{ enigme.id }}</td>
+                            <td>
+                                {% if enigme.active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Désactivée</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ enigme.ordre }}</td>
+                            <td class="fw-semibold">{{ enigme.titre }}</td>
+                            <td>{{ enigme.type.libelle }}</td>
+                            <td>{{ enigme.consigne|slice(0, 100) }}</td>
+                            <td>{{ enigme.lien }}</td>
+                            <td>{{ enigme.indice }}</td>
+                            <td>
+                                {% if enigme.vignette %}
+                                    <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" width="50" class="img-thumbnail">
+                                {% else %}
+                                    <span class="text-muted">Aucune</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('app_enigme_show', {'id': enigme.id}) }}" class="btn btn-info btn-sm text-white" title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}" class="btn btn-warning btn-sm text-white" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_enigme_toggle_active', {'id': enigme.id}) }}" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('toggle_active' ~ enigme.id) }}">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm {{ enigme.active ? 'btn-outline-danger' : 'btn-outline-success' }}"
+                                            title="{{ enigme.active ? 'Désactiver' : 'Activer' }}"
+                                        >
+                                            <i class="bi {{ enigme.active ? 'bi-toggle-on' : 'bi-toggle-off' }}"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center py-4">Aucune énigme trouvée</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-        {{ include('enigme/supprimer-toutes.html.twig') }}
+
+        <div class="enigme-page__actions mt-3 d-flex flex-wrap gap-2 justify-content-end">
+            {{ include('enigme/supprimer-toutes.html.twig') }}
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}

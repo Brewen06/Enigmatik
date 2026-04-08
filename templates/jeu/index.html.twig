@@ -74,7 +74,7 @@
                     </button>
                 {% else %}
                     <h2 class="intro-brief__title">Bienvenue à votre mission !</h2>
-                    <p class="intro-brief__lead">Votre dossier est prêt.</p>
+                    <p class="intro-brief__lead">Votre énigme est prête.</p>
                     <p class="intro-brief__content">Résolvez les énigmes dans l'ordre, récupérez les indices et déverrouillez le code final.</p>
                     <button data-action="click->board#closeModal" class="intro-brief__cta tw-mt-6">
                         Accéder au jeu
@@ -128,7 +128,7 @@
         <section class="enigma-wall tw-rounded-2xl tw-p-4 md:tw-p-6 tw-shadow-2xl">
         <div class="tw-flex tw-items-center tw-justify-between tw-gap-4 tw-mb-5 tw-px-1">
             <h2 class="tw-text-xl tw-font-bold tw-uppercase tw-tracking-wide tw-text-amber-100 tw-mb-0">Mur d'énigmes</h2>
-            <span class="tw-text-xs tw-font-semibold tw-uppercase tw-text-amber-200 tw-bg-black/20 tw-px-3 tw-py-1 tw-rounded-full">{{ enigmes|length }} dossiers</span>
+            <span class="tw-text-xs tw-font-semibold tw-uppercase tw-text-amber-200 tw-bg-black/20 tw-px-3 tw-py-1 tw-rounded-full">{{ enigmes|length }} énigmes</span>
         </div>
 
         <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 lg:tw-grid-cols-3 tw-gap-6 tw-justify-items-stretch">
@@ -148,7 +148,7 @@
                     <div class="enigma-file__tape enigma-file__tape--left" aria-hidden="true"></div>
                     <div class="enigma-file__tape enigma-file__tape--right" aria-hidden="true"></div>
                     <div class="enigma-file__body {% if enigme.active %}enigma-file__body--active{% else %}enigma-file__body--inactive{% endif %} {% if isSolved %}enigma-file__body--solved{% endif %}">
-                        <p class="enigma-file__tag tw-mb-2">Dossier #{{ enigme.ordre }}</p>
+                        <p class="enigma-file__tag tw-mb-2">Énigme #{{ enigme.ordre }}</p>
                         <h3 class="enigma-file__title">{{ enigme.titre }}</h3>
                         <p class="enigma-file__excerpt">{{ enigme.consigne|slice(0, 95) }}{% if enigme.consigne|length > 95 %}...{% endif %}</p>
                         <div class="tw-flex tw-items-center tw-justify-between tw-gap-2 tw-mt-auto">

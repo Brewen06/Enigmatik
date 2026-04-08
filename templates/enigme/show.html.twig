@@ -3,132 +3,133 @@
 {% block title %}Détails Enigme{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
-            <h1 class="h3 mb-0 fw-bold"><i class="bi bi-puzzle-fill me-2"></i>Détails de l'énigme</h1>
+<section class="enigme-page mt-4">
+    <div class="enigme-page__card">
+        <div class="enigme-page__header d-flex justify-content-between align-items-center gap-2 flex-wrap">
+            <div>
+                <h1 class="enigme-page__title mb-1"><i class="bi bi-puzzle-fill me-2"></i>Détails de l'énigme</h1>
+                <p class="enigme-page__subtitle">Consultez la consigne, validez votre réponse et débloquez l'indice.</p>
+            </div>
             <span class="badge bg-light text-primary fs-6">#{{ enigme.id }}</span>
         </div>
-        <div class="card-body p-4">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4 class="text-primary mb-0">{{ enigme.titre }}</h4>
-                        <span class="badge bg-info text-dark">{{ enigme.type.libelle }}</span>
+
+        <div class="enigme-detail">
+            <div>
+                <div class="enigme-detail__title-row">
+                    <h2 class="enigme-detail__subject">{{ enigme.titre }}</h2>
+                    <span class="enigme-detail__tag">{{ enigme.type.libelle }}</span>
+                </div>
+
+                <div class="enigme-detail__block">
+                    <p class="enigme-detail__kicker">Consigne</p>
+                    <p class="enigme-detail__consigne">{{ enigme.consigne|nl2br }}</p>
+                </div>
+
+                <div class="enigme-detail__meta-grid">
+                    <div class="enigme-detail__block mb-0">
+                        <p class="enigme-detail__kicker">Ordre</p>
+                        <p class="mb-0 fs-5">{{ enigme.ordre }}</p>
                     </div>
-                    <div class="mb-4">
-                        <h6 class="text-muted text-uppercase small fw-bold">Consigne</h6>
-                        <p class="lead bg-light p-3 rounded border-start border-4 border-primary">{{ enigme.consigne|nl2br }}</p>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6 class="text-muted text-uppercase small fw-bold">Ordre</h6>
-                            <p class="fs-5">{{ enigme.ordre }}</p>
-                        </div>
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <div class="col-md-6">
-                            <h6 class="text-muted text-uppercase small fw-bold">Indice</h6>
-                            <p class="fs-5 font-monospace bg-dark text-warning d-inline-block px-2 rounded">{{ enigme.indice }}</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-4">
-                        <h6 class="text-muted text-uppercase small fw-bold">Lien associé</h6>
-                        {% if enigme.lien %}
-                            <a href="{{ enigme.lien }}" target="_blank" class="btn btn-outline-primary">
-                                <i class="bi bi-link-45deg me-1"></i> Ouvrir le lien
-                            </a>
-                        {% else %}
-                            <p class="text-muted fst-italic">Aucun lien associé</p>
-                        {% endif %}
-                    </div>
-                        {% if enigme.type and enigme.type.libelle == 'frise' %}
-                            {% include 'enigme/frise.html.twig' with {
-                                enigme: enigme,
-                                friseItems: friseItems|default([]),
-                                availableVignettes: availableVignettes|default([]),
-                                canManageFrise: canManageFrise|default(false)
-                            } only %}
-                        {% else %}
-                        <div {{ stimulus_controller('game', { 'checkUrl': path('app_enigme_check', {'id': enigme.id}) }) }}>
-                            <form {{ stimulus_action('game', 'check', 'submit') }} class="mt-4">
-                                {% if enigme.choices is not empty %}
-                                    <div class="mb-3">
-                                        <p class="fw-bold mb-2">
-                                            {{ quizHasMultipleSolutions ? 'Choisissez les bonnes réponses :' : 'Choisissez la bonne réponse :' }}
-                                        </p>
-                                        {% if quizHasMultipleSolutions %}
-                                            <p class="text-muted small mb-2">Plusieurs réponses sont attendues.</p>
-                                        {% endif %}
-                                        {% for choice in enigme.choices %}
-                                            <div class="form-check mb-2">
-                                                <input
-                                                    class="form-check-input"
-                                                    type="{{ quizHasMultipleSolutions ? 'checkbox' : 'radio' }}"
-                                                    name="{{ quizHasMultipleSolutions ? 'answer[]' : 'answer' }}"
-                                                    id="choice_{{ loop.index }}"
-                                                    value="{{ choice }}"
-                                                    {{ stimulus_target('game', 'input') }}
-                                                >
-                                                <label class="form-check-label" for="choice_{{ loop.index }}">
-                                                    {{ choice }}
-                                                </label>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                    <button class="btn btn-primary w-100" type="submit">Vérifier</button>
-                                {% else %}
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control form-control-lg" placeholder="Entrez votre réponse..." {{ stimulus_target('game', 'input') }}>
-                                        <button class="btn btn-primary" type="submit">Vérifier</button>
-                                    </div>
-                                {% endif %}
-                            </form>
-                            <div {{ stimulus_target('game', 'result') }}></div>
-                            <div class="mt-3 d-none" {{ stimulus_target('game', 'nextButton') }}>
-                                <a href="{{ path('app_jeu_index') }}" class="btn btn-success">Retour au jeu</a>
-                            </div>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <div class="enigme-detail__block mb-0">
+                            <p class="enigme-detail__kicker">Indice</p>
+                            <p class="mb-0"><span class="enigme-detail__indice">{{ enigme.indice }}</span></p>
                         </div>
                     {% endif %}
                 </div>
-                
-                <div class="col-md-4">
-                    <div class="card bg-light border-0 h-100">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted text-uppercase small fw-bold mb-3">Vignette associée</h6>
-                            {% if enigme.vignette %}
-                                <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" class="img-fluid rounded shadow-sm mb-2" style="max-height: 200px;">
-                                <p class="small text-muted fst-italic">{{ enigme.vignette.information }}</p>
+
+                <div class="enigme-detail__block">
+                    <p class="enigme-detail__kicker">Lien associé</p>
+                    {% if enigme.lien %}
+                        <a href="{{ enigme.lien }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="bi bi-link-45deg me-1"></i> Ouvrir le lien
+                        </a>
+                    {% else %}
+                        <p class="mb-0 fst-italic text-muted">Aucun lien associé</p>
+                    {% endif %}
+                </div>
+
+                {% if enigme.type and enigme.type.libelle == 'frise' %}
+                    {% include 'enigme/frise.html.twig' with {
+                        enigme: enigme,
+                        friseItems: friseItems|default([]),
+                        availableVignettes: availableVignettes|default([]),
+                        canManageFrise: canManageFrise|default(false)
+                    } only %}
+                {% else %}
+                    <div class="enigme-detail__block" {{ stimulus_controller('game', { 'checkUrl': path('app_enigme_check', {'id': enigme.id}) }) }}>
+                        <p class="enigme-detail__kicker">Réponse</p>
+                        <form {{ stimulus_action('game', 'check', 'submit') }} class="enigme-detail__answer">
+                            {% if enigme.choices is not empty %}
+                                <div>
+                                    <p class="fw-bold mb-2">
+                                        {{ quizHasMultipleSolutions ? 'Choisissez les bonnes réponses :' : 'Choisissez la bonne réponse :' }}
+                                    </p>
+                                    {% if quizHasMultipleSolutions %}
+                                        <p class="text-muted small mb-2">Plusieurs réponses sont attendues.</p>
+                                    {% endif %}
+                                    {% for choice in enigme.choices %}
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="{{ quizHasMultipleSolutions ? 'checkbox' : 'radio' }}"
+                                                name="{{ quizHasMultipleSolutions ? 'answer[]' : 'answer' }}"
+                                                id="choice_{{ loop.index }}"
+                                                value="{{ choice }}"
+                                                {{ stimulus_target('game', 'input') }}
+                                            >
+                                            <label class="form-check-label" for="choice_{{ loop.index }}">
+                                                {{ choice }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-primary w-100" type="submit">Vérifier</button>
                             {% else %}
-                                <div class="py-5 text-muted">
-                                    <i class="bi bi-image fs-1 d-block mb-2"></i>
-                                    Aucune vignette
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-lg" placeholder="Entrez votre réponse..." {{ stimulus_target('game', 'input') }}>
+                                    <button class="btn btn-primary" type="submit">Vérifier</button>
                                 </div>
                             {% endif %}
+                        </form>
+                        <div class="mt-3" {{ stimulus_target('game', 'result') }}></div>
+                        <div class="mt-3 d-none" {{ stimulus_target('game', 'nextButton') }}>
+                            <a href="{{ path('app_jeu_index') }}" class="btn btn-success">Retour au jeu</a>
                         </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
 
-            <hr class="my-4">
-{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ path('app_jeu_index') }}" class="btn btn-success">Retour au jeu</a>
-                
-                <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Retour à la liste
-                </a>
-                    <div class="d-flex gap-2">
-                        <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}" class="btn btn-warning text-white">
-                            <i class="bi bi-pencil-square me-1"></i> Modifier
-                        </a>
-                        {{ include('enigme/_delete_form.html.twig') }}
+            <aside class="enigme-detail__vignette text-center">
+                <p class="enigme-detail__kicker mb-3">Vignette associée</p>
+                {% if enigme.vignette %}
+                    <img src="{{ asset(enigme.vignette.image | replace({'public/': ''})) }}" alt="{{ enigme.vignette.information }}" class="mb-2">
+                    <p class="small text-muted fst-italic mb-0">{{ enigme.vignette.information }}</p>
+                {% else %}
+                    <div class="py-5 text-muted">
+                        <i class="bi bi-image fs-1 d-block mb-2"></i>
+                        Aucune vignette
                     </div>
-                
-            </div>
-            {% endif %}
+                {% endif %}
+            </aside>
         </div>
+
+        {% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+            <div class="enigme-detail__footer">
+                <div class="enigme-detail__footer-group">
+                    <a href="{{ path('app_jeu_index') }}" class="btn btn-success">Retour au jeu</a>
+                    <a href="{{ path('app_enigme_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                </div>
+                <div class="enigme-detail__footer-group">
+                    <a href="{{ path('app_enigme_edit', {'id': enigme.id}) }}" class="btn btn-warning text-white">
+                        <i class="bi bi-pencil-square me-1"></i> Modifier
+                    </a>
+                    {{ include('enigme/_delete_form.html.twig') }}
+                </div>
+            </div>
+        {% endif %}
     </div>
-</div>
+</section>
 {% endblock %}
