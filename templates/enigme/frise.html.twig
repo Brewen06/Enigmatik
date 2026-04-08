@@ -3,8 +3,7 @@
 	{% set initialLibrary = initialLibrary|merge([{
 		id: 'v-' ~ vignette.id,
 		label: vignette.information,
-		src: asset(vignette.image|replace({'public/': ''})),
-		persisted: true
+		src: asset(vignette.image|replace({'public/': ''}))
 	}]) %}
 {% endfor %}
 
@@ -20,8 +19,7 @@
 		{% set initialLibrary = initialLibrary|merge([{
 			id: imageId,
 			label: item.information,
-			src: asset(item.image|replace({'public/': ''})),
-			persisted: true
+			src: asset(item.image|replace({'public/': ''}))
 		}]) %}
 	{% endif %}
 {% endfor %}
@@ -33,12 +31,12 @@
 
 {% set yearStart = enigme.yearStart|default(1960) %}
 {% set yearEnd = enigme.yearEnd|default(2025) %}
-{% set yearRange = yearEnd - yearStart %}
+{% set canManageFrise = is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
 
 <section
-	class="frise-editor{% if not (is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')) %} frise-editor--readonly{% endif %}"
+	class="frise-editor{% if not canManageFrise %} frise-editor--readonly{% endif %}"
 	data-frise-editor
-	data-can-manage-frise="{{ (is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')) ? '1' : '0' }}"
+	data-can-manage-frise="{{ canManageFrise ? '1' : '0' }}"
 	data-initial-library="{{ initialLibrary|json_encode|e('html_attr') }}"
 	data-initial-placed="{{ initialPlaced|json_encode|e('html_attr') }}"
 	data-year-start="{{ yearStart }}"
@@ -49,15 +47,15 @@
 >
 	<div class="frise-editor__inner">
 		<div class="frise-editor__header">
-			<h3 class="frise-editor__title">{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}Configuration de la frise{% else %}Chronologie{% endif %}</h3>
-			{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+			<h3 class="frise-editor__title">{% if canManageFrise %}Configuration de la frise{% else %}Chronologie{% endif %}</h3>
+			{% if canManageFrise %}
 				<p class="frise-editor__subtitle">Configurez la plage de dates, importez des images, puis ordonnez-les sur la frise.</p>
 			{% else %}
 				<p class="frise-editor__subtitle">Replacez les images dans le bon ordre chronologique.</p>
 			{% endif %}
 		</div>
 
-		{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+		{% if canManageFrise %}
 		<div class="frise-editor__config">
 			<div class="frise-editor__date-range">
 				<label for="year-start">Année de début :</label>
@@ -98,14 +96,14 @@
 
 		<p class="frise-editor__hint">
 			<i class="bi bi-info-circle me-2"></i>
-			{% if is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN') %}
+			{% if canManageFrise %}
 				Glissez une carte depuis la galerie sur la frise, puis déplacez-la horizontalement pour la placer à la bonne date.
 			{% else %}
 				Glissez les images pour les réorganiser, puis cliquez sur Vérifier.
 			{% endif %}
 		</p>
 		
-		{% if not (is_granted('ROLE_PROF') or is_granted('ROLE_ADMIN')) %}
+		{% if not canManageFrise %}
 		<div class="d-grid mt-3">
 			<button type="button" class="btn btn-primary btn-lg" data-frise-check-submit>
 				<i class="bi bi-check-circle me-2"></i>Vérifier
@@ -122,7 +120,7 @@
 <script>
 function initFriseEditor() {
 	document.querySelectorAll('[data-frise-editor]').forEach((root) => {
-		const canManageFrise = root.dataset.canManageFrise === '1' && Boolean(root.querySelector('[data-frise-upload]'));
+		const canManageFrise = root.dataset.canManageFrise === '1';
 
 		if (root.dataset.boundFriseEditor === '1') {
 			if (!canManageFrise) {
@@ -166,8 +164,6 @@ function initFriseEditor() {
 				id: String(item.id || ''),
 				label: String(item.label || ''),
 				src: String(item.src || ''),
-				persisted: Boolean(item.persisted),
-				isObjectUrl: false,
 			})).filter((item) => item.id && item.src),
 			placed: [],
 		};
@@ -186,6 +182,43 @@ function initFriseEditor() {
 		const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 		const findImage = (id) => state.library.find((item) => item.id === id);
 		const isPlaced = (id) => state.placed.some((item) => item.id === id);
+		const getPlacedSorted = () => [...state.placed].sort((a, b) => a.x - b.x);
+		const yearFromPercent = (percent) => {
+			const range = Math.max(1, state.yearEnd - state.yearStart);
+			return Math.round(state.yearStart + (clamp(percent, 0, 100) / 100) * range);
+		};
+
+		const postForm = async (url, formData) => {
+			const response = await fetch(url, {
+				method: 'POST',
+				body: formData,
+				headers: { 'X-Requested-With': 'XMLHttpRequest' },
+			});
+
+			let data = null;
+			try {
+				data = await response.json();
+			} catch (error) {
+				data = null;
+			}
+
+			return { response, data };
+		};
+
+		const parseYearValue = (input, fallback) => parseInt(input.value, 10) || fallback;
+		const bindYearInput = (input, getFallback, isValid, applyValue) => {
+			if (!input) return;
+			input.addEventListener('change', () => {
+				const nextValue = parseYearValue(input, getFallback());
+				if (!isValid(nextValue)) {
+					input.value = String(getFallback());
+					return;
+				}
+
+				applyValue(nextValue);
+				render();
+			});
+		};
 
 		const percentFromPointer = (clientX) => {
 			const rect = axis.getBoundingClientRect();
@@ -194,9 +227,7 @@ function initFriseEditor() {
 
 		const removeImage = (id) => {
 			if (!canManageFrise) return;
-			const image = findImage(id);
-			if (!image) return;
-			if (image.isObjectUrl) URL.revokeObjectURL(image.src);
+			if (!findImage(id)) return;
 			state.library = state.library.filter((item) => item.id !== id);
 			state.placed = state.placed.filter((item) => item.id !== id);
 			render();
@@ -214,19 +245,14 @@ function initFriseEditor() {
 			formData.append('_token', token);
 			formData.append('id', id);
 
-			const response = await fetch(deleteUrl, {
-				method: 'POST',
-				body: formData,
-				headers: { 'X-Requested-With': 'XMLHttpRequest' },
-			});
+			const { response, data } = await postForm(deleteUrl, formData);
 
 			if (!response.ok) {
 				removeImage(id);
 				return;
 			}
 
-			const data = await response.json();
-			if (data.success) {
+			if (data?.success) {
 				removeImage(id);
 			}
 		};
@@ -292,6 +318,7 @@ function initFriseEditor() {
 		const buildMarker = (placedItem) => {
 			const image = findImage(placedItem.id);
 			if (!image) return null;
+			const markerYear = yearFromPercent(placedItem.x);
 
 			const marker = document.createElement('article');
 			marker.className = 'frise-editor__marker';
@@ -299,6 +326,7 @@ function initFriseEditor() {
 			marker.style.left = `${placedItem.x}%`;
 
 			marker.innerHTML = `
+				<span class="frise-editor__marker-year">${markerYear}</span>
 				<button type="button" class="frise-editor__marker-remove" title="Retirer">×</button>
 				<img src="${image.src}" alt="${image.label}">
 				<span>${image.label}</span>
@@ -360,7 +388,7 @@ function initFriseEditor() {
 				empty.textContent = 'Glissez une image depuis la galerie.';
 				canvas.appendChild(empty);
 			} else {
-				state.placed.sort((a, b) => a.x - b.x).forEach((item) => {
+				getPlacedSorted().forEach((item) => {
 					const marker = buildMarker(item);
 					if (marker) canvas.appendChild(marker);
 				});
@@ -372,7 +400,7 @@ function initFriseEditor() {
 		if (uploadInput) {
 			uploadInput.addEventListener('change', (event) => {
 				const files = Array.from(event.target.files || []);
-				files.forEach(async (file, index) => {
+				files.forEach(async (file) => {
 					if (!file.type.startsWith('image/') || !uploadUrl) return;
 
 					const formData = new FormData();
@@ -381,14 +409,8 @@ function initFriseEditor() {
 					formData.append('information', file.name.replace(/\.[^.]+$/, ''));
 
 					try {
-						const response = await fetch(uploadUrl, {
-							method: 'POST',
-							body: formData,
-							headers: { 'X-Requested-With': 'XMLHttpRequest' },
-						});
-
-						const data = await response.json();
-						if (!response.ok || !data.success || !data.vignette) {
+						const { response, data } = await postForm(uploadUrl, formData);
+						if (!response.ok || !data?.success || !data.vignette) {
 							return;
 						}
 
@@ -396,8 +418,6 @@ function initFriseEditor() {
 							id: `v-${data.vignette.id}`,
 							label: data.vignette.information || file.name,
 							src: `/${String(data.vignette.image || '').replace(/^public\//, '')}`,
-							persisted: true,
-							isObjectUrl: false,
 						});
 						render();
 					} catch (error) {
@@ -415,29 +435,19 @@ function initFriseEditor() {
 			});
 		}
 
-		if (yearStartInput) {
-			yearStartInput.addEventListener('change', (event) => {
-				const newStart = parseInt(event.target.value) || state.yearStart;
-				if (newStart < state.yearEnd) {
-					state.yearStart = newStart;
-					render();
-				} else {
-					event.target.value = state.yearStart;
-				}
-			});
-		}
+		bindYearInput(
+			yearStartInput,
+			() => state.yearStart,
+			(nextValue) => nextValue < state.yearEnd,
+			(nextValue) => { state.yearStart = nextValue; }
+		);
 
-		if (yearEndInput) {
-			yearEndInput.addEventListener('change', (event) => {
-				const newEnd = parseInt(event.target.value) || state.yearEnd;
-				if (newEnd > state.yearStart) {
-					state.yearEnd = newEnd;
-					render();
-				} else {
-					event.target.value = state.yearEnd;
-				}
-			});
-		}
+		bindYearInput(
+			yearEndInput,
+			() => state.yearEnd,
+			(nextValue) => nextValue > state.yearStart,
+			(nextValue) => { state.yearEnd = nextValue; }
+		);
 
 		axis.addEventListener('dragover', (event) => {
 			event.preventDefault();
@@ -464,8 +474,7 @@ function initFriseEditor() {
 
 		if (checkSubmitButton && checkUrl) {
 			checkSubmitButton.addEventListener('click', async () => {
-				const order = state.placed
-					.sort((a, b) => a.x - b.x)
+				const order = getPlacedSorted()
 					.map((item) => {
 						const match = item.id.match(/^v-(\d+)$/);
 						return match ? parseInt(match[1]) : 0;
@@ -733,11 +742,12 @@ document.addEventListener('turbo:load', initFriseEditor);
 		position: absolute;
 		top: 182px;
 		font-size: 0.9rem;
-		font-weight: 600;
-		color: #3d4c67;
+		font-weight: 700;
+		color: #2f2a22;
 		white-space: nowrap;
 		transform: translateX(-50%);
 		pointer-events: none;
+		text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
 	}
 
 	.frise-editor__canvas {
@@ -747,7 +757,7 @@ document.addEventListener('turbo:load', initFriseEditor);
 
 	.frise-editor__marker {
 		position: absolute;
-		top: 60px;
+		top: 28px;
 		transform: translateX(-50%);
 		width: 160px;
 		padding: 0.5rem;
@@ -763,6 +773,22 @@ document.addEventListener('turbo:load', initFriseEditor);
 		transition: box-shadow 200ms ease;
 	}
 
+	.frise-editor__marker-year {
+		position: absolute;
+		top: -0.6rem;
+		left: 0.55rem;
+		height: 1.35rem;
+		padding: 0 0.45rem;
+		border-radius: 0.45rem;
+		background: #8282ff;
+		color: #fff;
+		font-size: 0.74rem;
+		font-weight: 700;
+		display: inline-flex;
+		align-items: center;
+		box-shadow: 0 4px 10px rgba(36, 89, 224, 0.35);
+	}
+
 	.frise-editor__marker:hover {
 		box-shadow: 0 12px 32px rgba(33, 50, 84, 0.22);
 	}
@@ -776,7 +802,7 @@ document.addEventListener('turbo:load', initFriseEditor);
 
 	.frise-editor__marker span {
 		font-size: 0.75rem;
-		color: #3d4c67;
+		color: #2f2a22;
 		font-weight: 500;
 		white-space: normal;
 		word-break: break-word;
@@ -785,7 +811,7 @@ document.addEventListener('turbo:load', initFriseEditor);
 
 	.frise-editor__marker-remove {
 		position: absolute;
-		top: -2px;
+		top: -0.6rem;
 		right: -2px;
 		width: 1.5rem;
 		height: 1.5rem;
@@ -810,7 +836,7 @@ document.addEventListener('turbo:load', initFriseEditor);
 
 	.frise-editor__canvas-empty {
 		position: absolute;
-		top: 50%;
+		top: 68%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		color: #8a9aad;
@@ -818,6 +844,7 @@ document.addEventListener('turbo:load', initFriseEditor);
 		font-size: 1rem;
 		font-weight: 500;
 		white-space: nowrap;
+		pointer-events: none;
 	}
 
 	.frise-editor__hint {
@@ -877,6 +904,7 @@ document.addEventListener('turbo:load', initFriseEditor);
 
 		.frise-editor__marker {
 			width: 140px;
+			top: 32px;
 		}
 	}
 </style>

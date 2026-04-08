@@ -311,6 +311,9 @@ function initFriseConfiguratorInForm() {
 
         const image = card.dataset.vignetteImage || '';
         const label = card.dataset.vignetteLabel || 'Vignette';
+        const { start, end } = getYearBounds();
+        const range = Math.max(1, end - start);
+        const markerYear = Math.round(start + (clamp(placedItem.x, 0, 100) / 100) * range);
 
         const marker = document.createElement('article');
         marker.className = 'frise-form-marker';
@@ -318,6 +321,7 @@ function initFriseConfiguratorInForm() {
         marker.style.left = `${placedItem.x}%`;
 
         marker.innerHTML = `
+            <span class="frise-form-marker-year">${markerYear}</span>
             <button type="button" class="frise-form-marker-remove" title="Retirer">×</button>
             <img src="/${String(image).replace(/^public\//, '')}" alt="${label}">
             <span>${label}</span>
@@ -358,7 +362,7 @@ function initFriseConfiguratorInForm() {
         if (state.placed.length === 0) {
             const empty = document.createElement('p');
             empty.className = 'frise-form-canvas-empty';
-            empty.textContent = 'Glissez une image sur la frise.';
+            empty.textContent = 'Glissez une image depuis la galerie.';
             canvas.appendChild(empty);
             return;
         }
@@ -671,11 +675,10 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
 
 <style>
     .frise-form-panel {
-        border: 1px solid #d9e2f0;
-        border-radius: 1rem;
-        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+        border-radius: 1.25rem;
+        background: linear-gradient(135deg, #f8ecdb 0%, #f5e8d0 100%);
         padding: 1.15rem;
-        box-shadow: 0 12px 24px rgba(33, 50, 84, 0.08);
+        box-shadow: 0 6px 20px rgba(77, 92, 120, 0.12);
     }
 
     .frise-form-editor {
@@ -685,9 +688,9 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
 
     .frise-form-dropzone {
         min-height: 120px;
-        border: 1px dashed #b8c7df;
+        border: 2px dashed #c8b88f;
         border-radius: 0.95rem;
-        background: #f8fbff;
+        background: #fff7df;
         padding: 0.85rem;
         display: flex;
         flex-wrap: wrap;
@@ -707,9 +710,9 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
     .frise-form-axis--board {
         position: relative;
         min-height: 360px;
-        border: 1px dashed #b8c7df;
+        border: 2px solid #d6c79f;
         border-radius: 0.95rem;
-        background: #f8fbff;
+        background: linear-gradient(180deg, #fbf2d6 0%, #fbeee0 100%);
         padding: 1rem;
     }
 
@@ -735,7 +738,7 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
 
     .frise-form-canvas-empty {
         position: absolute;
-        top: 50%;
+        top: 68%;
         left: 50%;
         transform: translate(-50%, -50%);
         color: #8a9aad;
@@ -743,11 +746,12 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         font-size: 0.95rem;
         font-weight: 500;
         white-space: nowrap;
+        pointer-events: none;
     }
 
     .frise-form-marker {
         position: absolute;
-        top: 140px;
+        top: 32px;
         transform: translateX(-50%);
         width: 180px;
         border: 1px solid #d8e4f6;
@@ -762,6 +766,22 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         touch-action: none;
     }
 
+    .frise-form-marker-year {
+        position: absolute;
+        top: -0.6rem;
+        left: 0.55rem;
+        height: 1.35rem;
+        padding: 0 0.45rem;
+        border-radius: 0.45rem;
+        background: #2459e0;
+        color: #fff;
+        font-size: 0.74rem;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(36, 89, 224, 0.35);
+    }
+
     .frise-form-marker img {
         width: 100%;
         height: 88px;
@@ -774,14 +794,14 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         font-size: 0.8rem;
         margin: 0;
         line-height: 1.2;
-        color: #334461;
+        color: #2f2a22;
         white-space: normal;
         word-break: break-word;
     }
 
     .frise-form-marker-remove {
         position: absolute;
-        top: -0.45rem;
+        top: -0.6rem;
         right: -0.45rem;
         width: 1.45rem;
         height: 1.45rem;
@@ -798,9 +818,10 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
     }
 
     .frise-form-line {
-        height: 3px;
+        height: 10px;
         border-radius: 999px;
-        background: linear-gradient(90deg, #1f74db 0%, #24a46c 100%);
+        background: linear-gradient(90deg, #556b82 0%, #556b82 100%);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(85, 107, 130, 0.25);
     }
 
     .frise-form-axis {
@@ -818,19 +839,21 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         position: absolute;
         top: 0;
         width: 2px;
-        height: 10px;
+        height: 24px;
         background: #a8b5c8;
         transform: translateX(-50%);
     }
 
     .frise-form-year {
         position: absolute;
-        top: 12px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #3d4c67;
+        top: 24px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #2f2a22;
         white-space: nowrap;
         transform: translateX(-50%);
+        pointer-events: none;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     .frise-form-card {
@@ -863,7 +886,7 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         font-size: 0.8rem;
         margin: 0;
         line-height: 1.2;
-        color: #334461;
+        color: #2f2a22;
     }
 
     .frise-form-card__actions {
@@ -903,6 +926,10 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         .frise-form-card {
             width: 100%;
             max-width: 240px;
+        }
+
+        .frise-form-marker {
+            top: 38px;
         }
 
         .frise-form-dropzone--bank {
