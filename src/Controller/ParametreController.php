@@ -30,7 +30,7 @@ final class ParametreController extends AbstractController
 
         if ($timerForm->isSubmitted() && $timerForm->isValid()) {
             $entityManager->flush();
-            $this->addFlash('success', 'Le chronometre a ete mis a jour.');
+            $this->addFlash('success', 'Le chronomètre a été mis à jour.');
 
             return $this->redirectToRoute('app_parametre_index');
         }

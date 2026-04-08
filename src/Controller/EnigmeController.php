@@ -530,4 +530,12 @@ final class EnigmeController extends AbstractController
 
         return $this->redirectToRoute('app_enigme_frise', ['id' => $enigme->getId()]);
     }
+
+    #[Route('/{id}/code', name: 'app_enigme_code', methods: ['GET'])]
+    public function code(Enigme $enigme): Response
+    {
+        return $this->render('enigme/code.html.twig', [
+            'enigme' => $enigme,
+        ]);
+    }
 }
