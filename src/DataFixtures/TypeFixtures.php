@@ -12,6 +12,7 @@ class TypeFixtures extends Fixture
     public const TYPE_REPONSE_OUVERTE = 'type_reponse_ouverte';
     public const TYPE_QCM = 'type_qcm';
     public const TYPE_VRAI_FAUX = 'type_vrai_faux';
+    public const TYPE_FRISE = 'type_frise';
 
     public function load(ObjectManager $manager): void
     {
