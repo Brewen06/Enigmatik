@@ -49,6 +49,7 @@ security:
         # contrôle d'accès à la route jeu
          - { path: ^/jeu, roles: PUBLIC_ACCESS }
          - { path: ^/jeu/configuration, roles: ROLE_ADMIN }
+         - { path: ^/jeu/victoire, roles: PUBLIC_ACCESS }
         # contrôle d'accès aux routes enigme
          - { path: ^/enigme/creer, roles: [ROLE_PROF, ROLE_ADMIN] }
          - { path: ^/enigme/*/delete, roles: [ROLE_PROF, ROLE_ADMIN] }
