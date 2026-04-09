@@ -142,6 +142,10 @@ final class VignetteController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Vignette introuvable.'], Response::HTTP_NOT_FOUND);
         }
 
+        foreach (iterator_to_array($vignette->getEnigmes()) as $enigme) {
+            $enigme->setVignette(null);
+        }
+
         $imagePath = $vignette->getImage();
         if (is_string($imagePath)) {
             $absolutePath = $this->getParameter('kernel.project_dir') . '/' . $imagePath;

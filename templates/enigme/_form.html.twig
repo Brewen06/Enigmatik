@@ -242,6 +242,7 @@ function initFriseConfiguratorInForm() {
 
     let draggedCard = null;
     let draggingMarkerId = null;
+    let draggingPointerId = null;
     const state = { placed: [] };
 
     function cardsIn(container) {
@@ -332,7 +333,8 @@ function initFriseConfiguratorInForm() {
 
         marker.addEventListener('pointerdown', (event) => {
             draggingMarkerId = placedItem.id;
-            marker.setPointerCapture(event.pointerId);
+            draggingPointerId = event.pointerId;
+            event.preventDefault();
         });
 
         const removeButton = marker.querySelector('.frise-form-marker-remove');
@@ -552,8 +554,12 @@ function initFriseConfiguratorInForm() {
     });
     axis.addEventListener('drop', handleDropOnAxis);
 
-    axis.addEventListener('pointermove', (event) => {
+    document.addEventListener('pointermove', (event) => {
         if (!draggingMarkerId) {
+            return;
+        }
+
+        if (draggingPointerId !== null && event.pointerId !== draggingPointerId) {
             return;
         }
 
@@ -565,11 +571,13 @@ function initFriseConfiguratorInForm() {
         marker.x = percentFromPointer(event.clientX);
         render();
     });
-    axis.addEventListener('pointerup', () => {
+    document.addEventListener('pointerup', () => {
         draggingMarkerId = null;
+        draggingPointerId = null;
     });
-    axis.addEventListener('pointercancel', () => {
+    document.addEventListener('pointercancel', () => {
         draggingMarkerId = null;
+        draggingPointerId = null;
     });
 
     if (yearStartInput && yearStartInput.dataset.boundFriseRuler !== '1') {
@@ -783,6 +791,8 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         display: inline-flex;
         align-items: center;
         box-shadow: 0 4px 10px rgba(36, 89, 224, 0.35);
+        z-index: 1;
+        pointer-events: none;
     }
 
     .frise-form-marker img {
@@ -818,6 +828,7 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         place-items: center;
         cursor: pointer;
         box-shadow: 0 4px 12px rgba(215, 52, 70, 0.35);
+        z-index: 2;
     }
 
     .frise-form-line {
@@ -923,6 +934,7 @@ document.addEventListener('turbo:load', initFriseConfiguratorInForm);
         display: grid;
         place-items: center;
         box-shadow: 0 3px 10px rgba(35, 103, 216, 0.35);
+        z-index: 1;
     }
 
     @media (max-width: 992px) {
