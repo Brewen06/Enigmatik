@@ -13,7 +13,6 @@ class TypeFixtures extends Fixture
     public const TYPE_QCM = 'type_qcm';
     public const TYPE_VRAI_FAUX = 'type_vrai_faux';
     public const TYPE_FRISE = 'type_frise';
-    public const TYPE_CODE = 'type_code';
 
     public function load(ObjectManager $manager): void
     {
@@ -46,12 +45,6 @@ class TypeFixtures extends Fixture
         $type5->setImageUsage(Type::IMAGE_USAGE);
         $manager->persist($type5);
         $this->addReference(self::TYPE_FRISE, $type5);
-
-        $type6 = new Type();
-        $type6->setLibelle('code');
-        $type6->setImageUsage(Type::IMAGE_USAGE_NONE);
-        $manager->persist($type6);
-        $this->addReference('type_code', $type6);
 
         $manager->flush();
     }
